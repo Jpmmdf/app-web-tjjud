@@ -59,7 +59,28 @@ jobs:
             REPO_NAME="${GITHUB_REPOSITORY#*/}"
             SITE_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}/"
           fi
-          python -m mkdocs build --strict --site-dir site --site-url "${SITE_URL}"
+          export SITE_URL
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          source = Path("mkdocs.yml").read_text(encoding="utf-8").splitlines()
+          generated = []
+          replaced = False
+
+          for line in source:
+              if line.startswith("site_url:"):
+                  generated.append(f"site_url: {os.environ['SITE_URL']}")
+                  replaced = True
+              else:
+                  generated.append(line)
+
+          if not replaced:
+              generated.insert(2, f"site_url: {os.environ['SITE_URL']}")
+
+          Path("mkdocs.generated.yml").write_text("\n".join(generated) + "\n", encoding="utf-8")
+          PY
+          python -m mkdocs build --strict --site-dir site --config-file mkdocs.generated.yml
 
       - name: Publicar artefato do Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
