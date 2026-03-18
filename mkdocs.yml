@@ -1,0 +1,26 @@
+site_name: TJJUD Cloud Native Docs
+site_description: Documentacao cloud-native do catalogo editorial TJJUD
+site_url: http://localhost:8000
+repo_name: app-web-tjjud
+
+theme:
+  name: readthedocs
+  highlightjs: true
+
+nav:
+  - Visao Geral: index.md
+  - Arquitetura:
+      - Panorama: architecture/index.md
+      - C4 e Structurizr: architecture/c4.md
+      - Decisoes: architecture/decisions.md
+  - API: api.md
+  - Dados: data.md
+  - Operacao: operations.md
+  - Onboarding: onboarding.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true

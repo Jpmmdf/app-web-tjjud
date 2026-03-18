@@ -1,0 +1,82 @@
+<div class="app-surface">
+  <div class="shell">
+    <header class="hero">
+      <div class="hero__copy">
+        <p class="eyebrow">{{ appTexts.eyebrow }}</p>
+        <h1>{{ appTexts.title }}</h1>
+        <p class="hero__lead">{{ appTexts.lead }}</p>
+      </div>
+
+      <div class="hero__actions">
+        @for (section of sections; track section.id) {
+          <button type="button" class="chip-button" (click)="jumpTo(section.id)">
+            {{ section.label }}
+          </button>
+        }
+
+        <a class="chip-button chip-button--link" href="/swagger-ui/index.html" target="_blank" rel="noopener">
+          {{ appTexts.links.swagger }}
+        </a>
+
+        <a class="chip-button chip-button--link" href="/api-docs" target="_blank" rel="noopener">
+          {{ appTexts.links.openApi }}
+        </a>
+      </div>
+
+      <div class="stat-grid">
+        <article class="stat-card">
+          <span class="stat-card__label">{{ appTexts.stats.authors }}</span>
+          <strong>{{ catalog.authorCount() }}</strong>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-card__label">{{ appTexts.stats.subjects }}</span>
+          <strong>{{ catalog.subjectCount() }}</strong>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-card__label">{{ appTexts.stats.books }}</span>
+          <strong>{{ catalog.bookCount() }}</strong>
+        </article>
+
+        <article class="stat-card stat-card--accent">
+          <span class="stat-card__label">{{ appTexts.stats.grossValue }}</span>
+          <strong>{{ catalog.formattedCatalogGrossValue() }}</strong>
+        </article>
+      </div>
+    </header>
+
+    @if (catalog.flash(); as flashMessage) {
+      <section
+        class="flash"
+        [class.flash--error]="flashMessage.kind === 'error'"
+        [class.flash--success]="flashMessage.kind === 'success'"
+        role="alert"
+      >
+        <div>
+          <strong>{{ flashMessage.title }}</strong>
+          <p>{{ flashMessage.detail }}</p>
+        </div>
+
+        <button type="button" class="flash__close" (click)="catalog.clearFlash()" [attr.aria-label]="commonTexts.closeNotification">
+          ×
+        </button>
+      </section>
+    }
+
+    @if (catalog.loading()) {
+      <section class="panel panel--loading">
+        <p class="eyebrow">{{ appTexts.loading.eyebrow }}</p>
+        <h2>{{ appTexts.loading.title }}</h2>
+        <p>{{ appTexts.loading.detail }}</p>
+      </section>
+    } @else {
+      <main class="workspace">
+        <app-author-panel></app-author-panel>
+        <app-subject-panel></app-subject-panel>
+        <app-book-panel></app-book-panel>
+        <app-report-panel></app-report-panel>
+      </main>
+    }
+  </div>
+</div>

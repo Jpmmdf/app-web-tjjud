@@ -1,0 +1,685 @@
+openapi: 3.1.0
+info:
+  title: TJJUD Book Catalog API
+  version: 1.0.0
+  description: >
+    API-first contract for managing books, authors, subjects and the report
+    grouped by author.
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+tags:
+  - name: Authors
+  - name: Subjects
+  - name: Books
+  - name: Reports
+paths:
+  /api/v1/authors:
+    get:
+      tags: [Authors]
+      summary: List authors
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 40
+      responses:
+        '200':
+          description: Authors page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorPageResponse'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      tags: [Authors]
+      summary: Create author
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorUpsertRequest'
+      responses:
+        '201':
+          description: Author created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        '422':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+
+  /api/v1/authors/{authorId}:
+    parameters:
+      - $ref: '#/components/parameters/AuthorId'
+    get:
+      tags: [Authors]
+      summary: Get author by id
+      responses:
+        '200':
+          description: Author found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        '404':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      tags: [Authors]
+      summary: Update author
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorUpsertRequest'
+      responses:
+        '200':
+          description: Author updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        '404':
+          $ref: '#/components/responses/Problem'
+        '422':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      tags: [Authors]
+      summary: Delete author
+      responses:
+        '204':
+          description: Author deleted
+        '404':
+          $ref: '#/components/responses/Problem'
+        '409':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+
+  /api/v1/subjects:
+    get:
+      tags: [Subjects]
+      summary: List subjects
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 20
+      responses:
+        '200':
+          description: Subjects page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectPageResponse'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      tags: [Subjects]
+      summary: Create subject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectUpsertRequest'
+      responses:
+        '201':
+          description: Subject created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectResponse'
+        '422':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+
+  /api/v1/subjects/{subjectId}:
+    parameters:
+      - $ref: '#/components/parameters/SubjectId'
+    get:
+      tags: [Subjects]
+      summary: Get subject by id
+      responses:
+        '200':
+          description: Subject found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectResponse'
+        '404':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      tags: [Subjects]
+      summary: Update subject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectUpsertRequest'
+      responses:
+        '200':
+          description: Subject updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectResponse'
+        '404':
+          $ref: '#/components/responses/Problem'
+        '422':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      tags: [Subjects]
+      summary: Delete subject
+      responses:
+        '204':
+          description: Subject deleted
+        '404':
+          $ref: '#/components/responses/Problem'
+        '409':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+
+  /api/v1/books:
+    get:
+      tags: [Books]
+      summary: List books
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: title
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 40
+        - name: authorId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: subjectId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Books page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookPageResponse'
+        default:
+          $ref: '#/components/responses/Problem'
+    post:
+      tags: [Books]
+      summary: Create book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookUpsertRequest'
+      responses:
+        '201':
+          description: Book created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+        '404':
+          $ref: '#/components/responses/Problem'
+        '422':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+
+  /api/v1/books/{bookId}:
+    parameters:
+      - $ref: '#/components/parameters/BookId'
+    get:
+      tags: [Books]
+      summary: Get book by id
+      responses:
+        '200':
+          description: Book found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+        '404':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+    put:
+      tags: [Books]
+      summary: Update book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookUpsertRequest'
+      responses:
+        '200':
+          description: Book updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+        '404':
+          $ref: '#/components/responses/Problem'
+        '422':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+    delete:
+      tags: [Books]
+      summary: Delete book
+      responses:
+        '204':
+          description: Book deleted
+        '404':
+          $ref: '#/components/responses/Problem'
+        '409':
+          $ref: '#/components/responses/Problem'
+        default:
+          $ref: '#/components/responses/Problem'
+
+  /api/v1/reports/books-by-author:
+    get:
+      tags: [Reports]
+      summary: Get report data grouped by author
+      parameters:
+        - name: authorId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Report data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorBookReportResponse'
+        default:
+          $ref: '#/components/responses/Problem'
+
+  /api/v1/reports/books-by-author/export:
+    get:
+      tags: [Reports]
+      summary: Export report grouped by author as PDF
+      parameters:
+        - name: authorId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: PDF report
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        default:
+          $ref: '#/components/responses/Problem'
+
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    AuthorId:
+      name: authorId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    SubjectId:
+      name: subjectId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    BookId:
+      name: bookId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+  responses:
+    Problem:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemResponse'
+
+  schemas:
+    PaginationMetadata:
+      type: object
+      required: [page, size, totalElements, totalPages]
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+
+    AuthorUpsertRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 40
+          example: Machado de Assis
+
+    AuthorResponse:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+
+    AuthorPageResponse:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthorResponse'
+        page:
+          $ref: '#/components/schemas/PaginationMetadata'
+
+    SubjectUpsertRequest:
+      type: object
+      required: [description]
+      properties:
+        description:
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: Romance
+
+    SubjectResponse:
+      type: object
+      required: [id, description]
+      properties:
+        id:
+          type: integer
+          format: int64
+        description:
+          type: string
+
+    SubjectPageResponse:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubjectResponse'
+        page:
+          $ref: '#/components/schemas/PaginationMetadata'
+
+    AuthorSummary:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+
+    SubjectSummary:
+      type: object
+      required: [id, description]
+      properties:
+        id:
+          type: integer
+          format: int64
+        description:
+          type: string
+
+    BookUpsertRequest:
+      type: object
+      required:
+        - title
+        - publisher
+        - edition
+        - publicationYear
+        - price
+        - authorIds
+        - subjectIds
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 40
+          example: Dom Casmurro
+        publisher:
+          type: string
+          minLength: 1
+          maxLength: 40
+          example: Editora Exemplo
+        edition:
+          type: integer
+          minimum: 1
+          example: 1
+        publicationYear:
+          type: integer
+          minimum: 1000
+          maximum: 9999
+          example: 1899
+        price:
+          type: string
+          pattern: '^\d{1,10}\.\d{2}$'
+          example: '129.90'
+        authorIds:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: integer
+            format: int64
+        subjectIds:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: integer
+            format: int64
+
+    BookResponse:
+      type: object
+      required:
+        - id
+        - title
+        - publisher
+        - edition
+        - publicationYear
+        - price
+        - authors
+        - subjects
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        publisher:
+          type: string
+        edition:
+          type: integer
+        publicationYear:
+          type: integer
+        price:
+          type: string
+          pattern: '^\d{1,10}\.\d{2}$'
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthorSummary'
+        subjects:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubjectSummary'
+
+    BookPageResponse:
+      type: object
+      required: [items, page]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookResponse'
+        page:
+          $ref: '#/components/schemas/PaginationMetadata'
+
+    ReportBookItem:
+      type: object
+      required:
+        - bookId
+        - title
+        - publisher
+        - edition
+        - publicationYear
+        - price
+        - subjects
+      properties:
+        bookId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        publisher:
+          type: string
+        edition:
+          type: integer
+        publicationYear:
+          type: integer
+        price:
+          type: string
+          pattern: '^\d{1,10}\.\d{2}$'
+        subjects:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubjectSummary'
+
+    ReportAuthorGroup:
+      type: object
+      required: [authorId, authorName, books]
+      properties:
+        authorId:
+          type: integer
+          format: int64
+        authorName:
+          type: string
+        books:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportBookItem'
+
+    AuthorBookReportResponse:
+      type: object
+      required: [generatedAt, authors]
+      properties:
+        generatedAt:
+          type: string
+          format: date-time
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportAuthorGroup'
+
+    ValidationError:
+      type: object
+      required: [field, message]
+      properties:
+        field:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+
+    ProblemResponse:
+      type: object
+      required: [title, status]
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'

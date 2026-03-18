@@ -1,0 +1,66 @@
+<section id="reports" class="panel">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">{{ texts.eyebrow }}</p>
+      <h2>{{ texts.title }}</h2>
+    </div>
+
+    <div class="toolbar toolbar--wide">
+      <select [formControl]="reportFilterControl" [attr.aria-label]="texts.filterAriaLabel">
+        <option [ngValue]="null">{{ commonTexts.allAuthors }}</option>
+        @for (author of catalog.authors(); track author.id) {
+          <option [ngValue]="author.id">{{ author.name }}</option>
+        }
+      </select>
+
+      <button type="button" (click)="loadReport()">{{ commonTexts.update }}</button>
+      <button type="button" class="button button--ghost" (click)="resetReportFilter()">{{ texts.clearFilter }}</button>
+      <button type="button" class="button button--primary" (click)="downloadReport()" [disabled]="catalog.isBusy()">
+        {{ texts.exportPdf }}
+      </button>
+    </div>
+  </div>
+
+  <div class="report-summary">
+    <article class="stat-card">
+      <span class="stat-card__label">{{ texts.summary.authors }}</span>
+      <strong>{{ catalog.reportGroupCount() }}</strong>
+    </article>
+
+    <article class="stat-card stat-card--accent">
+      <span class="stat-card__label">{{ texts.summary.generatedAt }}</span>
+      <strong>{{ formatTimestamp(catalog.report()?.generatedAt) }}</strong>
+    </article>
+  </div>
+
+  @if (catalog.report()?.authors?.length) {
+    <div class="report-grid">
+      @for (group of catalog.report()!.authors; track group.authorId) {
+        <article class="report-card">
+          <header class="report-card__header">
+            <div>
+              <p class="book-card__meta">{{ texts.card.authorIdentifier(group.authorId) }}</p>
+              <h3>{{ group.authorName }}</h3>
+            </div>
+            <strong>{{ commonTexts.booksCount(group.books.length) }}</strong>
+          </header>
+
+          <ul class="report-card__list">
+            @for (book of group.books; track book.bookId) {
+              <li>
+                <div>
+                  <strong>{{ book.title }}</strong>
+                  <p>{{ book.publisher }} • {{ book.publicationYear }} • {{ book.price }}</p>
+                </div>
+
+                <small>{{ reportSubjects(book.subjects) }}</small>
+              </li>
+            }
+          </ul>
+        </article>
+      }
+    </div>
+  } @else {
+    <p class="empty-state">{{ texts.emptyState }}</p>
+  }
+</section>
