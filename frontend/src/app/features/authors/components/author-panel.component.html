@@ -1,0 +1,67 @@
+<section id="authors" class="panel">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">{{ texts.eyebrow }}</p>
+      <h2>{{ texts.title }}</h2>
+    </div>
+
+    <form class="toolbar" (ngSubmit)="loadAuthors()">
+      <input
+        type="search"
+        [formControl]="authorSearchControl"
+        [placeholder]="texts.searchPlaceholder"
+        [attr.aria-label]="texts.searchAriaLabel"
+      />
+      <button type="submit">{{ commonTexts.filter }}</button>
+    </form>
+  </div>
+
+  <div class="panel__content panel__content--split">
+    <form class="card-form" [formGroup]="authorForm" (ngSubmit)="submitAuthor()" novalidate>
+      <div class="card-form__header">
+        <h3>{{ texts.formTitle(editingAuthorId() !== null) }}</h3>
+        <button type="button" class="button button--ghost" (click)="resetAuthorForm()">{{ commonTexts.clear }}</button>
+      </div>
+
+      <label class="field">
+        <span>{{ texts.fieldLabel }}</span>
+        <input type="text" formControlName="name" maxlength="40" [placeholder]="texts.fieldPlaceholder" />
+      </label>
+
+      @if (authorForm.controls.name.touched && authorForm.controls.name.invalid) {
+        <p class="field-error">{{ texts.fieldError }}</p>
+      }
+
+      <button type="submit" class="button button--primary" [disabled]="authorForm.invalid || catalog.isBusy()">
+        {{ texts.submitLabel(editingAuthorId() !== null) }}
+      </button>
+    </form>
+
+    <div class="list-shell">
+      <div class="list-shell__header">
+        <h3>{{ texts.listTitle }}</h3>
+        <span>{{ commonTexts.records(catalog.authors().length) }}</span>
+      </div>
+
+      @if (catalog.authors().length > 0) {
+        <ul class="entity-list">
+          @for (author of catalog.authors(); track author.id) {
+            <li class="entity-list__item">
+              <div>
+                <strong>{{ author.name }}</strong>
+                <small>{{ commonTexts.identifier(author.id) }}</small>
+              </div>
+
+              <div class="entity-list__actions">
+                <button type="button" class="button button--ghost" (click)="editAuthor(author)">{{ commonTexts.edit }}</button>
+                <button type="button" class="button button--danger" (click)="deleteAuthor(author)">{{ commonTexts.delete }}</button>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="empty-state">{{ texts.emptyState }}</p>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,11 @@
+package br.com.tjjud.catalog.authors.infra.persistence;
+
+import br.com.tjjud.catalog.authors.domain.Author;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AuthorRepository extends JpaRepository<Author, Long> {
+
+    Page<Author> findByNameContainingIgnoreCase(String name, Pageable pageable);
+}

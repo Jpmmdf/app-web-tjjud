@@ -1,0 +1,160 @@
+<section id="books" class="panel">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">{{ texts.eyebrow }}</p>
+      <h2>{{ texts.title }}</h2>
+    </div>
+
+    <form class="toolbar toolbar--wide" [formGroup]="bookFiltersForm" (ngSubmit)="loadBooks()">
+      <input
+        type="search"
+        formControlName="title"
+        [placeholder]="texts.filters.titlePlaceholder"
+        [attr.aria-label]="texts.filters.titleAriaLabel"
+      />
+
+      <select formControlName="authorId" [attr.aria-label]="texts.filters.authorAriaLabel">
+        <option [ngValue]="null">{{ commonTexts.allAuthors }}</option>
+        @for (author of catalog.authors(); track author.id) {
+          <option [ngValue]="author.id">{{ author.name }}</option>
+        }
+      </select>
+
+      <select formControlName="subjectId" [attr.aria-label]="texts.filters.subjectAriaLabel">
+        <option [ngValue]="null">{{ commonTexts.allSubjects }}</option>
+        @for (subject of catalog.subjects(); track subject.id) {
+          <option [ngValue]="subject.id">{{ subject.description }}</option>
+        }
+      </select>
+
+      <button type="submit">{{ commonTexts.apply }}</button>
+      <button type="button" class="button button--ghost" (click)="resetBookFilters()">{{ commonTexts.reset }}</button>
+    </form>
+  </div>
+
+  <div class="panel__content panel__content--split">
+    <form class="card-form" [formGroup]="bookForm" (ngSubmit)="submitBook()" novalidate>
+      <div class="card-form__header">
+        <h3>{{ texts.formTitle(editingBookId() !== null) }}</h3>
+        <button type="button" class="button button--ghost" (click)="resetBookForm()">{{ commonTexts.clear }}</button>
+      </div>
+
+      <div class="field-grid">
+        <label class="field field--span-2">
+          <span>{{ texts.fields.title }}</span>
+          <input type="text" formControlName="title" maxlength="40" [placeholder]="texts.fields.titlePlaceholder" />
+        </label>
+
+        <label class="field field--span-2">
+          <span>{{ texts.fields.publisher }}</span>
+          <input type="text" formControlName="publisher" maxlength="40" [placeholder]="texts.fields.publisherPlaceholder" />
+        </label>
+
+        <label class="field">
+          <span>{{ texts.fields.edition }}</span>
+          <input type="number" formControlName="edition" min="1" />
+        </label>
+
+        <label class="field">
+          <span>{{ texts.fields.publicationYear }}</span>
+          <input type="number" formControlName="publicationYear" min="1000" max="9999" />
+        </label>
+
+        <label class="field field--span-2">
+          <span>{{ texts.fields.price }}</span>
+          <input
+            type="text"
+            inputmode="numeric"
+            appBrlCurrencyMask
+            formControlName="price"
+            [placeholder]="texts.fields.pricePlaceholder"
+          />
+        </label>
+
+        <label class="field field--span-2">
+          <span>{{ texts.fields.authors }}</span>
+          <select formControlName="authorIds" multiple size="5" [attr.aria-label]="texts.fields.authorsAriaLabel">
+            @for (author of catalog.authors(); track author.id) {
+              <option [ngValue]="author.id">{{ author.name }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="field field--span-2">
+          <span>{{ texts.fields.subjects }}</span>
+          <select formControlName="subjectIds" multiple size="5" [attr.aria-label]="texts.fields.subjectsAriaLabel">
+            @for (subject of catalog.subjects(); track subject.id) {
+              <option [ngValue]="subject.id">{{ subject.description }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (bookForm.invalid && (bookForm.touched || bookForm.dirty)) {
+        <p class="field-error">{{ texts.formError }}</p>
+      }
+
+      <button type="submit" class="button button--primary" [disabled]="bookForm.invalid || catalog.isBusy()">
+        {{ texts.submitLabel(editingBookId() !== null) }}
+      </button>
+    </form>
+
+    <div class="list-shell">
+      <div class="list-shell__header">
+        <h3>{{ texts.listTitle }}</h3>
+        <span>{{ commonTexts.booksCount(catalog.books().length) }}</span>
+      </div>
+
+      @if (catalog.books().length > 0) {
+        <div class="book-grid">
+          @for (book of catalog.books(); track book.id) {
+            <article class="book-card">
+              <div class="book-card__header">
+                <div>
+                  <p class="book-card__meta">{{ texts.card.bookIdentifier(book.id) }}</p>
+                  <h4>{{ book.title }}</h4>
+                </div>
+
+                <strong>{{ book.price }}</strong>
+              </div>
+
+              <dl class="book-card__details">
+                <div>
+                  <dt>{{ texts.card.publisher }}</dt>
+                  <dd>{{ book.publisher }}</dd>
+                </div>
+
+                <div>
+                  <dt>{{ texts.card.edition }}</dt>
+                  <dd>{{ book.edition }}</dd>
+                </div>
+
+                <div>
+                  <dt>{{ texts.card.year }}</dt>
+                  <dd>{{ book.publicationYear }}</dd>
+                </div>
+
+                <div>
+                  <dt>{{ texts.card.authors }}</dt>
+                  <dd>{{ bookAuthors(book) }}</dd>
+                </div>
+
+                <div>
+                  <dt>{{ texts.card.subjects }}</dt>
+                  <dd>{{ bookSubjects(book) }}</dd>
+                </div>
+              </dl>
+
+              <div class="entity-list__actions">
+                <button type="button" class="button button--ghost" (click)="editBook(book)">{{ commonTexts.edit }}</button>
+                <button type="button" class="button button--danger" (click)="deleteBook(book)">{{ commonTexts.delete }}</button>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <p class="empty-state">{{ texts.emptyState }}</p>
+      }
+    </div>
+  </div>
+</section>

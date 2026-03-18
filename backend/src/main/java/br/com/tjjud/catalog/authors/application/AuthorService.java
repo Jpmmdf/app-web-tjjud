@@ -1,0 +1,86 @@
+package br.com.tjjud.catalog.authors.application;
+
+import br.com.tjjud.catalog.authors.api.AuthorResponse;
+import br.com.tjjud.catalog.authors.api.AuthorUpsertRequest;
+import br.com.tjjud.catalog.authors.domain.Author;
+import br.com.tjjud.catalog.authors.infra.persistence.AuthorRepository;
+import br.com.tjjud.catalog.shared.api.PageResponse;
+import br.com.tjjud.catalog.shared.exception.BusinessValidationException;
+import br.com.tjjud.catalog.shared.exception.ConflictException;
+import br.com.tjjud.catalog.shared.exception.ResourceNotFoundException;
+import io.micrometer.observation.annotation.Observed;
+import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+@Service
+@Observed(name = "catalog.authors", contextualName = "catalog-authors-service")
+public class AuthorService {
+
+    private final AuthorRepository authorRepository;
+
+    public AuthorService(AuthorRepository authorRepository) {
+        this.authorRepository = authorRepository;
+    }
+
+    public PageResponse<AuthorResponse> list(String query, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("name").ascending().and(Sort.by("id").ascending()));
+        String sanitized = sanitize(query);
+        Page<Author> results = sanitized == null
+                ? authorRepository.findAll(pageRequest)
+                : authorRepository.findByNameContainingIgnoreCase(sanitized, pageRequest);
+        return PageResponse.from(results.map(AuthorResponse::from));
+    }
+
+    public AuthorResponse get(Long authorId) {
+        return AuthorResponse.from(findEntity(authorId));
+    }
+
+    @Transactional
+    public AuthorResponse create(AuthorUpsertRequest request) {
+        Author author = new Author(sanitizeRequired(request.name()));
+        return AuthorResponse.from(authorRepository.save(author));
+    }
+
+    @Transactional
+    public AuthorResponse update(Long authorId, AuthorUpsertRequest request) {
+        Author author = findEntity(authorId);
+        author.changeName(sanitizeRequired(request.name()));
+        return AuthorResponse.from(authorRepository.save(author));
+    }
+
+    @Transactional
+    public void delete(Long authorId) {
+        Author author = findEntity(authorId);
+        try {
+            authorRepository.delete(author);
+            authorRepository.flush();
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException("error.autor.exclusao.vinculado");
+        }
+    }
+
+    private Author findEntity(Long authorId) {
+        return authorRepository.findById(authorId)
+                .orElseThrow(() -> new ResourceNotFoundException("resource.autor", authorId));
+    }
+
+    private String sanitize(String value) {
+        if (value == null) {
+            return null;
+        }
+        String sanitized = value.trim();
+        return sanitized.isEmpty() ? null : sanitized;
+    }
+
+    private String sanitizeRequired(String value) {
+        String sanitized = sanitize(value);
+        if (sanitized == null) {
+            throw new BusinessValidationException("INVALID_TEXT_FIELD", "error.autor.nome.vazio");
+        }
+        return sanitized;
+    }
+}

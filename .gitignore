@@ -1,0 +1,5 @@
+site/
+.venv/
+frontend/.angular/
+frontend/dist/
+docs/assets/structurizr/
