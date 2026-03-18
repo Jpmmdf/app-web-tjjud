@@ -1,0 +1,50 @@
+name: Dependabot Auto Approve
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  auto-approve:
+    name: Aprovar PR do Dependabot
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aprovar PR automaticamente
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = context.payload.pull_request.number;
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              owner,
+              repo,
+              pull_number,
+              per_page: 100
+            });
+
+            const alreadyApproved = reviews.some((review) => {
+              return review.user?.login === "github-actions[bot]" && review.state === "APPROVED";
+            });
+
+            if (alreadyApproved) {
+              core.info("A PR ja foi aprovada automaticamente.");
+              return;
+            }
+
+            await github.rest.pulls.createReview({
+              owner,
+              repo,
+              pull_number,
+              event: "APPROVE",
+              body: "Aprovacao automatica para atualizacao gerada pelo Dependabot. A CI continua sendo obrigatoria."
+            });
