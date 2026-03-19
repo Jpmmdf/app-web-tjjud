@@ -7,17 +7,6 @@
     </div>
 
     <div class="list-actions">
-      <form class="toolbar" (ngSubmit)="loadSubjects()">
-        <input
-          class="form-control"
-          type="search"
-          [formControl]="subjectSearchControl"
-          [placeholder]="texts.searchPlaceholder"
-          [attr.aria-label]="texts.searchAriaLabel"
-        />
-        <button type="submit" class="btn btn-primary">{{ commonTexts.filter }}</button>
-      </form>
-
       <a class="btn btn-outline-secondary" routerLink="/assuntos/novo">{{ commonTexts.create }}</a>
     </div>
   </div>
@@ -28,18 +17,23 @@
       <span class="badge rounded-pill text-bg-light">{{ commonTexts.records(catalog.subjects().length) }}</span>
     </div>
 
+    <form class="toolbar list-toolbar" (ngSubmit)="loadSubjects()">
+      <input
+        class="form-control"
+        type="search"
+        [formControl]="subjectSearchControl"
+        [placeholder]="texts.searchPlaceholder"
+        [attr.aria-label]="texts.searchAriaLabel"
+      />
+      <button type="submit" class="btn btn-primary">{{ commonTexts.filter }}</button>
+    </form>
+
     @if (catalog.subjects().length > 0) {
       <div class="br-table table-responsive">
         <table>
           <caption>{{ texts.listTitle }}</caption>
           <thead>
             <tr>
-              <th scope="col">
-                <button type="button" class="table-sort" (click)="sortBy('id')">
-                  <span>Identificador</span>
-                  <span class="table-sort__icon">{{ sortIndicator('id') }}</span>
-                </button>
-              </th>
               <th scope="col">
                 <button type="button" class="table-sort" (click)="sortBy('description')">
                   <span>Descrição</span>
@@ -52,7 +46,6 @@
           <tbody>
             @for (subject of catalog.subjects(); track subject.id) {
               <tr>
-                <td data-th="Identificador">{{ commonTexts.identifier(subject.id) }}</td>
                 <td data-th="Descrição">
                   <strong>{{ subject.description }}</strong>
                 </td>

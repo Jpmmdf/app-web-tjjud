@@ -1,11 +1,21 @@
 <section id="reports" class="panel panel--govbr card border-0">
-  <div class="panel__header d-flex flex-column flex-xl-row justify-content-between align-items-xl-start">
+  <div class="panel__header">
     <div>
       <p class="eyebrow">{{ texts.eyebrow }}</p>
       <h2>{{ texts.title }}</h2>
+      <p class="text-muted mb-0">{{ texts.detail }}</p>
+    </div>
+  </div>
+
+  <section class="report-toolbar">
+    <div class="report-toolbar__header">
+      <div>
+        <h3>{{ texts.filterSectionTitle }}</h3>
+        <p>{{ texts.filterSectionDetail }}</p>
+      </div>
     </div>
 
-    <div class="toolbar toolbar--wide">
+    <div class="toolbar toolbar--wide report-toolbar__controls">
       <select class="form-select" [formControl]="reportFilterControl" [attr.aria-label]="texts.filterAriaLabel">
         <option [ngValue]="null">{{ commonTexts.allAuthors }}</option>
         @for (author of catalog.authorOptions(); track author.id) {
@@ -26,12 +36,22 @@
         {{ texts.exportPdf }}
       </button>
     </div>
-  </div>
+  </section>
 
   <div class="report-summary">
     <article class="stat-card stat-card--gov card border-0 h-100">
       <span class="stat-card__label">{{ texts.summary.authors }}</span>
       <strong>{{ catalog.reportGroupCount() }}</strong>
+    </article>
+
+    <article class="stat-card stat-card--gov card border-0 h-100">
+      <span class="stat-card__label">{{ texts.summary.books }}</span>
+      <strong>{{ visibleBookCount() }}</strong>
+    </article>
+
+    <article class="stat-card stat-card--gov card border-0 h-100">
+      <span class="stat-card__label">{{ texts.summary.scope }}</span>
+      <strong>{{ activeAuthorLabel() }}</strong>
     </article>
 
     <article class="stat-card stat-card--accent stat-card--gov card border-0 h-100">
@@ -41,32 +61,58 @@
   </div>
 
   @if (catalog.report()?.items?.length) {
-    <div class="report-grid">
+    <section class="report-results">
+      <div class="report-results__header">
+        <div>
+          <h3>{{ texts.results.title }}</h3>
+          <p>{{ texts.results.detail(catalog.report()!.items.length, visibleBookCount()) }}</p>
+        </div>
+      </div>
+
+      <div class="report-grid">
       @for (group of catalog.report()!.items; track group.authorId) {
         <article class="report-card card border-0 shadow-sm h-100">
           <header class="report-card__header">
-            <div>
-              <p class="book-card__meta">{{ texts.card.authorIdentifier(group.authorId) }}</p>
+            <div class="report-card__identity">
               <h3>{{ group.authorName }}</h3>
+              <p>{{ texts.card.booksLabel }}</p>
             </div>
             <strong class="badge rounded-pill text-bg-light align-self-start">{{ commonTexts.booksCount(group.books.length) }}</strong>
           </header>
 
           <ul class="report-card__list">
             @for (book of group.books; track book.bookId) {
-              <li>
-                <div>
-                  <strong>{{ book.title }}</strong>
-                  <p>{{ book.publisher }} • {{ book.publicationYear }} • {{ reportPrice(book.price) }}</p>
+              <li class="report-book">
+                <div class="report-book__main">
+                  <div class="report-book__headline">
+                    <strong>{{ book.title }}</strong>
+                    <span class="report-book__price">{{ reportPrice(book.price) }}</span>
+                  </div>
+
+                  <div class="report-book__meta">
+                    @for (meta of bookMeta(book); track meta) {
+                      <span>{{ meta }}</span>
+                    }
+                  </div>
                 </div>
 
-                <small>{{ reportSubjects(book.subjects) }}</small>
+                <div class="report-book__subjects">
+                  <span class="report-book__subjects-label">{{ texts.card.subjectsLabel }}</span>
+                  <div class="report-book__subjects-list">
+                    @for (subject of book.subjects; track subject.id) {
+                      <span class="report-tag">{{ subject.description }}</span>
+                    } @empty {
+                      <span class="report-tag report-tag--muted">{{ texts.card.noSubjects }}</span>
+                    }
+                  </div>
+                </div>
               </li>
             }
           </ul>
         </article>
       }
-    </div>
+      </div>
+    </section>
     <div class="list-pagination">
       <span>{{ commonTexts.pageLabel(catalog.reportPage().page, catalog.reportPage().totalPages) }}</span>
       <span>{{ commonTexts.totalRecords(catalog.reportPage().totalElements) }}</span>

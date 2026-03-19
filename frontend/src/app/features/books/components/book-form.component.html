@@ -42,23 +42,129 @@
         />
       </label>
 
-      <label class="field field--span-2">
-        <span class="form-label mb-0">{{ texts.fields.authors }}</span>
-        <select class="form-select" formControlName="authorIds" multiple size="5" [attr.aria-label]="texts.fields.authorsAriaLabel">
-          @for (author of catalog.authorOptions(); track author.id) {
-            <option [ngValue]="author.id">{{ author.name }}</option>
-          }
-        </select>
-      </label>
+      <div class="field field--span-2">
+        <div class="selection-field" [class.selection-field--invalid]="hasSelectionError('authorIds')">
+          <div class="selection-field__header">
+            <span class="form-label mb-0">{{ texts.fields.authors }}</span>
+            <span class="selection-field__count">{{ texts.fields.authorsSelected(selectedAuthors().length) }}</span>
+          </div>
 
-      <label class="field field--span-2">
-        <span class="form-label mb-0">{{ texts.fields.subjects }}</span>
-        <select class="form-select" formControlName="subjectIds" multiple size="5" [attr.aria-label]="texts.fields.subjectsAriaLabel">
-          @for (subject of catalog.subjectOptions(); track subject.id) {
-            <option [ngValue]="subject.id">{{ subject.description }}</option>
+          <p class="selection-field__hint">{{ texts.fields.authorsHint }}</p>
+
+          <input
+            #authorSearchInput
+            class="form-control selection-field__search"
+            type="search"
+            [value]="authorSearch()"
+            [placeholder]="texts.fields.authorsSearchPlaceholder"
+            [attr.aria-label]="texts.fields.authorsSearchAriaLabel"
+            (input)="setAuthorSearch(authorSearchInput.value)"
+          />
+
+          @if (selectedAuthors().length > 0) {
+            <div class="selection-chips">
+              @for (author of selectedAuthors(); track author.id) {
+                <button
+                  type="button"
+                  class="selection-chip"
+                  [attr.aria-label]="texts.fields.removeAuthorAriaLabel(author.name)"
+                  (click)="removeAuthor(author.id)"
+                >
+                  <span>{{ author.name }}</span>
+                  <span aria-hidden="true">x</span>
+                </button>
+              }
+            </div>
           }
-        </select>
-      </label>
+
+          <div class="selection-options">
+            @for (author of filteredAuthors(); track author.id) {
+              <label class="selection-card" [class.selection-card--selected]="isAuthorSelected(author.id)">
+                <input
+                  #authorToggle
+                  class="selection-card__input"
+                  type="checkbox"
+                  [checked]="isAuthorSelected(author.id)"
+                  [attr.aria-label]="texts.fields.authorsAriaLabel"
+                  (change)="toggleAuthor(author.id, authorToggle.checked)"
+                />
+                <span class="selection-card__body">
+                  <strong>{{ author.name }}</strong>
+                  <small>{{ commonTexts.identifier(author.id) }}</small>
+                </span>
+              </label>
+            } @empty {
+              <p class="selection-empty">{{ texts.fields.authorsEmptySearch }}</p>
+            }
+          </div>
+        </div>
+
+        @if (hasSelectionError('authorIds')) {
+          <p class="field-error">{{ texts.fields.authorsError }}</p>
+        }
+      </div>
+
+      <div class="field field--span-2">
+        <div class="selection-field" [class.selection-field--invalid]="hasSelectionError('subjectIds')">
+          <div class="selection-field__header">
+            <span class="form-label mb-0">{{ texts.fields.subjects }}</span>
+            <span class="selection-field__count">{{ texts.fields.subjectsSelected(selectedSubjects().length) }}</span>
+          </div>
+
+          <p class="selection-field__hint">{{ texts.fields.subjectsHint }}</p>
+
+          <input
+            #subjectSearchInput
+            class="form-control selection-field__search"
+            type="search"
+            [value]="subjectSearch()"
+            [placeholder]="texts.fields.subjectsSearchPlaceholder"
+            [attr.aria-label]="texts.fields.subjectsSearchAriaLabel"
+            (input)="setSubjectSearch(subjectSearchInput.value)"
+          />
+
+          @if (selectedSubjects().length > 0) {
+            <div class="selection-chips">
+              @for (subject of selectedSubjects(); track subject.id) {
+                <button
+                  type="button"
+                  class="selection-chip"
+                  [attr.aria-label]="texts.fields.removeSubjectAriaLabel(subject.description)"
+                  (click)="removeSubject(subject.id)"
+                >
+                  <span>{{ subject.description }}</span>
+                  <span aria-hidden="true">x</span>
+                </button>
+              }
+            </div>
+          }
+
+          <div class="selection-options">
+            @for (subject of filteredSubjects(); track subject.id) {
+              <label class="selection-card" [class.selection-card--selected]="isSubjectSelected(subject.id)">
+                <input
+                  #subjectToggle
+                  class="selection-card__input"
+                  type="checkbox"
+                  [checked]="isSubjectSelected(subject.id)"
+                  [attr.aria-label]="texts.fields.subjectsAriaLabel"
+                  (change)="toggleSubject(subject.id, subjectToggle.checked)"
+                />
+                <span class="selection-card__body">
+                  <strong>{{ subject.description }}</strong>
+                  <small>{{ commonTexts.identifier(subject.id) }}</small>
+                </span>
+              </label>
+            } @empty {
+              <p class="selection-empty">{{ texts.fields.subjectsEmptySearch }}</p>
+            }
+          </div>
+        </div>
+
+        @if (hasSelectionError('subjectIds')) {
+          <p class="field-error">{{ texts.fields.subjectsError }}</p>
+        }
+      </div>
     </div>
 
     @if (bookForm.invalid && (bookForm.touched || bookForm.dirty)) {

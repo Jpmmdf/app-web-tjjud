@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "separate-pull-requests": true,
+  "packages": {
+    "backend": {
+      "release-type": "maven",
+      "component": "backend",
+      "package-name": "backend",
+      "include-component-in-tag": true
+    },
+    "frontend": {
+      "release-type": "node",
+      "component": "frontend",
+      "package-name": "frontend",
+      "include-component-in-tag": true
+    }
+  }
+}
