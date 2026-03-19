@@ -8,10 +8,10 @@ O fluxo de release automatica do repositorio segue esta ordem:
 2. as pipelines de CI de backend e frontend rodam nessa PR
 3. depois do merge na `main`, o `release-please` abre ou atualiza a PR de release por componente
 4. a PR de release pode ser aprovada automaticamente
-5. ao fazer merge da PR de release, o `release-please` cria a tag e a GitHub Release
-6. o `push` da tag publica a imagem correspondente no Docker Hub
+5. ao fazer merge da PR de release, o `release-please` cria a tag e a GitHub Release com `GITHUB_TOKEN`
+6. no mesmo workflow, quando uma release real e criada, os jobs reutilizaveis publicam a imagem correspondente no Docker Hub
 
-Esse desenho evita publicar imagem oficial antes de uma versao semanticamente fechada e vincula o artefato Docker a uma tag real do repositorio.
+Esse desenho evita publicar imagem oficial antes de uma versao semanticamente fechada e vincula o artefato Docker a uma tag real do repositorio, sem depender de um segundo workflow disparado por essa tag.
 
 ## Tags publicadas
 
@@ -26,11 +26,11 @@ As imagens recebem:
 
 ## Workflows
 
-- `release-please.yml`: executa no `push` da `main` e apenas abre ou atualiza PRs de release e GitHub Releases
+- `release-please.yml`: executa no `push` da `main`, abre ou atualiza PRs de release e, quando uma release e criada, chama os jobs de publicacao Docker
 - `release-please-auto-approve.yml`: aprova automaticamente PRs de release validas
 - `dependabot-auto-approve.yml`: aprova automaticamente PRs validas abertas pelo Dependabot
-- `backend-image.yml`: publica a imagem do backend quando uma tag `backend-v*` e enviada
-- `frontend-image.yml`: publica a imagem do frontend quando uma tag `frontend-v*` e enviada
+- `backend-image.yml`: workflow reutilizavel para publicar a imagem do backend, tambem acionavel manualmente
+- `frontend-image.yml`: workflow reutilizavel para publicar a imagem do frontend, tambem acionavel manualmente
 - `backend-ci.yml` e `frontend-ci.yml`: nao rodam nas PRs de release para evitar duplicidade
 
 ## Secrets necessarios
@@ -43,6 +43,6 @@ As imagens recebem:
 ## GitHub App
 
 - o repositorio usa `actions/create-github-app-token` para gerar tokens efemeros em tempo de execucao
-- o App precisa ter permissao para `contents`, `issues` e `pull requests` no repositorio
-- o mesmo App e usado para abrir PRs de release, criar tags, aprovar PRs de release e aprovar PRs do Dependabot
-- esse desenho evita depender de PATs de usuarios e reduz o risco operacional
+- o App precisa ter permissao de `pull requests` no repositorio
+- o App e usado para aprovar PRs de release e aprovar PRs do Dependabot
+- a abertura das PRs de release e a criacao das tags ficam com `GITHUB_TOKEN`, enquanto a publicacao Docker acontece no mesmo workflow do `release-please`

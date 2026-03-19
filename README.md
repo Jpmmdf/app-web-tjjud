@@ -45,8 +45,8 @@ Fluxo configurado:
 3. Fazer merge na `main`.
 4. O `release-please` abre ou atualiza as PRs de release do `backend` e do `frontend`.
 5. Essas PRs de release podem ser autoaprovadas.
-6. Ao fazer merge da PR de release, o `release-please` cria a tag e a GitHub Release.
-7. O `push` da tag publica a imagem correspondente no Docker Hub.
+6. Ao fazer merge da PR de release, o `release-please` cria a tag e a GitHub Release usando `GITHUB_TOKEN`.
+7. No mesmo workflow, quando uma release real e criada, os jobs reutilizaveis publicam a imagem correspondente no Docker Hub.
 
 As pipelines normais de CI nao rodam nas PRs de release do `release-please`, para evitar trabalho duplicado.
 
@@ -54,10 +54,10 @@ Secrets necessarios no repositorio:
 
 - `DOCKER_USERNAME`
 - `DOCKERHUB_TOKEN`
-- `AUTOMATION_APP_ID`: App ID do GitHub App usado para release e automacoes
+- `AUTOMATION_APP_ID`: App ID do GitHub App usado nas automacoes de aprovacao
 - `AUTOMATION_APP_PRIVATE_KEY`: chave privada PEM do GitHub App
 
-Esse GitHub App gera o token efemero usado pelo `release-please`, pela autoaprovacao das PRs de release e pela autoaprovacao das PRs do Dependabot.
+O `release-please` usa `GITHUB_TOKEN`. O GitHub App continua sendo usado para a autoaprovacao das PRs de release e das PRs do Dependabot.
 
 ## Documentacao
 
