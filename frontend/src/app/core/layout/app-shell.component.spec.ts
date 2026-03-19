@@ -2,6 +2,7 @@ import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import packageJson from '../../../../package.json';
 import { AppShellComponent } from './app-shell.component';
 import { CatalogFacadeService, FlashMessage } from '../state/catalog-facade.service';
 
@@ -56,6 +57,7 @@ describe('AppShellComponent', () => {
     expect(compiled.querySelector('main#main-content')).not.toBeNull();
     expect(compiled.querySelector('footer')).toBeNull();
     expect(compiled.textContent).toContain('Catálogo editorial');
+    expect(compiled.textContent).toContain(`Versão ${packageJson.version}`);
   });
 
   it('should refresh catalog data on init', async () => {

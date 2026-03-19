@@ -258,6 +258,13 @@ class CatalogApiIntegrationTest {
                         .value("O assunto não pode ser excluído porque está vinculado a um ou mais livros."));
     }
 
+    @Test
+    void shouldExposeOpenApiServerWithBackendPort() throws Exception {
+        mockMvc.perform(get("/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.servers[0].url").value("http://localhost:8080"));
+    }
+
     private long createAuthor(String name) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/authors")
                         .contentType(MediaType.APPLICATION_JSON)

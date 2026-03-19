@@ -1,9 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ptBrCatalogMessages } from '../../../core/i18n/pt-br';
+import type { AuthorSummary } from '../../../core/models/authors.models';
 import { Book } from '../../../core/models/books.models';
 import { SortDirection } from '../../../core/models/common.models';
+import type { SubjectSummary } from '../../../core/models/subjects.models';
 import { CatalogFacadeService } from '../../../core/state/catalog-facade.service';
 import { formatCurrencyValue, joinAuthorNames, joinSubjectDescriptions } from '../../../shared/formatters/catalog-formatters';
 
@@ -20,6 +22,14 @@ export class BookListComponent implements OnInit {
   protected readonly catalog = inject(CatalogFacadeService);
   protected readonly commonTexts = ptBrCatalogMessages.common;
   protected readonly texts = ptBrCatalogMessages.books;
+  protected readonly authorMatches = signal<AuthorSummary[]>([]);
+  protected readonly subjectMatches = signal<SubjectSummary[]>([]);
+  protected readonly selectedAuthor = signal<AuthorSummary | null>(null);
+  protected readonly selectedSubject = signal<SubjectSummary | null>(null);
+  protected readonly authorLookupBusy = signal(false);
+  protected readonly subjectLookupBusy = signal(false);
+  protected readonly authorLookupTouched = signal(false);
+  protected readonly subjectLookupTouched = signal(false);
   protected readonly sortControl = this.fb.nonNullable.control<BookSortOption>(this.toSortOption(
     this.catalog.currentBookList().sortField,
     this.catalog.currentBookList().sortDirection,
@@ -28,22 +38,31 @@ export class BookListComponent implements OnInit {
     title: this.fb.nonNullable.control(this.catalog.currentBookList().title),
     authorId: this.fb.control<number | null>(this.catalog.currentBookList().authorId),
     subjectId: this.fb.control<number | null>(this.catalog.currentBookList().subjectId),
+    authorQuery: this.fb.nonNullable.control(''),
+    subjectQuery: this.fb.nonNullable.control(''),
   });
 
   async ngOnInit(): Promise<void> {
+    await this.restoreSelectedFilters();
     await this.loadBooks();
   }
 
   protected async loadBooks(): Promise<void> {
     await this.catalog.loadBooks({
-      ...this.bookFiltersForm.getRawValue(),
+      ...this.currentBookFilters(),
       page: 0,
       ...this.fromSortOption(this.sortControl.value),
     });
   }
 
   protected resetBookFilters(): void {
-    this.bookFiltersForm.reset({ title: '', authorId: null, subjectId: null });
+    this.bookFiltersForm.reset({ title: '', authorId: null, subjectId: null, authorQuery: '', subjectQuery: '' });
+    this.authorMatches.set([]);
+    this.subjectMatches.set([]);
+    this.selectedAuthor.set(null);
+    this.selectedSubject.set(null);
+    this.authorLookupTouched.set(false);
+    this.subjectLookupTouched.set(false);
     void this.catalog.loadBooks({
       title: '',
       authorId: null,
@@ -65,10 +84,96 @@ export class BookListComponent implements OnInit {
     const nextOption = this.nextSortOption(field);
     this.sortControl.setValue(nextOption);
     await this.catalog.loadBooks({
-      ...this.bookFiltersForm.getRawValue(),
+      ...this.currentBookFilters(),
       page: 0,
       ...this.fromSortOption(nextOption),
     });
+  }
+
+  protected async searchAuthors(): Promise<void> {
+    const query = this.bookFiltersForm.controls.authorQuery.value.trim();
+    this.authorLookupTouched.set(true);
+
+    if (query.length < 2) {
+      this.authorMatches.set([]);
+      return;
+    }
+
+    this.authorLookupBusy.set(true);
+    try {
+      this.authorMatches.set(await this.catalog.searchAuthorOptions(query));
+    } finally {
+      this.authorLookupBusy.set(false);
+    }
+  }
+
+  protected async searchSubjects(): Promise<void> {
+    const query = this.bookFiltersForm.controls.subjectQuery.value.trim();
+    this.subjectLookupTouched.set(true);
+
+    if (query.length < 2) {
+      this.subjectMatches.set([]);
+      return;
+    }
+
+    this.subjectLookupBusy.set(true);
+    try {
+      this.subjectMatches.set(await this.catalog.searchSubjectOptions(query));
+    } finally {
+      this.subjectLookupBusy.set(false);
+    }
+  }
+
+  protected selectAuthorFilter(author: AuthorSummary): void {
+    this.bookFiltersForm.controls.authorId.setValue(author.id);
+    this.bookFiltersForm.controls.authorQuery.setValue('');
+    this.selectedAuthor.set(author);
+    this.authorMatches.set([]);
+    this.authorLookupTouched.set(false);
+  }
+
+  protected selectSubjectFilter(subject: SubjectSummary): void {
+    this.bookFiltersForm.controls.subjectId.setValue(subject.id);
+    this.bookFiltersForm.controls.subjectQuery.setValue('');
+    this.selectedSubject.set(subject);
+    this.subjectMatches.set([]);
+    this.subjectLookupTouched.set(false);
+  }
+
+  protected clearAuthorSelection(): void {
+    this.bookFiltersForm.controls.authorId.setValue(null);
+    this.bookFiltersForm.controls.authorQuery.setValue('');
+    this.selectedAuthor.set(null);
+    this.authorMatches.set([]);
+    this.authorLookupTouched.set(false);
+  }
+
+  protected clearSubjectSelection(): void {
+    this.bookFiltersForm.controls.subjectId.setValue(null);
+    this.bookFiltersForm.controls.subjectQuery.setValue('');
+    this.selectedSubject.set(null);
+    this.subjectMatches.set([]);
+    this.subjectLookupTouched.set(false);
+  }
+
+  protected showAuthorTooShort(): boolean {
+    const query = this.bookFiltersForm.controls.authorQuery.value.trim();
+    return this.authorLookupTouched() && query.length > 0 && query.length < 2;
+  }
+
+  protected showSubjectTooShort(): boolean {
+    const query = this.bookFiltersForm.controls.subjectQuery.value.trim();
+    return this.subjectLookupTouched() && query.length > 0 && query.length < 2;
+  }
+
+  protected showEmptyAuthorSearch(): boolean {
+    const query = this.bookFiltersForm.controls.authorQuery.value.trim();
+    return this.authorLookupTouched() && !this.authorLookupBusy() && query.length >= 2 && this.authorMatches().length === 0;
+  }
+
+  protected showEmptySubjectSearch(): boolean {
+    const query = this.bookFiltersForm.controls.subjectQuery.value.trim();
+    return this.subjectLookupTouched() && !this.subjectLookupBusy() && query.length >= 2 && this.subjectMatches().length === 0;
   }
 
   protected bookAuthors(book: Book): string {
@@ -147,6 +252,26 @@ export class BookListComponent implements OnInit {
       return current === 'priceAsc' ? 'priceDesc' : 'priceAsc';
     }
     return current === 'titleAsc' ? 'titleDesc' : 'titleAsc';
+  }
+
+  private currentBookFilters(): { title: string; authorId: number | null; subjectId: number | null } {
+    const { title, authorId, subjectId } = this.bookFiltersForm.getRawValue();
+    return { title, authorId, subjectId };
+  }
+
+  private async restoreSelectedFilters(): Promise<void> {
+    const authorId = this.bookFiltersForm.controls.authorId.value;
+    const subjectId = this.bookFiltersForm.controls.subjectId.value;
+
+    if (authorId !== null) {
+      const cachedAuthor = this.catalog.authorOptions().find((author) => author.id === authorId);
+      this.selectedAuthor.set(cachedAuthor ?? (await this.catalog.getAuthorOption(authorId)) ?? null);
+    }
+
+    if (subjectId !== null) {
+      const cachedSubject = this.catalog.subjectOptions().find((subject) => subject.id === subjectId);
+      this.selectedSubject.set(cachedSubject ?? (await this.catalog.getSubjectOption(subjectId)) ?? null);
+    }
   }
 }
 
