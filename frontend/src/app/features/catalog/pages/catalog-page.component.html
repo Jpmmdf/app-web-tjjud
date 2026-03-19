@@ -1,24 +1,50 @@
-<section class="panel panel--govbr card border-0">
-  <div class="panel__header">
-    <div>
-      <p class="eyebrow">{{ appTexts.eyebrow }}</p>
-      <h2>{{ appTexts.overview.title }}</h2>
-      <p class="text-muted mb-0">{{ appTexts.overview.detail }}</p>
+<section class="overview">
+  <div class="overview__hero">
+    <p class="eyebrow">{{ appTexts.eyebrow }}</p>
+    <h1>{{ appTexts.title }}</h1>
+    <p class="overview__lead">{{ appTexts.lead }}</p>
+
+    <div class="overview__links">
+      <a class="btn btn-outline-secondary" href="/swagger-ui/index.html" target="_blank" rel="noopener">
+        {{ appTexts.links.swagger }}
+      </a>
+
+      <a class="btn btn-outline-secondary" href="/api-docs" target="_blank" rel="noopener">
+        {{ appTexts.links.openApi }}
+      </a>
     </div>
+  </div>
+
+  <div class="overview__stats">
+    <article class="overview-stat">
+      <span>{{ appTexts.stats.authors }}</span>
+      <strong>{{ catalog.authorCount() }}</strong>
+    </article>
+
+    <article class="overview-stat">
+      <span>{{ appTexts.stats.subjects }}</span>
+      <strong>{{ catalog.subjectCount() }}</strong>
+    </article>
+
+    <article class="overview-stat">
+      <span>{{ appTexts.stats.books }}</span>
+      <strong>{{ catalog.bookCount() }}</strong>
+    </article>
+
+    <article class="overview-stat overview-stat--accent">
+      <span>{{ appTexts.stats.grossValue }}</span>
+      <strong>{{ catalog.formattedCatalogGrossValue() }}</strong>
+    </article>
   </div>
 
   <div class="overview-grid">
     @for (section of sections; track section.path) {
-      <article class="overview-card overview-card--govbr card border-0 h-100">
+      <a class="overview-card" [routerLink]="section.path">
         <div class="overview-card__body">
-          <h3>{{ section.label }}</h3>
+          <h2>{{ section.label }}</h2>
           <p>{{ section.description }}</p>
         </div>
-
-        <a class="btn btn-primary align-self-start" [routerLink]="section.path">
-          Acessar {{ section.label.toLowerCase() }}
-        </a>
-      </article>
+      </a>
     }
   </div>
 </section>

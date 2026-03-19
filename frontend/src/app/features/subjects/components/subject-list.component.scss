@@ -1,0 +1,98 @@
+:host {
+  display: block;
+}
+
+.list-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.list-shell {
+  border: 1px solid var(--line) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: none !important;
+  background: var(--surface) !important;
+  padding: 1.1rem;
+}
+
+.list-shell__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.list-shell__header h3 {
+  margin: 0;
+  font-family: 'Rawline', Arial, sans-serif;
+  font-weight: 700;
+}
+
+.br-table {
+  margin-top: 1rem;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+}
+
+.br-table table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.br-table caption {
+  display: none;
+}
+
+.br-table th,
+.br-table td {
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.br-table thead th {
+  background: var(--surface-alt);
+  color: var(--ink-950);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.br-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.actions-column {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.list-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.empty-state {
+  margin: 0;
+  padding: 1rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: 0.5rem;
+  color: var(--ink-700);
+  background: var(--surface-alt);
+}
+
+@media (max-width: 720px) {
+  .list-shell__header {
+    flex-direction: column;
+  }
+}

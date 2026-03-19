@@ -8,9 +8,16 @@
     <div class="toolbar toolbar--wide">
       <select class="form-select" [formControl]="reportFilterControl" [attr.aria-label]="texts.filterAriaLabel">
         <option [ngValue]="null">{{ commonTexts.allAuthors }}</option>
-        @for (author of catalog.authors(); track author.id) {
+        @for (author of catalog.authorOptions(); track author.id) {
           <option [ngValue]="author.id">{{ author.name }}</option>
         }
+      </select>
+
+      <select class="form-select" [formControl]="sortControl" [attr.aria-label]="commonTexts.sortBy">
+        <option value="authorNameAsc">{{ texts.sortOptions.authorNameAsc }}</option>
+        <option value="authorNameDesc">{{ texts.sortOptions.authorNameDesc }}</option>
+        <option value="bookCountDesc">{{ texts.sortOptions.bookCountDesc }}</option>
+        <option value="bookCountAsc">{{ texts.sortOptions.bookCountAsc }}</option>
       </select>
 
       <button type="button" class="btn btn-primary" (click)="loadReport()">{{ commonTexts.update }}</button>
@@ -33,9 +40,9 @@
     </article>
   </div>
 
-  @if (catalog.report()?.authors?.length) {
+  @if (catalog.report()?.items?.length) {
     <div class="report-grid">
-      @for (group of catalog.report()!.authors; track group.authorId) {
+      @for (group of catalog.report()!.items; track group.authorId) {
         <article class="report-card card border-0 shadow-sm h-100">
           <header class="report-card__header">
             <div>
@@ -59,6 +66,18 @@
           </ul>
         </article>
       }
+    </div>
+    <div class="list-pagination">
+      <span>{{ commonTexts.pageLabel(catalog.reportPage().page, catalog.reportPage().totalPages) }}</span>
+      <span>{{ commonTexts.totalRecords(catalog.reportPage().totalElements) }}</span>
+      <div class="entity-list__actions">
+        <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!hasPreviousPage()" (click)="goToPage(catalog.reportPage().page - 1)">
+          {{ commonTexts.previousPage }}
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!hasNextPage()" (click)="goToPage(catalog.reportPage().page + 1)">
+          {{ commonTexts.nextPage }}
+        </button>
+      </div>
     </div>
   } @else {
     <p class="empty-state">{{ texts.emptyState }}</p>

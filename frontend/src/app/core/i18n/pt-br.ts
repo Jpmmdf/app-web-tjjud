@@ -7,6 +7,15 @@ export const ptBrCatalogMessages = {
     update: 'Atualizar',
     edit: 'Editar',
     delete: 'Excluir',
+    create: 'Cadastrar novo',
+    back: 'Voltar',
+    save: 'Salvar',
+    cancel: 'Cancelar',
+    sortBy: 'Ordenar por',
+    pageLabel: (page: number, totalPages: number) => `Página ${page + 1} de ${Math.max(totalPages, 1)}`,
+    totalRecords: (count: number) => `${count} registro(s) no total`,
+    previousPage: 'Página anterior',
+    nextPage: 'Próxima página',
     closeNotification: 'Fechar notificação',
     allAuthors: 'Todos os autores',
     allSubjects: 'Todos os assuntos',
@@ -17,7 +26,7 @@ export const ptBrCatalogMessages = {
   },
   app: {
     eyebrow: 'API-first • Spring Boot • Angular • PostgreSQL',
-    title: 'Catálogo editorial TJJUD',
+    title: 'Catálogo editorial',
     lead:
       'Operação única para autores, assuntos, livros e relatórios por autor, com consistência relacional e valor monetário mascarado em reais.',
     navigation: [
@@ -50,7 +59,7 @@ export const ptBrCatalogMessages = {
     },
     menu: {
       label: 'Menu principal',
-      home: 'Painel de navegação',
+      serviceName: 'Catálogo editorial',
     },
     overview: {
       title: 'Visão geral do catálogo',
@@ -71,6 +80,20 @@ export const ptBrCatalogMessages = {
     fieldError: 'Informe um nome de autor com até 40 caracteres.',
     submitLabel: (isEditing: boolean) => (isEditing ? 'Salvar autor' : 'Cadastrar autor'),
     listTitle: 'Autores disponíveis',
+    listDetail: 'Consulte, filtre e acesse os fluxos de criação e edição de autores.',
+    sortOptions: {
+      nameAsc: 'Nome de A a Z',
+      nameDesc: 'Nome de Z a A',
+      idAsc: 'ID crescente',
+      idDesc: 'ID decrescente',
+    },
+    createTitle: 'Novo autor',
+    editTitle: 'Editar autor',
+    backToList: 'Voltar para autores',
+    actions: {
+      editAriaLabel: (name: string) => `Editar autor ${name}`,
+      deleteAriaLabel: (name: string) => `Excluir autor ${name}`,
+    },
     emptyState: 'Nenhum autor encontrado para o filtro informado.',
     confirmDelete: (name: string) => `Excluir o autor "${name}"?`,
     messages: {
@@ -96,6 +119,20 @@ export const ptBrCatalogMessages = {
     fieldError: 'Informe um assunto com até 20 caracteres.',
     submitLabel: (isEditing: boolean) => (isEditing ? 'Salvar assunto' : 'Cadastrar assunto'),
     listTitle: 'Assuntos disponíveis',
+    listDetail: 'Consulte, filtre e acesse os fluxos de criação e edição de assuntos.',
+    sortOptions: {
+      descriptionAsc: 'Descrição de A a Z',
+      descriptionDesc: 'Descrição de Z a A',
+      idAsc: 'ID crescente',
+      idDesc: 'ID decrescente',
+    },
+    createTitle: 'Novo assunto',
+    editTitle: 'Editar assunto',
+    backToList: 'Voltar para assuntos',
+    actions: {
+      editAriaLabel: (description: string) => `Editar assunto ${description}`,
+      deleteAriaLabel: (description: string) => `Excluir assunto ${description}`,
+    },
     emptyState: 'Nenhum assunto encontrado para o filtro informado.',
     confirmDelete: (description: string) => `Excluir o assunto "${description}"?`,
     messages: {
@@ -138,6 +175,22 @@ export const ptBrCatalogMessages = {
       'Revise título, editora, valor, ano, edição e selecione pelo menos um autor e um assunto.',
     submitLabel: (isEditing: boolean) => (isEditing ? 'Salvar livro' : 'Cadastrar livro'),
     listTitle: 'Acervo filtrado',
+    listDetail: 'Consulte o acervo e acesse fluxos dedicados para cadastro e edição de livros.',
+    sortOptions: {
+      titleAsc: 'Título de A a Z',
+      titleDesc: 'Título de Z a A',
+      yearDesc: 'Ano mais recente',
+      yearAsc: 'Ano mais antigo',
+      priceDesc: 'Maior valor',
+      priceAsc: 'Menor valor',
+    },
+    createTitle: 'Novo livro',
+    editTitle: 'Editar livro',
+    backToList: 'Voltar para livros',
+    actions: {
+      editAriaLabel: (title: string) => `Editar livro ${title}`,
+      deleteAriaLabel: (title: string) => `Excluir livro ${title}`,
+    },
     emptyState: 'Nenhum livro encontrado para a combinação atual de filtros.',
     card: {
       bookIdentifier: (id: number) => `Livro #${id}`,
@@ -169,6 +222,12 @@ export const ptBrCatalogMessages = {
     summary: {
       authors: 'Autores no relatório',
       generatedAt: 'Gerado em',
+    },
+    sortOptions: {
+      authorNameAsc: 'Autor de A a Z',
+      authorNameDesc: 'Autor de Z a A',
+      bookCountDesc: 'Mais livros',
+      bookCountAsc: 'Menos livros',
     },
     card: {
       authorIdentifier: (id: number) => `Autor #${id}`,

@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { CatalogApiService } from './catalog-api.service';
+import { ReportsApiService } from './reports-api.service';
 
-describe('CatalogApiService', () => {
-  let service: CatalogApiService;
+describe('ReportsApiService', () => {
+  let service: ReportsApiService;
   let httpTesting: HttpTestingController;
 
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('CatalogApiService', () => {
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
 
-    service = TestBed.inject(CatalogApiService);
+    service = TestBed.inject(ReportsApiService);
     httpTesting = TestBed.inject(HttpTestingController);
   });
 
@@ -20,17 +20,30 @@ describe('CatalogApiService', () => {
     httpTesting.verify();
   });
 
-  it('should request paged books with filters', () => {
-    service.listBooks({ title: 'Dom', authorId: 7, subjectId: 3 }).subscribe();
+  it('should request paged report with sorting', () => {
+    service
+      .getBooksByAuthorReport({
+        authorId: 12,
+        page: 2,
+        size: 5,
+        sortField: 'bookCount',
+        sortDirection: 'DESC',
+      })
+      .subscribe();
 
-    const request = httpTesting.expectOne((req) => req.url === '/api/v1/books');
+    const request = httpTesting.expectOne((req) => req.url === '/api/v1/reports/books-by-author');
     expect(request.request.method).toBe('GET');
-    expect(request.request.params.get('title')).toBe('Dom');
-    expect(request.request.params.get('authorId')).toBe('7');
-    expect(request.request.params.get('subjectId')).toBe('3');
-    expect(request.request.params.get('size')).toBe('100');
+    expect(request.request.params.get('authorId')).toBe('12');
+    expect(request.request.params.get('page')).toBe('2');
+    expect(request.request.params.get('size')).toBe('5');
+    expect(request.request.params.get('sortField')).toBe('bookCount');
+    expect(request.request.params.get('sortDirection')).toBe('DESC');
 
-    request.flush({ items: [], metadata: { page: 0, size: 100, totalItems: 0, totalPages: 0 } });
+    request.flush({
+      generatedAt: '2026-03-19T00:00:00Z',
+      items: [],
+      page: { page: 2, size: 5, totalElements: 0, totalPages: 0 },
+    });
   });
 
   it('should export the author report as pdf blob', () => {

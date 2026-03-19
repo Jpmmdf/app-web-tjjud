@@ -1,63 +1,29 @@
 <div class="app-surface">
-  <div class="shell container-xxl py-4 py-lg-5">
-    <header class="hero hero--govbr card border-0">
-      <div class="hero__copy">
-        <p class="eyebrow eyebrow--service">{{ appTexts.eyebrow }}</p>
-        <h1>{{ appTexts.title }}</h1>
-        <p class="hero__lead">{{ appTexts.lead }}</p>
-      </div>
+  <header class="app-nav" role="banner">
+    <div class="app-nav__inner container-xxl">
+      <a class="app-nav__brand" routerLink="/visao-geral">{{ appTexts.menu.serviceName }}</a>
 
-      <nav class="app-menu" [attr.aria-label]="appTexts.menu.label">
-        <span class="app-menu__label">{{ appTexts.menu.home }}</span>
-
-        <div class="app-menu__links">
-          @for (item of navigationItems; track item.path) {
-            <a
-              class="chip-button chip-button--menu btn btn-light"
-              [routerLink]="item.path"
-              routerLinkActive="app-menu__link--active"
-              [routerLinkActiveOptions]="{ exact: true }"
-            >
-              {{ item.label }}
-            </a>
-          }
-
-          <a class="chip-button chip-button--link chip-button--menu btn btn-outline-secondary" href="/swagger-ui/index.html" target="_blank" rel="noopener">
-            {{ appTexts.links.swagger }}
+      <nav class="app-nav__links" id="main-navigation" [attr.aria-label]="appTexts.menu.label">
+        @for (item of navigationItems; track item.path) {
+          <a
+            class="app-nav__link"
+            [routerLink]="item.path"
+            routerLinkActive="app-nav__link--active"
+            #routeLink="routerLinkActive"
+            [attr.aria-current]="routeLink.isActive ? 'page' : null"
+          >
+            {{ item.label }}
           </a>
-
-          <a class="chip-button chip-button--link chip-button--menu btn btn-outline-secondary" href="/api-docs" target="_blank" rel="noopener">
-            {{ appTexts.links.openApi }}
-          </a>
-        </div>
+        }
       </nav>
+    </div>
+  </header>
 
-      <div class="stat-grid">
-        <article class="stat-card stat-card--gov card border-0 h-100">
-          <span class="stat-card__label">{{ appTexts.stats.authors }}</span>
-          <strong>{{ catalog.authorCount() }}</strong>
-        </article>
-
-        <article class="stat-card stat-card--gov card border-0 h-100">
-          <span class="stat-card__label">{{ appTexts.stats.subjects }}</span>
-          <strong>{{ catalog.subjectCount() }}</strong>
-        </article>
-
-        <article class="stat-card stat-card--gov card border-0 h-100">
-          <span class="stat-card__label">{{ appTexts.stats.books }}</span>
-          <strong>{{ catalog.bookCount() }}</strong>
-        </article>
-
-        <article class="stat-card stat-card--accent stat-card--gov card border-0 h-100">
-          <span class="stat-card__label">{{ appTexts.stats.grossValue }}</span>
-          <strong>{{ catalog.formattedCatalogGrossValue() }}</strong>
-        </article>
-      </div>
-    </header>
+  <div class="shell shell--nav-fixed container-xxl py-4 py-lg-5">
 
     @if (catalog.flash(); as flashMessage) {
       <section
-        class="flash alert d-flex justify-content-between gap-3 align-items-start mb-0"
+        class="flash alert d-flex justify-content-between gap-3 align-items-start mb-0 mt-4"
         [class.flash--error]="flashMessage.kind === 'error'"
         [class.flash--success]="flashMessage.kind === 'success'"
         role="alert"
@@ -73,16 +39,16 @@
       </section>
     }
 
-    @if (catalog.loading()) {
-      <section class="panel panel--loading card border-0 mt-4">
-        <p class="eyebrow">{{ appTexts.loading.eyebrow }}</p>
-        <h2>{{ appTexts.loading.title }}</h2>
-        <p>{{ appTexts.loading.detail }}</p>
-      </section>
-    } @else {
-      <main class="workspace d-grid gap-4 mt-4">
+    <main class="workspace d-grid gap-4 mt-4" id="main-content" tabindex="-1">
+      @if (catalog.loading()) {
+        <section class="panel panel--loading card border-0">
+          <p class="eyebrow">{{ appTexts.loading.eyebrow }}</p>
+          <h2>{{ appTexts.loading.title }}</h2>
+          <p>{{ appTexts.loading.detail }}</p>
+        </section>
+      } @else {
         <router-outlet></router-outlet>
-      </main>
-    }
+      }
+    </main>
   </div>
 </div>

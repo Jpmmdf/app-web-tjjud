@@ -1,0 +1,28 @@
+<section class="panel panel--govbr card border-0">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">{{ texts.eyebrow }}</p>
+      <h2>{{ editingSubjectId() === null ? texts.createTitle : texts.editTitle }}</h2>
+    </div>
+
+    <a class="btn btn-outline-secondary" routerLink="/assuntos">{{ texts.backToList }}</a>
+  </div>
+
+  <form class="card-form card border-0 shadow-sm" [formGroup]="subjectForm" (ngSubmit)="submitSubject()" novalidate>
+    <label class="field">
+      <span class="form-label mb-0">{{ texts.fieldLabel }}</span>
+      <input class="form-control" type="text" formControlName="description" maxlength="20" [placeholder]="texts.fieldPlaceholder" />
+    </label>
+
+    @if (subjectForm.controls.description.touched && subjectForm.controls.description.invalid) {
+      <p class="field-error invalid-feedback d-block">{{ texts.fieldError }}</p>
+    }
+
+    <div class="form-actions">
+      <button type="submit" class="button button--primary btn btn-primary align-self-start" [disabled]="subjectForm.invalid || catalog.isBusy()">
+        {{ texts.submitLabel(editingSubjectId() !== null) }}
+      </button>
+      <a class="btn btn-outline-secondary" routerLink="/assuntos">{{ commonTexts.cancel }}</a>
+    </div>
+  </form>
+</section>

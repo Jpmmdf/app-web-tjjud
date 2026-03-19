@@ -8,6 +8,8 @@ import br.com.tjjud.catalog.books.domain.Book;
 import br.com.tjjud.catalog.books.infra.persistence.BookRepository;
 import br.com.tjjud.catalog.shared.api.PageMetadata;
 import br.com.tjjud.catalog.shared.api.PageResponse;
+import br.com.tjjud.catalog.shared.api.SortDirection;
+import br.com.tjjud.catalog.shared.api.SortFactory;
 import br.com.tjjud.catalog.shared.exception.BusinessValidationException;
 import br.com.tjjud.catalog.shared.exception.ConflictException;
 import br.com.tjjud.catalog.shared.exception.ResourceNotFoundException;
@@ -25,12 +27,16 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
 @Observed(name = "catalog.books", contextualName = "catalog-books-service")
 public class BookService {
+    private static final Map<String, String> SORT_FIELDS = Map.of(
+            "title", "title",
+            "publicationYear", "publicationYear",
+            "price", "price",
+            "id", "id");
 
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
@@ -42,8 +48,9 @@ public class BookService {
         this.subjectRepository = subjectRepository;
     }
 
-    public PageResponse<BookResponse> list(String title, Long authorId, Long subjectId, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("title").ascending().and(Sort.by("id").ascending()));
+    public PageResponse<BookResponse> list(
+            String title, Long authorId, Long subjectId, int page, int size, String sortField, SortDirection sortDirection) {
+        PageRequest pageRequest = PageRequest.of(page, size, SortFactory.from(sortField, sortDirection, SORT_FIELDS));
         String sanitizedTitle = sanitize(title);
         Page<Long> pageIds = bookRepository.findPageIds(sanitizedTitle, authorId, subjectId, pageRequest);
         List<BookResponse> items = pageIds.isEmpty() ? List.of() : hydrateBooks(pageIds.getContent()).stream()

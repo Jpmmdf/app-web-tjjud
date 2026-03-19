@@ -1,0 +1,118 @@
+<section class="panel panel--govbr card border-0">
+  <div class="panel__header d-flex flex-column flex-xl-row justify-content-between align-items-xl-start">
+    <div>
+      <p class="eyebrow">{{ texts.eyebrow }}</p>
+      <h2>{{ texts.title }}</h2>
+      <p class="text-muted mb-0">{{ texts.listDetail }}</p>
+    </div>
+
+    <div class="list-actions">
+      <form class="toolbar toolbar--wide" [formGroup]="bookFiltersForm" (ngSubmit)="loadBooks()">
+        <input
+          class="form-control"
+          type="search"
+          formControlName="title"
+          [placeholder]="texts.filters.titlePlaceholder"
+          [attr.aria-label]="texts.filters.titleAriaLabel"
+        />
+
+        <select class="form-select" formControlName="authorId" [attr.aria-label]="texts.filters.authorAriaLabel">
+          <option [ngValue]="null">{{ commonTexts.allAuthors }}</option>
+          @for (author of catalog.authorOptions(); track author.id) {
+            <option [ngValue]="author.id">{{ author.name }}</option>
+          }
+        </select>
+
+        <select class="form-select" formControlName="subjectId" [attr.aria-label]="texts.filters.subjectAriaLabel">
+          <option [ngValue]="null">{{ commonTexts.allSubjects }}</option>
+          @for (subject of catalog.subjectOptions(); track subject.id) {
+            <option [ngValue]="subject.id">{{ subject.description }}</option>
+          }
+        </select>
+
+        <select class="form-select" [formControl]="sortControl" [attr.aria-label]="commonTexts.sortBy">
+          <option value="titleAsc">{{ texts.sortOptions.titleAsc }}</option>
+          <option value="titleDesc">{{ texts.sortOptions.titleDesc }}</option>
+          <option value="yearDesc">{{ texts.sortOptions.yearDesc }}</option>
+          <option value="yearAsc">{{ texts.sortOptions.yearAsc }}</option>
+          <option value="priceDesc">{{ texts.sortOptions.priceDesc }}</option>
+          <option value="priceAsc">{{ texts.sortOptions.priceAsc }}</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">{{ commonTexts.apply }}</button>
+        <button type="button" class="button button--ghost btn btn-outline-secondary" (click)="resetBookFilters()">{{ commonTexts.reset }}</button>
+      </form>
+
+      <a class="btn btn-outline-secondary" routerLink="/livros/novo">{{ commonTexts.create }}</a>
+    </div>
+  </div>
+
+  <div class="list-shell card border-0 shadow-sm">
+    <div class="list-shell__header">
+      <h3>{{ texts.listTitle }}</h3>
+      <span class="badge rounded-pill text-bg-light">{{ commonTexts.booksCount(catalog.books().length) }}</span>
+    </div>
+
+    @if (catalog.books().length > 0) {
+      <div class="br-table table-responsive">
+        <table>
+          <caption>{{ texts.listTitle }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Livro</th>
+              <th scope="col">{{ texts.card.publisher }}</th>
+              <th scope="col">{{ texts.card.edition }}</th>
+              <th scope="col">{{ texts.card.year }}</th>
+              <th scope="col">Valor</th>
+              <th scope="col">{{ texts.card.authors }}</th>
+              <th scope="col">{{ texts.card.subjects }}</th>
+              <th scope="col" class="actions-column">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (book of catalog.books(); track book.id) {
+              <tr>
+                <td data-th="Livro">
+                  <div class="table-primary-cell">
+                    <strong>{{ book.title }}</strong>
+                    <small>{{ texts.card.bookIdentifier(book.id) }}</small>
+                  </div>
+                </td>
+                <td [attr.data-th]="texts.card.publisher">{{ book.publisher }}</td>
+                <td [attr.data-th]="texts.card.edition">{{ book.edition }}</td>
+                <td [attr.data-th]="texts.card.year">{{ book.publicationYear }}</td>
+                <td data-th="Valor"><strong>{{ book.price }}</strong></td>
+                <td [attr.data-th]="texts.card.authors">{{ bookAuthors(book) }}</td>
+                <td [attr.data-th]="texts.card.subjects">{{ bookSubjects(book) }}</td>
+                <td data-th="Ações">
+                  <div class="entity-list__actions">
+                    <a class="button button--ghost btn btn-outline-secondary btn-sm" [routerLink]="['/livros', book.id, 'editar']">
+                      {{ commonTexts.edit }}
+                    </a>
+                    <button type="button" class="button button--danger btn btn-outline-danger btn-sm" (click)="deleteBook(book)">
+                      {{ commonTexts.delete }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="list-pagination">
+        <span>{{ commonTexts.pageLabel(catalog.bookPage().page, catalog.bookPage().totalPages) }}</span>
+        <span>{{ commonTexts.totalRecords(catalog.bookPage().totalElements) }}</span>
+        <div class="entity-list__actions">
+          <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!hasPreviousPage()" (click)="goToPage(catalog.bookPage().page - 1)">
+            {{ commonTexts.previousPage }}
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!hasNextPage()" (click)="goToPage(catalog.bookPage().page + 1)">
+            {{ commonTexts.nextPage }}
+          </button>
+        </div>
+      </div>
+    } @else {
+      <p class="empty-state">{{ texts.emptyState }}</p>
+    }
+  </div>
+</section>

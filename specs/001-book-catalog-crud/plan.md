@@ -12,13 +12,13 @@ Implementar uma aplicacao web de cadastro de livros em dois projetos, com `contr
 ## Technical Context
 
 **Language/Version**: Java 21 LTS, TypeScript 5.x, SQL (PostgreSQL 16+)  
-**Primary Dependencies**: Spring Boot 4.x (Web, Validation, Data JPA, Actuator), Flyway, springdoc-openapi, OpenTelemetry/OTLP, OpenPDF, bundles de mensagens via i18n ou `properties`, Angular 21+ com componentes standalone, Angular Reactive Forms, Angular HttpClient, Design System do gov.br, Bootstrap 5 quando necessario para compatibilidade estrutural  
+**Primary Dependencies**: Spring Boot 4.x (Web, Validation, Data JPA, Actuator), Flyway, springdoc-openapi, OpenTelemetry/OTLP, OpenPDF, bundles de mensagens via i18n ou `properties`, Spring Data pagination/sorting, Angular 21+ com componentes standalone, Angular Reactive Forms, Angular HttpClient, Design System do gov.br, Bootstrap 5 quando necessario para compatibilidade estrutural  
 **Storage**: PostgreSQL 16+ com schema normalizado, constraints, indices e view de relatorio  
 **Testing**: JUnit 5, Spring Boot Test, MockMvc, Testcontainers para PostgreSQL, Angular unit tests, Playwright para fluxo critico ponta a ponta  
 **Target Platform**: Navegadores modernos no frontend e API REST executando em Linux/macOS localmente ou em container  
 **Project Type**: web application (Angular SPA + Spring Boot REST API)  
 **Performance Goals**: p95 menor que 300 ms para operacoes de CRUD e consulta simples; geracao do relatorio em ate 5 s para base com 10 mil livros  
-**Constraints**: abordagem API-first obrigatoria, valor monetario com precisao decimal e mascara BRL, view de banco obrigatoria para o relatorio, aderencia ao modelo fornecido com melhorias apenas de qualidade/performance, mensagens de erro especificas em portugues com i18n/properties, suporte a OpenTelemetry, aderencia ao Design System do gov.br no frontend, uso de Bootstrap apenas de forma compativel e setup reproduzivel para demonstracao  
+**Constraints**: abordagem API-first obrigatoria, valor monetario com precisao decimal e mascara BRL, view de banco obrigatoria para o relatorio, aderencia ao modelo fornecido com melhorias apenas de qualidade/performance, mensagens de erro especificas em portugues com i18n/properties, suporte a OpenTelemetry, aderencia ao Design System do gov.br no frontend, uso de Bootstrap apenas de forma compativel, ordenacao por campo executada no backend, paginacao em todas as listagens e setup reproduzivel para demonstracao  
 **Scale/Scope**: desafio tecnico com 4 areas principais de interface, base pequena a media, dezenas de usuarios concorrentes e ate 10 mil livros catalogados
 
 ## Constitution Check
@@ -97,6 +97,7 @@ frontend/
 - Adotar PostgreSQL como banco principal pela combinacao de constraints robustas, suporte nativo a view, tipos numericos confiaveis para moeda e boa integracao com Spring Boot/Testcontainers.
 - Representar valor monetario como decimal canonico na API e `NUMERIC(12,2)` no banco, com `BigDecimal` no backend e mascara `pt-BR` no frontend para evitar erros de ponto flutuante.
 - Implementar a interface web com Angular standalone, formularios reativos e Design System do gov.br como referencia visual e de componentes, usando Bootstrap apenas quando nao conflitar com esse padrao e mantendo um controle reutilizavel de moeda em vez de acoplamento a uma biblioteca de mascara de baixa manutencao.
+- Tratar listagens como consultas paginadas e ordenadas no backend, expondo parametros de `page`, `size`, `sortField` e `sortDirection` no contrato para manter consistencia entre cliente e servidor.
 - Gerar o relatorio a partir de uma view relacional do banco e renderiza-lo via OpenPDF no backend para exportacao PDF, mantendo uma consulta JSON equivalente para inspecao e testes.
 - Validar integracao com testes em camadas: unitarios para regras, integracao para persistencia/view, contrato para API e E2E para o fluxo principal.
 - Externalizar mensagens de negocio e validacao em mecanismo centralizado de i18n/properties, com `pt-BR` como idioma padrao da demonstracao.
@@ -120,7 +121,9 @@ frontend/
 - `CurrencyInputComponent` ou diretiva equivalente para entrada de `valor`, exibindo `R$ 1.234,56` e persistindo decimal canonico.
 - Servicos HTTP gerados ou alinhados ao contrato OpenAPI, com adaptadores finos para a camada de tela.
 - Paginas separadas para listagem/formulario de autores, assuntos e livros, mais tela de relatorio com filtros simples.
+- A experiencia de listagem e a experiencia de criacao/edicao devem permanecer em rotas ou superficies distintas para reduzir carga cognitiva e evitar formularios concorrendo com tabelas/listas.
 - Rotulos, mensagens de erro e feedbacks centralizados em catalogo de mensagens para manter a interface integralmente em portugues.
+- Controles de tabela no frontend devem apenas refletir e acionar ordenacao/paginacao server-side, preservando no estado da rota os parametros ativos de consulta.
 
 ### Database
 
@@ -129,10 +132,11 @@ frontend/
 - Campo `ano_publicacao` armazenado como `SMALLINT` com validacao de faixa para manter semantica do modelo original com tipagem mais segura.
 - Campo `valor` armazenado como `NUMERIC(12,2)` com `CHECK (valor >= 0)`.
 - View `vw_relatorio_livros_por_autor` consolidando livro, autor e assunto para alimentar o relatorio.
+- Indices devem considerar os campos expostos para ordenacao e filtros mais frequentes, reduzindo custo das consultas paginadas.
 
 ### API-first Workflow
 
-1. Fechar `contracts/openapi.yaml`.
+1. Fechar `contracts/openapi.yaml`, incluindo filtros, paginacao e ordenacao server-side.
 2. Implementar testes de contrato/backend a partir do contrato.
 3. Implementar endpoints REST no backend.
 4. Implementar cliente e telas do Angular consumindo o contrato.

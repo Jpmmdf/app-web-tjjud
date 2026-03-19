@@ -3,6 +3,8 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ptBrCatalogMessages } from '../i18n/pt-br';
 import { CatalogFacadeService } from '../state/catalog-facade.service';
 
+type NavigationItem = (typeof ptBrCatalogMessages.app.navigation)[number];
+
 @Component({
   selector: 'app-shell',
   standalone: true,
@@ -14,7 +16,7 @@ export class AppShellComponent implements OnInit {
   protected readonly catalog = inject(CatalogFacadeService);
   protected readonly appTexts = ptBrCatalogMessages.app;
   protected readonly commonTexts = ptBrCatalogMessages.common;
-  protected readonly navigationItems = this.appTexts.navigation;
+  protected readonly navigationItems: readonly NavigationItem[] = this.appTexts.navigation;
 
   async ngOnInit(): Promise<void> {
     await this.catalog.refreshAll();

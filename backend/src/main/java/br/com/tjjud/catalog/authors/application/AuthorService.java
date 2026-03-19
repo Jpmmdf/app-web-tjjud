@@ -5,20 +5,25 @@ import br.com.tjjud.catalog.authors.api.AuthorUpsertRequest;
 import br.com.tjjud.catalog.authors.domain.Author;
 import br.com.tjjud.catalog.authors.infra.persistence.AuthorRepository;
 import br.com.tjjud.catalog.shared.api.PageResponse;
+import br.com.tjjud.catalog.shared.api.SortDirection;
+import br.com.tjjud.catalog.shared.api.SortFactory;
 import br.com.tjjud.catalog.shared.exception.BusinessValidationException;
 import br.com.tjjud.catalog.shared.exception.ConflictException;
 import br.com.tjjud.catalog.shared.exception.ResourceNotFoundException;
 import io.micrometer.observation.annotation.Observed;
 import jakarta.transaction.Transactional;
+import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
 @Observed(name = "catalog.authors", contextualName = "catalog-authors-service")
 public class AuthorService {
+    private static final Map<String, String> SORT_FIELDS = Map.of(
+            "name", "name",
+            "id", "id");
 
     private final AuthorRepository authorRepository;
 
@@ -26,8 +31,8 @@ public class AuthorService {
         this.authorRepository = authorRepository;
     }
 
-    public PageResponse<AuthorResponse> list(String query, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("name").ascending().and(Sort.by("id").ascending()));
+    public PageResponse<AuthorResponse> list(String query, int page, int size, String sortField, SortDirection sortDirection) {
+        PageRequest pageRequest = PageRequest.of(page, size, SortFactory.from(sortField, sortDirection, SORT_FIELDS));
         String sanitized = sanitize(query);
         Page<Author> results = sanitized == null
                 ? authorRepository.findAll(pageRequest)

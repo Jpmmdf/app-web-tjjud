@@ -1,16 +1,21 @@
 package br.com.tjjud.catalog.reports.application;
 
 import br.com.tjjud.catalog.reports.api.AuthorBookReportResponse;
+import br.com.tjjud.catalog.reports.api.PagedAuthorBookReportResponse;
 import br.com.tjjud.catalog.reports.api.ReportAuthorGroup;
 import br.com.tjjud.catalog.reports.api.ReportBookItem;
 import br.com.tjjud.catalog.reports.infra.jdbc.AuthorBookReportViewRepository;
 import br.com.tjjud.catalog.reports.infra.jdbc.ReportRow;
 import br.com.tjjud.catalog.reports.infra.pdf.AuthorBookReportPdfRenderer;
+import br.com.tjjud.catalog.shared.api.PageMetadata;
+import br.com.tjjud.catalog.shared.api.SortDirection;
+import br.com.tjjud.catalog.shared.exception.BusinessValidationException;
 import br.com.tjjud.catalog.shared.api.reference.SubjectSummary;
 import br.com.tjjud.catalog.shared.util.MoneyMapper;
 import io.micrometer.observation.annotation.Observed;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +33,8 @@ public class ReportService {
         this.pdfRenderer = pdfRenderer;
     }
 
-    public AuthorBookReportResponse getBooksByAuthor(Long authorId) {
+    public PagedAuthorBookReportResponse getBooksByAuthor(
+            Long authorId, int page, int size, String sortField, SortDirection sortDirection) {
         List<ReportRow> rows = reportViewRepository.findRows(authorId);
 
         Map<Long, MutableAuthorGroup> authorGroups = new LinkedHashMap<>();
@@ -40,14 +46,37 @@ public class ReportService {
 
         List<ReportAuthorGroup> authors = authorGroups.values().stream()
                 .map(MutableAuthorGroup::toImmutable)
+                .sorted(authorGroupComparator(sortField, sortDirection))
                 .toList();
 
-        return new AuthorBookReportResponse(OffsetDateTime.now(), authors);
+        int sanitizedSize = Math.max(size, 1);
+        int fromIndex = Math.min(page * sanitizedSize, authors.size());
+        int toIndex = Math.min(fromIndex + sanitizedSize, authors.size());
+        List<ReportAuthorGroup> pageItems = authors.subList(fromIndex, toIndex);
+        int totalPages = authors.isEmpty() ? 0 : (int) Math.ceil((double) authors.size() / sanitizedSize);
+
+        return new PagedAuthorBookReportResponse(
+                OffsetDateTime.now(),
+                pageItems,
+                new PageMetadata(page, sanitizedSize, authors.size(), totalPages));
     }
 
     public byte[] exportBooksByAuthor(Long authorId) {
-        AuthorBookReportResponse report = getBooksByAuthor(authorId);
+        PagedAuthorBookReportResponse pagedReport = getBooksByAuthor(authorId, 0, Integer.MAX_VALUE, "authorName", SortDirection.ASC);
+        AuthorBookReportResponse report = new AuthorBookReportResponse(pagedReport.generatedAt(), pagedReport.items());
         return pdfRenderer.render(report);
+    }
+
+    private Comparator<ReportAuthorGroup> authorGroupComparator(String sortField, SortDirection sortDirection) {
+        String normalizedField = sortField == null || sortField.isBlank() ? "authorName" : sortField;
+        Comparator<ReportAuthorGroup> comparator = switch (normalizedField) {
+            case "authorId" -> Comparator.comparing(ReportAuthorGroup::authorId);
+            case "bookCount" -> Comparator.comparing(group -> group.books().size());
+            case "authorName" -> Comparator.comparing(ReportAuthorGroup::authorName, String.CASE_INSENSITIVE_ORDER);
+            default -> throw new BusinessValidationException("INVALID_SORT_FIELD", "error.ordenacao.campo.invalido");
+        };
+        Comparator<ReportAuthorGroup> withTieBreaker = comparator.thenComparing(ReportAuthorGroup::authorId);
+        return sortDirection != null && sortDirection.isAscending() ? withTieBreaker : withTieBreaker.reversed();
     }
 
     private static final class MutableAuthorGroup {

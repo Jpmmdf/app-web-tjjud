@@ -1,0 +1,75 @@
+<section class="panel panel--govbr card border-0">
+  <div class="panel__header">
+    <div>
+      <p class="eyebrow">{{ texts.eyebrow }}</p>
+      <h2>{{ editingBookId() === null ? texts.createTitle : texts.editTitle }}</h2>
+    </div>
+
+    <a class="btn btn-outline-secondary" routerLink="/livros">{{ texts.backToList }}</a>
+  </div>
+
+  <form class="card-form card border-0 shadow-sm" [formGroup]="bookForm" (ngSubmit)="submitBook()" novalidate>
+    <div class="field-grid">
+      <label class="field field--span-2">
+        <span class="form-label mb-0">{{ texts.fields.title }}</span>
+        <input class="form-control" type="text" formControlName="title" maxlength="40" [placeholder]="texts.fields.titlePlaceholder" />
+      </label>
+
+      <label class="field field--span-2">
+        <span class="form-label mb-0">{{ texts.fields.publisher }}</span>
+        <input class="form-control" type="text" formControlName="publisher" maxlength="40" [placeholder]="texts.fields.publisherPlaceholder" />
+      </label>
+
+      <label class="field">
+        <span class="form-label mb-0">{{ texts.fields.edition }}</span>
+        <input class="form-control" type="number" formControlName="edition" min="1" />
+      </label>
+
+      <label class="field">
+        <span class="form-label mb-0">{{ texts.fields.publicationYear }}</span>
+        <input class="form-control" type="number" formControlName="publicationYear" min="1000" max="9999" />
+      </label>
+
+      <label class="field field--span-2">
+        <span class="form-label mb-0">{{ texts.fields.price }}</span>
+        <input
+          class="form-control"
+          type="text"
+          inputmode="numeric"
+          appBrlCurrencyMask
+          formControlName="price"
+          [placeholder]="texts.fields.pricePlaceholder"
+        />
+      </label>
+
+      <label class="field field--span-2">
+        <span class="form-label mb-0">{{ texts.fields.authors }}</span>
+        <select class="form-select" formControlName="authorIds" multiple size="5" [attr.aria-label]="texts.fields.authorsAriaLabel">
+          @for (author of catalog.authorOptions(); track author.id) {
+            <option [ngValue]="author.id">{{ author.name }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="field field--span-2">
+        <span class="form-label mb-0">{{ texts.fields.subjects }}</span>
+        <select class="form-select" formControlName="subjectIds" multiple size="5" [attr.aria-label]="texts.fields.subjectsAriaLabel">
+          @for (subject of catalog.subjectOptions(); track subject.id) {
+            <option [ngValue]="subject.id">{{ subject.description }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    @if (bookForm.invalid && (bookForm.touched || bookForm.dirty)) {
+      <p class="field-error invalid-feedback d-block">{{ texts.formError }}</p>
+    }
+
+    <div class="form-actions">
+      <button type="submit" class="button button--primary btn btn-primary align-self-start" [disabled]="bookForm.invalid || catalog.isBusy()">
+        {{ texts.submitLabel(editingBookId() !== null) }}
+      </button>
+      <a class="btn btn-outline-secondary" routerLink="/livros">{{ commonTexts.cancel }}</a>
+    </div>
+  </form>
+</section>

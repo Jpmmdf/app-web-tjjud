@@ -1,0 +1,86 @@
+<section class="panel panel--govbr card border-0">
+  <div class="panel__header d-flex flex-column flex-xl-row justify-content-between align-items-xl-start">
+    <div>
+      <p class="eyebrow">{{ texts.eyebrow }}</p>
+      <h2>{{ texts.title }}</h2>
+      <p class="text-muted mb-0">{{ texts.listDetail }}</p>
+    </div>
+
+    <div class="list-actions">
+      <form class="toolbar" (ngSubmit)="loadAuthors()">
+        <input
+          class="form-control"
+          type="search"
+          [formControl]="authorSearchControl"
+          [placeholder]="texts.searchPlaceholder"
+          [attr.aria-label]="texts.searchAriaLabel"
+        />
+        <select class="form-select" [formControl]="sortControl" [attr.aria-label]="commonTexts.sortBy">
+          <option value="nameAsc">{{ texts.sortOptions.nameAsc }}</option>
+          <option value="nameDesc">{{ texts.sortOptions.nameDesc }}</option>
+          <option value="idAsc">{{ texts.sortOptions.idAsc }}</option>
+          <option value="idDesc">{{ texts.sortOptions.idDesc }}</option>
+        </select>
+        <button type="submit" class="btn btn-primary">{{ commonTexts.filter }}</button>
+      </form>
+
+      <a class="btn btn-outline-secondary" routerLink="/autores/novo">{{ commonTexts.create }}</a>
+    </div>
+  </div>
+
+  <div class="list-shell card border-0 shadow-sm">
+    <div class="list-shell__header">
+      <h3>{{ texts.listTitle }}</h3>
+      <span class="badge rounded-pill text-bg-light">{{ commonTexts.records(catalog.authors().length) }}</span>
+    </div>
+
+    @if (catalog.authors().length > 0) {
+      <div class="br-table table-responsive">
+        <table>
+          <caption>{{ texts.listTitle }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Identificador</th>
+              <th scope="col">Nome</th>
+              <th scope="col" class="actions-column">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (author of catalog.authors(); track author.id) {
+              <tr>
+                <td data-th="Identificador">{{ commonTexts.identifier(author.id) }}</td>
+                <td data-th="Nome">
+                  <strong>{{ author.name }}</strong>
+                </td>
+                <td data-th="Ações">
+                  <div class="entity-list__actions">
+                    <a class="button button--ghost btn btn-outline-secondary btn-sm" [routerLink]="['/autores', author.id, 'editar']">
+                      {{ commonTexts.edit }}
+                    </a>
+                    <button type="button" class="button button--danger btn btn-outline-danger btn-sm" (click)="deleteAuthor(author)">
+                      {{ commonTexts.delete }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="list-pagination">
+        <span>{{ commonTexts.pageLabel(catalog.authorPage().page, catalog.authorPage().totalPages) }}</span>
+        <span>{{ commonTexts.totalRecords(catalog.authorPage().totalElements) }}</span>
+        <div class="entity-list__actions">
+          <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!hasPreviousPage()" (click)="goToPage(catalog.authorPage().page - 1)">
+            {{ commonTexts.previousPage }}
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!hasNextPage()" (click)="goToPage(catalog.authorPage().page + 1)">
+            {{ commonTexts.nextPage }}
+          </button>
+        </div>
+      </div>
+    } @else {
+      <p class="empty-state">{{ texts.emptyState }}</p>
+    }
+  </div>
+</section>
