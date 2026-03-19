@@ -11,7 +11,6 @@ import { Book, BookUpsertPayload } from '../models/books.models';
 import { PageMetadata, ProblemResponse, SortDirection } from '../models/common.models';
 import { AuthorBookReport } from '../models/reports.models';
 import { Subject } from '../models/subjects.models';
-import { formatCurrencyTotal } from '../../shared/formatters/catalog-formatters';
 
 export interface FlashMessage {
   kind: 'success' | 'error';
@@ -46,6 +45,12 @@ interface ReportListState extends ListState {
   authorId: number | null;
 }
 
+interface OverviewStats {
+  authors: number;
+  subjects: number;
+  books: number;
+}
+
 const DEFAULT_PAGE_SIZE = 10;
 
 @Injectable({ providedIn: 'root' })
@@ -66,6 +71,7 @@ export class CatalogFacadeService {
   readonly report = signal<AuthorBookReport | null>(null);
   readonly authorOptions = signal<Author[]>([]);
   readonly subjectOptions = signal<Subject[]>([]);
+  readonly overviewStats = signal<OverviewStats>(emptyOverviewStats());
 
   readonly authorPage = signal<PageMetadata>(emptyPageMetadata(DEFAULT_PAGE_SIZE));
   readonly subjectPage = signal<PageMetadata>(emptyPageMetadata(DEFAULT_PAGE_SIZE));
@@ -104,18 +110,21 @@ export class CatalogFacadeService {
   });
 
   readonly isBusy = computed(() => this.pendingRequests() > 0);
-  readonly authorCount = computed(() => this.authorPage().totalElements);
-  readonly subjectCount = computed(() => this.subjectPage().totalElements);
-  readonly bookCount = computed(() => this.bookPage().totalElements);
+  readonly authorCount = computed(() => this.overviewStats().authors);
+  readonly subjectCount = computed(() => this.overviewStats().subjects);
+  readonly bookCount = computed(() => this.overviewStats().books);
   readonly reportGroupCount = computed(() => this.reportPage().totalElements);
-  readonly catalogGrossValue = computed(() =>
-    this.books().reduce((total, book) => total + Number.parseFloat(book.price), 0),
-  );
-  readonly formattedCatalogGrossValue = computed(() => formatCurrencyTotal(this.catalogGrossValue()));
 
   async refreshAll(): Promise<void> {
     this.loading.set(true);
-    await Promise.all([this.loadAuthors(), this.loadSubjects(), this.loadBooks(), this.loadReport(), this.loadReferenceOptions()]);
+    await Promise.all([
+      this.loadAuthors(),
+      this.loadSubjects(),
+      this.loadBooks(),
+      this.loadReport(),
+      this.loadReferenceOptions(),
+      this.loadOverviewStats(),
+    ]);
     this.loading.set(false);
   }
 
@@ -152,7 +161,7 @@ export class CatalogFacadeService {
       authorId == null ? this.messages.authors.messages.createSuccessTitle : this.messages.authors.messages.updateSuccessTitle,
       this.messages.authors.messages.saveSuccessDetail(response.name),
     );
-    await Promise.all([this.loadAuthors(), this.loadBooks(), this.loadReport()]);
+    await Promise.all([this.loadAuthors(), this.loadBooks(), this.loadReport(), this.loadOverviewStats()]);
     return response;
   }
 
@@ -173,7 +182,7 @@ export class CatalogFacadeService {
       this.messages.authors.messages.deleteSuccessTitle,
       this.messages.authors.messages.deleteSuccessDetail(author.name),
     );
-    await Promise.all([this.loadAuthors(), this.loadBooks(), this.loadReport()]);
+    await Promise.all([this.loadAuthors(), this.loadBooks(), this.loadReport(), this.loadOverviewStats()]);
     return true;
   }
 
@@ -206,7 +215,7 @@ export class CatalogFacadeService {
       subjectId == null ? this.messages.subjects.messages.createSuccessTitle : this.messages.subjects.messages.updateSuccessTitle,
       this.messages.subjects.messages.saveSuccessDetail(response.description),
     );
-    await Promise.all([this.loadSubjects(), this.loadBooks(), this.loadReport()]);
+    await Promise.all([this.loadSubjects(), this.loadBooks(), this.loadReport(), this.loadOverviewStats()]);
     return response;
   }
 
@@ -227,7 +236,7 @@ export class CatalogFacadeService {
       this.messages.subjects.messages.deleteSuccessTitle,
       this.messages.subjects.messages.deleteSuccessDetail(subject.description),
     );
-    await Promise.all([this.loadSubjects(), this.loadBooks(), this.loadReport()]);
+    await Promise.all([this.loadSubjects(), this.loadBooks(), this.loadReport(), this.loadOverviewStats()]);
     return true;
   }
 
@@ -260,7 +269,7 @@ export class CatalogFacadeService {
       bookId == null ? this.messages.books.messages.createSuccessTitle : this.messages.books.messages.updateSuccessTitle,
       this.messages.books.messages.saveSuccessDetail(response.title),
     );
-    await Promise.all([this.loadBooks(), this.loadReport()]);
+    await Promise.all([this.loadBooks(), this.loadReport(), this.loadOverviewStats()]);
     return response;
   }
 
@@ -281,7 +290,7 @@ export class CatalogFacadeService {
       this.messages.books.messages.deleteSuccessTitle,
       this.messages.books.messages.deleteSuccessDetail(book.title),
     );
-    await Promise.all([this.loadBooks(), this.loadReport()]);
+    await Promise.all([this.loadBooks(), this.loadReport(), this.loadOverviewStats()]);
     return true;
   }
 
@@ -334,6 +343,100 @@ export class CatalogFacadeService {
     if (subjects) {
       this.subjectOptions.set(subjects.items);
     }
+  }
+
+  async searchAuthorOptions(query: string, size = 10): Promise<Author[]> {
+    const response = await this.runRequest(
+      () =>
+        firstValueFrom(
+          this.authorsApi.list({
+            query,
+            page: 0,
+            size,
+            sortField: 'name',
+            sortDirection: 'ASC',
+          }),
+        ),
+      this.messages.authors.messages.loadError,
+    );
+    return response?.items ?? [];
+  }
+
+  async searchSubjectOptions(query: string, size = 10): Promise<Subject[]> {
+    const response = await this.runRequest(
+      () =>
+        firstValueFrom(
+          this.subjectsApi.list({
+            query,
+            page: 0,
+            size,
+            sortField: 'description',
+            sortDirection: 'ASC',
+          }),
+        ),
+      this.messages.subjects.messages.loadError,
+    );
+    return response?.items ?? [];
+  }
+
+  async getAuthorOption(authorId: number): Promise<Author | undefined> {
+    return this.runRequest(() => firstValueFrom(this.authorsApi.get(authorId)), this.messages.authors.messages.loadError);
+  }
+
+  async getSubjectOption(subjectId: number): Promise<Subject | undefined> {
+    return this.runRequest(() => firstValueFrom(this.subjectsApi.get(subjectId)), this.messages.subjects.messages.loadError);
+  }
+
+  async loadOverviewStats(): Promise<void> {
+    const [authors, subjects, books] = await Promise.all([
+      this.runRequest(
+        () =>
+          firstValueFrom(
+            this.authorsApi.list({
+              query: '',
+              page: 0,
+              size: 1,
+              sortField: 'name',
+              sortDirection: 'ASC',
+            }),
+          ),
+        this.messages.authors.messages.loadError,
+      ),
+      this.runRequest(
+        () =>
+          firstValueFrom(
+            this.subjectsApi.list({
+              query: '',
+              page: 0,
+              size: 1,
+              sortField: 'description',
+              sortDirection: 'ASC',
+            }),
+          ),
+        this.messages.subjects.messages.loadError,
+      ),
+      this.runRequest(
+        () =>
+          firstValueFrom(
+            this.booksApi.list({
+              title: '',
+              authorId: null,
+              subjectId: null,
+              page: 0,
+              size: 1,
+              sortField: 'title',
+              sortDirection: 'ASC',
+            }),
+          ),
+        this.messages.books.messages.loadError,
+      ),
+    ]);
+
+    this.overviewStats.set({
+      authors: authors?.page.totalElements ?? this.overviewStats().authors,
+      subjects: subjects?.page.totalElements ?? this.overviewStats().subjects,
+      books: books?.page.totalElements ?? this.overviewStats().books,
+    });
   }
 
   async downloadReport(authorId = this.currentReportList().authorId): Promise<boolean> {
@@ -409,5 +512,13 @@ function emptyPageMetadata(size: number): PageMetadata {
     size,
     totalElements: 0,
     totalPages: 0,
+  };
+}
+
+function emptyOverviewStats(): OverviewStats {
+  return {
+    authors: 0,
+    subjects: 0,
+    books: 0,
   };
 }

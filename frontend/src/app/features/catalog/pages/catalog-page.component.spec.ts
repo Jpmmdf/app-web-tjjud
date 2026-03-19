@@ -104,6 +104,7 @@ describe('CatalogPageComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain('Catálogo editorial');
     expect(compiled.textContent).toContain('Cadastre e mantenha a base de autores.');
+    expect(compiled.textContent).not.toContain('Valor bruto');
   });
 
   it('should expose Swagger UI and OpenAPI links from the generated backend contract', async () => {
