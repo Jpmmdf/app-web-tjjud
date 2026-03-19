@@ -59,6 +59,7 @@ export const ptBrCatalogMessages = {
     menu: {
       label: 'Menu principal',
       serviceName: 'Catálogo editorial',
+      versionLabel: (version: string) => `Versão ${version}`,
     },
     overview: {
       title: 'Visão geral do catálogo',
