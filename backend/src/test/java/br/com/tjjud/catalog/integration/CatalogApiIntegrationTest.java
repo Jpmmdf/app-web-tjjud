@@ -262,6 +262,10 @@ class CatalogApiIntegrationTest {
     void shouldExposeOpenApiServerWithBackendPort() throws Exception {
         mockMvc.perform(get("/api-docs"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.info.title").value("Catálogo editorial API"))
+                .andExpect(jsonPath("$.info.description")
+                        .value("API para gerenciar autores, assuntos, livros e relatórios do catálogo editorial."))
+                .andExpect(jsonPath("$.servers[0].description").value("Servidor local da API"))
                 .andExpect(jsonPath("$.servers[0].url").value("http://localhost:8080"));
     }
 
