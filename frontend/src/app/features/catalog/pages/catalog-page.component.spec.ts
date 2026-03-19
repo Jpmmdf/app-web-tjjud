@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { CatalogApiService } from '../../../core/api/catalog-api.service';
 import { AuthorBookReport, PageResponse } from '../../../core/models/catalog.models';
@@ -55,7 +56,7 @@ describe('CatalogPageComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CatalogPageComponent],
-      providers: [{ provide: CatalogApiService, useValue: apiStub }],
+      providers: [{ provide: CatalogApiService, useValue: apiStub }, provideRouter([])],
     }).compileComponents();
   });
 
@@ -66,7 +67,7 @@ describe('CatalogPageComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Catálogo editorial TJJUD');
-    expect(compiled.textContent).toContain('Relatório por autor');
+    expect(compiled.querySelector('h2')?.textContent).toContain('Visão geral do catálogo');
+    expect(compiled.textContent).toContain('Acessar autores');
   });
 });

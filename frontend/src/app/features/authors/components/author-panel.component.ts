@@ -10,6 +10,7 @@ import { CatalogFacadeService } from '../../../core/state/catalog-facade.service
   standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './author-panel.component.html',
+  styleUrl: './author-panel.component.scss',
 })
 export class AuthorPanelComponent {
   private readonly fb = inject(FormBuilder);

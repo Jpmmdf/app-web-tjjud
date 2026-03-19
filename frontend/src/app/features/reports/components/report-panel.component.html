@@ -1,4 +1,4 @@
-<section id="reports" class="panel card border-0">
+<section id="reports" class="panel panel--govbr card border-0">
   <div class="panel__header d-flex flex-column flex-xl-row justify-content-between align-items-xl-start">
     <div>
       <p class="eyebrow">{{ texts.eyebrow }}</p>
@@ -22,12 +22,12 @@
   </div>
 
   <div class="report-summary">
-    <article class="stat-card card border-0 h-100">
+    <article class="stat-card stat-card--gov card border-0 h-100">
       <span class="stat-card__label">{{ texts.summary.authors }}</span>
       <strong>{{ catalog.reportGroupCount() }}</strong>
     </article>
 
-    <article class="stat-card stat-card--accent card border-0 h-100">
+    <article class="stat-card stat-card--accent stat-card--gov card border-0 h-100">
       <span class="stat-card__label">{{ texts.summary.generatedAt }}</span>
       <strong>{{ formatTimestamp(catalog.report()?.generatedAt) }}</strong>
     </article>

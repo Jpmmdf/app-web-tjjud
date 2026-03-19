@@ -1,0 +1,148 @@
+:host {
+  display: block;
+}
+
+.hero,
+.flash {
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+}
+
+.hero {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border-radius: 1rem;
+  background: var(--surface);
+}
+
+.hero--govbr {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero--govbr::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 0.375rem;
+  background: linear-gradient(90deg, #168821 0 22%, #ffcd07 22% 48%, #1351b4 48% 100%);
+}
+
+.hero__copy h1 {
+  margin: 0;
+  font-family: 'Rawline', Arial, sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.hero__lead {
+  max-width: 68ch;
+  margin: 0.85rem 0 0;
+  color: var(--ink-700);
+  font-size: 1rem;
+}
+
+.eyebrow--service {
+  color: var(--accent-900);
+}
+
+.app-menu {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--surface-alt);
+}
+
+.app-menu__label {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-700);
+}
+
+.app-menu__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.app-menu__link--active {
+  background: var(--accent-700) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-700) !important;
+  box-shadow: none;
+}
+
+.chip-button--menu {
+  min-height: 2.75rem;
+}
+
+.stat-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.stat-card {
+  padding: 1.15rem;
+  border-radius: 0.75rem;
+  background: var(--surface);
+}
+
+.stat-card--gov {
+  border-left: 0.35rem solid var(--accent-700);
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+}
+
+.stat-card__label {
+  color: var(--ink-700);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.stat-card--accent {
+  background: linear-gradient(135deg, rgba(19, 81, 180, 0.08), rgba(255, 255, 255, 1));
+}
+
+.flash {
+  margin-top: 1rem;
+  padding: 1rem 1.15rem;
+  border-radius: 0.75rem;
+}
+
+.flash p {
+  margin: 0.35rem 0 0;
+}
+
+.flash--success {
+  background: var(--success-100);
+}
+
+.flash--error {
+  background: var(--danger-100);
+}
+
+.flash__close {
+  border: 0;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.workspace {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1.5rem;
+}

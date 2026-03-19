@@ -10,6 +10,7 @@ import { formatTimestamp, joinSubjectDescriptions } from '../../../shared/format
   standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './report-panel.component.html',
+  styleUrl: './report-panel.component.scss',
 })
 export class ReportPanelComponent {
   private readonly fb = inject(FormBuilder);

@@ -72,3 +72,11 @@
 - **Alternatives considered**:
   - Logs isolados sem correlacao: rejeitada porque nao oferece rastreabilidade suficiente entre camadas.
   - Solucao proprietaria de observabilidade: rejeitada porque reduz portabilidade e foge do requisito de compatibilidade aberta.
+
+## Decision 10: Design System do gov.br como referencia principal do frontend
+
+- **Decision**: Adotar o Design System do gov.br como referencia primaria para identidade visual, navegacao, formularios, feedbacks e acessibilidade da aplicacao, usando Bootstrap apenas de forma complementar quando houver compatibilidade clara.
+- **Rationale**: O usuario solicitou aderencia ao padrao do gov.br. Tratar esse design system como base reduz ambiguidade visual, melhora consistencia institucional e orienta escolhas de UX alem do simples grid responsivo.
+- **Alternatives considered**:
+  - Bootstrap como base exclusiva: rejeitada porque nao garante aderencia ao padrao visual e comportamental exigido.
+  - CSS autoral inspirado no gov.br sem referencia explicita ao design system: rejeitada porque aumenta risco de divergencia e subjetividade na implementacao.
