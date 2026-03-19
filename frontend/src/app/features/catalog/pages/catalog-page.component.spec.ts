@@ -105,4 +105,17 @@ describe('CatalogPageComponent', () => {
     expect(compiled.querySelector('h1')?.textContent).toContain('Catálogo editorial');
     expect(compiled.textContent).toContain('Cadastre e mantenha a base de autores.');
   });
+
+  it('should expose Swagger UI and OpenAPI links from the generated backend contract', async () => {
+    const fixture = TestBed.createComponent(CatalogPageComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const links = Array.from(compiled.querySelectorAll('.overview__links a'));
+
+    expect(links[0]?.getAttribute('href')).toBe('/swagger-ui.html');
+    expect(links[1]?.getAttribute('href')).toBe('/api-docs');
+  });
 });

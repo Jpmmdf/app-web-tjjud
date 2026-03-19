@@ -3,8 +3,30 @@
 }
 
 .list-actions {
-  display: grid;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 0.75rem;
+}
+
+.list-actions > .btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.list-toolbar {
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.list-toolbar .form-control {
+  flex: 1 1 20rem;
+  width: auto;
+  min-width: 0;
+}
+
+.list-toolbar .btn {
+  flex: 0 0 auto;
 }
 
 .list-shell {
@@ -144,7 +166,7 @@
 }
 
 .empty-state {
-  margin: 0;
+  margin: 1rem 0 0;
   padding: 1rem;
   border: 1px dashed var(--line-strong);
   border-radius: 0.5rem;
@@ -155,5 +177,17 @@
 @media (max-width: 720px) {
   .list-shell__header {
     flex-direction: column;
+  }
+
+  .list-actions,
+  .list-toolbar {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .list-actions > .btn,
+  .list-toolbar .btn {
+    width: 100%;
   }
 }

@@ -7,17 +7,6 @@
     </div>
 
     <div class="list-actions">
-      <form class="toolbar" (ngSubmit)="loadSubjects()">
-        <input
-          class="form-control"
-          type="search"
-          [formControl]="subjectSearchControl"
-          [placeholder]="texts.searchPlaceholder"
-          [attr.aria-label]="texts.searchAriaLabel"
-        />
-        <button type="submit" class="btn btn-primary">{{ commonTexts.filter }}</button>
-      </form>
-
       <a class="btn btn-outline-secondary" routerLink="/assuntos/novo">{{ commonTexts.create }}</a>
     </div>
   </div>
@@ -27,6 +16,17 @@
       <h3>{{ texts.listTitle }}</h3>
       <span class="badge rounded-pill text-bg-light">{{ commonTexts.records(catalog.subjects().length) }}</span>
     </div>
+
+    <form class="toolbar list-toolbar" (ngSubmit)="loadSubjects()">
+      <input
+        class="form-control"
+        type="search"
+        [formControl]="subjectSearchControl"
+        [placeholder]="texts.searchPlaceholder"
+        [attr.aria-label]="texts.searchAriaLabel"
+      />
+      <button type="submit" class="btn btn-primary">{{ commonTexts.filter }}</button>
+    </form>
 
     @if (catalog.subjects().length > 0) {
       <div class="br-table table-responsive">

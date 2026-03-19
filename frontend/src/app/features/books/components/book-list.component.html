@@ -7,33 +7,6 @@
     </div>
 
     <div class="list-actions">
-      <form class="toolbar toolbar--wide" [formGroup]="bookFiltersForm" (ngSubmit)="loadBooks()">
-        <input
-          class="form-control"
-          type="search"
-          formControlName="title"
-          [placeholder]="texts.filters.titlePlaceholder"
-          [attr.aria-label]="texts.filters.titleAriaLabel"
-        />
-
-        <select class="form-select" formControlName="authorId" [attr.aria-label]="texts.filters.authorAriaLabel">
-          <option [ngValue]="null">{{ commonTexts.allAuthors }}</option>
-          @for (author of catalog.authorOptions(); track author.id) {
-            <option [ngValue]="author.id">{{ author.name }}</option>
-          }
-        </select>
-
-        <select class="form-select" formControlName="subjectId" [attr.aria-label]="texts.filters.subjectAriaLabel">
-          <option [ngValue]="null">{{ commonTexts.allSubjects }}</option>
-          @for (subject of catalog.subjectOptions(); track subject.id) {
-            <option [ngValue]="subject.id">{{ subject.description }}</option>
-          }
-        </select>
-
-        <button type="submit" class="btn btn-primary">{{ commonTexts.apply }}</button>
-        <button type="button" class="button button--ghost btn btn-outline-secondary" (click)="resetBookFilters()">{{ commonTexts.reset }}</button>
-      </form>
-
       <a class="btn btn-outline-secondary" routerLink="/livros/novo">{{ commonTexts.create }}</a>
     </div>
   </div>
@@ -43,6 +16,33 @@
       <h3>{{ texts.listTitle }}</h3>
       <span class="badge rounded-pill text-bg-light">{{ commonTexts.booksCount(catalog.books().length) }}</span>
     </div>
+
+    <form class="toolbar toolbar--wide list-toolbar" [formGroup]="bookFiltersForm" (ngSubmit)="loadBooks()">
+      <input
+        class="form-control"
+        type="search"
+        formControlName="title"
+        [placeholder]="texts.filters.titlePlaceholder"
+        [attr.aria-label]="texts.filters.titleAriaLabel"
+      />
+
+      <select class="form-select" formControlName="authorId" [attr.aria-label]="texts.filters.authorAriaLabel">
+        <option [ngValue]="null">{{ commonTexts.allAuthors }}</option>
+        @for (author of catalog.authorOptions(); track author.id) {
+          <option [ngValue]="author.id">{{ author.name }}</option>
+        }
+      </select>
+
+      <select class="form-select" formControlName="subjectId" [attr.aria-label]="texts.filters.subjectAriaLabel">
+        <option [ngValue]="null">{{ commonTexts.allSubjects }}</option>
+        @for (subject of catalog.subjectOptions(); track subject.id) {
+          <option [ngValue]="subject.id">{{ subject.description }}</option>
+        }
+      </select>
+
+      <button type="submit" class="btn btn-primary">{{ commonTexts.apply }}</button>
+      <button type="button" class="button button--ghost btn btn-outline-secondary" (click)="resetBookFilters()">{{ commonTexts.reset }}</button>
+    </form>
 
     @if (catalog.books().length > 0) {
       <div class="br-table table-responsive">

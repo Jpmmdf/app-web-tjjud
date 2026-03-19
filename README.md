@@ -19,7 +19,7 @@ Acesse:
 
 - Frontend: `http://localhost:4200`
 - API: `http://localhost:8080`
-- Swagger UI: `http://localhost:4200/swagger-ui/index.html`
+- Swagger UI: `http://localhost:4200/swagger-ui.html`
 - OpenAPI JSON: `http://localhost:4200/api-docs`
 
 ## Fluxo local sem containers
