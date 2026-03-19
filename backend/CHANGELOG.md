@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.0](https://github.com/Jpmmdf/app-web-tjjud/compare/backend-v1.0.0...backend-v1.1.0) (2026-03-19)
+
+
+### Features
+
+* improve book filters and overview data ([665881d](https://github.com/Jpmmdf/app-web-tjjud/commit/665881d7d2aa5dcbed8d645608e59f998a82e744))
+* improve book filters and overview data ([55e326c](https://github.com/Jpmmdf/app-web-tjjud/commit/55e326c675ab7dd42dd261d93cc2e557b9a20796))
+
+
+### Bug Fixes
+
+* honor report download filenames ([#49](https://github.com/Jpmmdf/app-web-tjjud/issues/49)) ([a7ebd49](https://github.com/Jpmmdf/app-web-tjjud/commit/a7ebd49eab3e9884429564bfceb9927134cae596))
+* polish shell version badge and openapi metadata ([#42](https://github.com/Jpmmdf/app-web-tjjud/issues/42)) ([1b225e7](https://github.com/Jpmmdf/app-web-tjjud/commit/1b225e795b14448c3fdbf763262cfe26a6a8155e))
+* refine book filter copy and openapi version ([#46](https://github.com/Jpmmdf/app-web-tjjud/issues/46)) ([8d4800e](https://github.com/Jpmmdf/app-web-tjjud/commit/8d4800e4740ea1fd4f87a1a85dae9b882b779bc2))
+* support versioned backend artifacts ([#37](https://github.com/Jpmmdf/app-web-tjjud/issues/37)) ([69f2974](https://github.com/Jpmmdf/app-web-tjjud/commit/69f2974244d3d80ea33bea8441bd1f221bc49603))
+
 ## 1.0.0 (2026-03-19)
 
 
