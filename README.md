@@ -38,12 +38,23 @@ make frontend-test
 
 ## Release automatica
 
-Ao fazer merge na `main`, o `release-please` abre as PRs de release do `backend` e do `frontend`. Quando essas PRs sao mergeadas, o workflow publica as imagens no Docker Hub.
+Fluxo configurado:
+
+1. Abrir PR normal para a `main`.
+2. Rodar CI de `backend` e `frontend` nessa PR.
+3. Fazer merge na `main`.
+4. O `release-please` abre ou atualiza as PRs de release do `backend` e do `frontend`.
+5. Essas PRs de release podem ser autoaprovadas.
+6. Ao fazer merge da PR de release, o `release-please` cria a tag e a GitHub Release.
+7. O `push` da tag publica a imagem correspondente no Docker Hub.
+
+As pipelines normais de CI nao rodam nas PRs de release do `release-please`, para evitar trabalho duplicado.
 
 Secrets necessarios no repositorio:
 
 - `DOCKER_USERNAME`
 - `DOCKERHUB_TOKEN`
+- `RELEASE_PLEASE_TOKEN`: PAT ou token de bot usado pelo `release-please` para abrir PRs e criar tags que possam disparar outros workflows
 - `RELEASE_PLEASE_REVIEW_TOKEN`: PAT de outro usuario ou bot, com permissao para aprovar PRs. O `github-actions` nao pode aprovar a propria PR de release.
 
 ## Documentacao

@@ -16,6 +16,7 @@ nav:
   - API: api.md
   - Dados: data.md
   - Operacao: operations.md
+  - Release: release.md
   - Onboarding: onboarding.md
 
 markdown_extensions:

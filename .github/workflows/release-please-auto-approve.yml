@@ -17,8 +17,9 @@ jobs:
     name: Auto Approve Release PR
     if: >-
       github.event.pull_request.base.ref == 'main' &&
-      github.event.pull_request.user.login == 'app/github-actions' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
       startsWith(github.event.pull_request.head.ref, 'release-please--branches--') &&
+      startsWith(github.event.pull_request.title, 'chore(main): release ') &&
       github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     env:

@@ -57,3 +57,7 @@ docker compose up --build
 - a API pode escalar horizontalmente porque o estado e externo ao processo
 - o banco continua como dependencia stateful gerenciada separadamente
 - a view do relatorio reduz custo de agregacao na camada web
+
+## Releases
+
+O fluxo de release e publicacao de imagens foi separado do CI normal. O detalhamento de PR de release, tags e Docker Hub esta em `docs/release.md`.
