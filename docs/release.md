@@ -28,6 +28,7 @@ As imagens recebem:
 
 - `release-please.yml`: executa no `push` da `main` e apenas abre ou atualiza PRs de release e GitHub Releases
 - `release-please-auto-approve.yml`: aprova automaticamente PRs de release validas
+- `dependabot-auto-approve.yml`: aprova automaticamente PRs validas abertas pelo Dependabot
 - `backend-image.yml`: publica a imagem do backend quando uma tag `backend-v*` e enviada
 - `frontend-image.yml`: publica a imagem do frontend quando uma tag `frontend-v*` e enviada
 - `backend-ci.yml` e `frontend-ci.yml`: nao rodam nas PRs de release para evitar duplicidade
@@ -36,11 +37,12 @@ As imagens recebem:
 
 - `DOCKER_USERNAME`
 - `DOCKERHUB_TOKEN`
-- `RELEASE_PLEASE_TOKEN`
-- `RELEASE_PLEASE_REVIEW_TOKEN`
+- `AUTOMATION_APP_ID`
+- `AUTOMATION_APP_PRIVATE_KEY`
 
-## Regras dos tokens
+## GitHub App
 
-- `RELEASE_PLEASE_TOKEN` deve ser um PAT ou token de bot com permissao para abrir PRs e criar tags
-- `RELEASE_PLEASE_REVIEW_TOKEN` deve pertencer a outro usuario ou bot, para que a aprovacao nao seja da mesma identidade que abriu a PR
-- nao use apenas `GITHUB_TOKEN` para esse fluxo quando a publicacao da imagem depender de outro workflow disparado por tag
+- o repositorio usa `actions/create-github-app-token` para gerar tokens efemeros em tempo de execucao
+- o App precisa ter permissao para `contents`, `issues` e `pull requests` no repositorio
+- o mesmo App e usado para abrir PRs de release, criar tags, aprovar PRs de release e aprovar PRs do Dependabot
+- esse desenho evita depender de PATs de usuarios e reduz o risco operacional

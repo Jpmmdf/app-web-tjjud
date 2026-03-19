@@ -54,8 +54,10 @@ Secrets necessarios no repositorio:
 
 - `DOCKER_USERNAME`
 - `DOCKERHUB_TOKEN`
-- `RELEASE_PLEASE_TOKEN`: PAT ou token de bot usado pelo `release-please` para abrir PRs e criar tags que possam disparar outros workflows
-- `RELEASE_PLEASE_REVIEW_TOKEN`: PAT de outro usuario ou bot, com permissao para aprovar PRs. O `github-actions` nao pode aprovar a propria PR de release.
+- `AUTOMATION_APP_ID`: App ID do GitHub App usado para release e automacoes
+- `AUTOMATION_APP_PRIVATE_KEY`: chave privada PEM do GitHub App
+
+Esse GitHub App gera o token efemero usado pelo `release-please`, pela autoaprovacao das PRs de release e pela autoaprovacao das PRs do Dependabot.
 
 ## Documentacao
 
