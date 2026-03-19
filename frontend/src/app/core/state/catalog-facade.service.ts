@@ -441,22 +441,36 @@ export class CatalogFacadeService {
 
   async downloadReport(authorId = this.currentReportList().authorId): Promise<boolean> {
     const normalizedAuthorId = authorId ?? null;
-    const blob = await this.runRequest(
+    const response = await this.runRequest(
       () => firstValueFrom(this.reportsApi.exportBooksByAuthorReport(normalizedAuthorId)),
       this.messages.reports.messages.exportError,
     );
-    if (!blob) {
+    if (!response?.body) {
       return false;
     }
 
-    const url = window.URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(response.body);
     const link = document.createElement('a');
     link.href = url;
-    link.download = this.messages.reports.messages.exportFilename;
+    link.download = this.extractFilename(response.headers.get('content-disposition'));
     link.click();
     window.URL.revokeObjectURL(url);
     this.showSuccess(this.messages.reports.messages.exportSuccessTitle, this.messages.reports.messages.exportSuccessDetail);
     return true;
+  }
+
+  private extractFilename(contentDisposition: string | null): string {
+    if (!contentDisposition) {
+      return this.messages.reports.messages.exportFilename;
+    }
+
+    const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+    if (utf8Match?.[1]) {
+      return decodeURIComponent(utf8Match[1]);
+    }
+
+    const filenameMatch = contentDisposition.match(/filename="?([^";]+)"?/i);
+    return filenameMatch?.[1] ?? this.messages.reports.messages.exportFilename;
   }
 
   private normalizeBookList(filters: BookListState): BookListState {

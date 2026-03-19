@@ -54,6 +54,10 @@ describe('ReportsApiService', () => {
     expect(request.request.params.get('authorId')).toBe('12');
     expect(request.request.responseType).toBe('blob');
 
-    request.flush(new Blob(), { status: 200, statusText: 'OK' });
+    request.flush(new Blob(), {
+      status: 200,
+      statusText: 'OK',
+      headers: { 'content-disposition': 'attachment; filename="livros-por-autor.pdf"' },
+    });
   });
 });
