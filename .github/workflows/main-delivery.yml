@@ -164,6 +164,7 @@ jobs:
 
             gh pr merge "$pr_number" \
               --repo "$GITHUB_REPOSITORY" \
+              --auto \
               --merge \
               --delete-branch
           done <<< "$RELEASE_PRS"
