@@ -27,7 +27,7 @@ As imagens recebem:
 ## Workflows
 
 - `release-please.yml`: executa no `push` da `main`, abre ou atualiza PRs de release e, quando uma release e criada, chama os jobs de publicacao Docker
-- `release-please-auto-approve.yml`: aprova automaticamente PRs de release validas
+- `release-please-auto-approve.yml`: aprova automaticamente PRs de release validas depois que o workflow `Release Please` termina com sucesso
 - `dependabot-auto-approve.yml`: aprova automaticamente PRs validas abertas pelo Dependabot
 - `backend-image.yml`: workflow reutilizavel para publicar a imagem do backend, tambem acionavel manualmente
 - `frontend-image.yml`: workflow reutilizavel para publicar a imagem do frontend, tambem acionavel manualmente

@@ -1,12 +1,12 @@
 name: Auto Approve Release PRs
 
 on:
-  pull_request_target:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Release Please
     types:
-      - opened
-      - reopened
-      - synchronize
-      - ready_for_review
+      - completed
 
 permissions:
   contents: read
@@ -16,11 +16,11 @@ jobs:
   auto-approve:
     name: Auto Approve Release PR
     if: >-
-      github.event.pull_request.base.ref == 'main' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      startsWith(github.event.pull_request.head.ref, 'release-please--branches--') &&
-      startsWith(github.event.pull_request.title, 'chore(main): release ') &&
-      github.event.pull_request.draft == false
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main'
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Validar secrets do GitHub App
@@ -42,12 +42,46 @@ jobs:
           owner: ${{ github.repository_owner }}
           permission-pull-requests: write
 
-      - name: Aprovar PR de release
+      - name: Aprovar PRs de release abertas pelo Release Please
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          gh pr review "$PR_NUMBER" \
-            --repo "$GITHUB_REPOSITORY" \
-            --approve \
-            --body "Aprovacao automatica da PR de release."
+          REVIEWER_LOGIN="$(gh api user --jq '.login')"
+          RELEASE_PRS="$(
+            gh pr list \
+              --repo "$GITHUB_REPOSITORY" \
+              --state open \
+              --base main \
+              --json number,title,headRefName,author,reviewDecision \
+              --jq '.[] | select(.author.login == "app/github-actions") | select(.headRefName | startswith("release-please--branches--")) | select(.title | startswith("chore(main): release ")) | @base64'
+          )"
+
+          if [ -z "$RELEASE_PRS" ]; then
+            echo "Nenhuma PR de release pendente para aprovar."
+            exit 0
+          fi
+
+          while IFS= read -r encoded_pr; do
+            [ -z "$encoded_pr" ] && continue
+
+            pr_json="$(printf '%s' "$encoded_pr" | base64 --decode)"
+            pr_number="$(printf '%s' "$pr_json" | jq -r '.number')"
+            review_decision="$(printf '%s' "$pr_json" | jq -r '.reviewDecision // empty')"
+
+            if [ "$review_decision" = "APPROVED" ]; then
+              echo "PR #$pr_number ja aprovada. Pulando."
+              continue
+            fi
+
+            existing_review="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$pr_number/reviews" --jq ".[] | select(.user.login == \"$REVIEWER_LOGIN\" and .state == \"APPROVED\") | .id" | head -n 1)"
+
+            if [ -n "$existing_review" ]; then
+              echo "PR #$pr_number ja aprovada por $REVIEWER_LOGIN. Pulando."
+              continue
+            fi
+
+            gh pr review "$pr_number" \
+              --repo "$GITHUB_REPOSITORY" \
+              --approve \
+              --body "Aprovacao automatica da PR de release."
+          done <<< "$RELEASE_PRS"
