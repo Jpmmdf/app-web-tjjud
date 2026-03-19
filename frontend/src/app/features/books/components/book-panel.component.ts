@@ -13,6 +13,7 @@ import { joinAuthorNames, joinSubjectDescriptions } from '../../../shared/format
   standalone: true,
   imports: [ReactiveFormsModule, BrlCurrencyMaskDirective],
   templateUrl: './book-panel.component.html',
+  styleUrl: './book-panel.component.scss',
 })
 export class BookPanelComponent {
   private readonly fb = inject(FormBuilder);

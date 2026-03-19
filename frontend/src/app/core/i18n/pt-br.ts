@@ -20,11 +20,18 @@ export const ptBrCatalogMessages = {
     title: 'Catálogo editorial TJJUD',
     lead:
       'Operação única para autores, assuntos, livros e relatórios por autor, com consistência relacional e valor monetário mascarado em reais.',
+    navigation: [
+      { path: '/visao-geral', label: 'Visão geral' },
+      { path: '/autores', label: 'Autores' },
+      { path: '/assuntos', label: 'Assuntos' },
+      { path: '/livros', label: 'Livros' },
+      { path: '/relatorios', label: 'Relatórios' },
+    ] as const,
     sections: [
-      { id: 'authors', label: 'Autores' },
-      { id: 'subjects', label: 'Assuntos' },
-      { id: 'books', label: 'Livros' },
-      { id: 'reports', label: 'Relatórios' },
+      { path: '/autores', label: 'Autores', description: 'Cadastre e mantenha a base de autores.' },
+      { path: '/assuntos', label: 'Assuntos', description: 'Organize a taxonomia editorial do catálogo.' },
+      { path: '/livros', label: 'Livros', description: 'Gerencie o acervo com filtros, autores e assuntos.' },
+      { path: '/relatorios', label: 'Relatórios', description: 'Acompanhe a visão consolidada por autor e exporte em PDF.' },
     ] as const,
     links: {
       swagger: 'Swagger UI',
@@ -40,6 +47,14 @@ export const ptBrCatalogMessages = {
       eyebrow: 'Bootstrap inicial',
       title: 'Sincronizando catálogo e relatórios com a API',
       detail: 'Os dados de autores, assuntos, livros e relatório por autor estão sendo carregados.',
+    },
+    menu: {
+      label: 'Menu principal',
+      home: 'Painel de navegação',
+    },
+    overview: {
+      title: 'Visão geral do catálogo',
+      detail: 'Acompanhe os totais do acervo e entre diretamente no fluxo operacional de cada funcionalidade.',
     },
   },
   notifications: {

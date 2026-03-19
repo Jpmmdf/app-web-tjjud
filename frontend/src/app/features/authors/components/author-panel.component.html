@@ -1,5 +1,5 @@
-<section id="authors" class="panel">
-  <div class="panel__header">
+<section id="authors" class="panel panel--govbr card border-0">
+  <div class="panel__header d-flex flex-column flex-xl-row justify-content-between align-items-xl-start">
     <div>
       <p class="eyebrow">{{ texts.eyebrow }}</p>
       <h2>{{ texts.title }}</h2>
@@ -7,40 +7,41 @@
 
     <form class="toolbar" (ngSubmit)="loadAuthors()">
       <input
+        class="form-control"
         type="search"
         [formControl]="authorSearchControl"
         [placeholder]="texts.searchPlaceholder"
         [attr.aria-label]="texts.searchAriaLabel"
       />
-      <button type="submit">{{ commonTexts.filter }}</button>
+      <button type="submit" class="btn btn-primary">{{ commonTexts.filter }}</button>
     </form>
   </div>
 
   <div class="panel__content panel__content--split">
-    <form class="card-form" [formGroup]="authorForm" (ngSubmit)="submitAuthor()" novalidate>
+    <form class="card-form card border-0 shadow-sm" [formGroup]="authorForm" (ngSubmit)="submitAuthor()" novalidate>
       <div class="card-form__header">
         <h3>{{ texts.formTitle(editingAuthorId() !== null) }}</h3>
-        <button type="button" class="button button--ghost" (click)="resetAuthorForm()">{{ commonTexts.clear }}</button>
+        <button type="button" class="button button--ghost btn btn-outline-secondary" (click)="resetAuthorForm()">{{ commonTexts.clear }}</button>
       </div>
 
       <label class="field">
-        <span>{{ texts.fieldLabel }}</span>
-        <input type="text" formControlName="name" maxlength="40" [placeholder]="texts.fieldPlaceholder" />
+        <span class="form-label mb-0">{{ texts.fieldLabel }}</span>
+        <input class="form-control" type="text" formControlName="name" maxlength="40" [placeholder]="texts.fieldPlaceholder" />
       </label>
 
       @if (authorForm.controls.name.touched && authorForm.controls.name.invalid) {
-        <p class="field-error">{{ texts.fieldError }}</p>
+        <p class="field-error invalid-feedback d-block">{{ texts.fieldError }}</p>
       }
 
-      <button type="submit" class="button button--primary" [disabled]="authorForm.invalid || catalog.isBusy()">
+      <button type="submit" class="button button--primary btn btn-primary align-self-start" [disabled]="authorForm.invalid || catalog.isBusy()">
         {{ texts.submitLabel(editingAuthorId() !== null) }}
       </button>
     </form>
 
-    <div class="list-shell">
+    <div class="list-shell card border-0 shadow-sm">
       <div class="list-shell__header">
         <h3>{{ texts.listTitle }}</h3>
-        <span>{{ commonTexts.records(catalog.authors().length) }}</span>
+        <span class="badge rounded-pill text-bg-light">{{ commonTexts.records(catalog.authors().length) }}</span>
       </div>
 
       @if (catalog.authors().length > 0) {
@@ -53,8 +54,8 @@
               </div>
 
               <div class="entity-list__actions">
-                <button type="button" class="button button--ghost" (click)="editAuthor(author)">{{ commonTexts.edit }}</button>
-                <button type="button" class="button button--danger" (click)="deleteAuthor(author)">{{ commonTexts.delete }}</button>
+                <button type="button" class="button button--ghost btn btn-outline-secondary btn-sm" (click)="editAuthor(author)">{{ commonTexts.edit }}</button>
+                <button type="button" class="button button--danger btn btn-outline-danger btn-sm" (click)="deleteAuthor(author)">{{ commonTexts.delete }}</button>
               </div>
             </li>
           }

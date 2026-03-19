@@ -112,6 +112,7 @@ Como usuario do sistema, quero acessar rapidamente as telas principais e consult
 - **FR-018**: O sistema MUST manter as mensagens destinadas ao usuario em mecanismo centralizado de internacionalizacao ou arquivos de configuracao equivalentes, evitando literais dispersos pelo codigo.
 - **FR-019**: A aplicacao MUST suportar telemetria compativel com OpenTelemetry para rastrear requisicoes, operacoes criticas e integracoes relevantes durante execucao local e em ambiente alvo.
 - **FR-020**: O frontend MUST utilizar Bootstrap como base do sistema visual, do layout responsivo e dos componentes estruturais principais das telas de cadastro, consulta e relatorio.
+- **FR-021**: O frontend MUST adotar o Design System do gov.br como referencia oficial para componentes, estilos, navegacao e acessibilidade das telas principais, preservando aderencia visual e comportamental ao padrao institucional.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -135,3 +136,4 @@ Como usuario do sistema, quero acessar rapidamente as telas principais e consult
 - **SC-007**: 100% das mensagens exibidas ao usuario nos fluxos principais da demonstracao aparecem em portugues do Brasil, sem textos residuais em ingles.
 - **SC-008**: Os fluxos principais de CRUD e emissao de relatorio podem ser acompanhados por telemetria compativel com OpenTelemetry, com rastros exportaveis para um coletor ou backend observavel.
 - **SC-009**: As telas principais da demonstracao apresentam comportamento responsivo e padrao visual consistente baseado na biblioteca definida para o frontend, sem necessidade de estrutura paralela conflitante para formularios, grids e navegacao.
+- **SC-010**: As telas principais da demonstracao seguem padroes verificaveis do Design System do gov.br para navegacao, formularios, feedbacks e acessibilidade visual, sem divergencias perceptiveis nos fluxos principais.

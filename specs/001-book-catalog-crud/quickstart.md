@@ -25,10 +25,11 @@
 ## 3. Estruturar frontend
 
 1. Criar o projeto em `frontend/` com Angular.
-2. Adicionar Bootstrap ao frontend e configurar a base visual responsiva para layout, grid, formularios, tabelas e navegacao.
-3. Configurar roteamento para `livros`, `autores`, `assuntos` e `relatorios`.
-4. Implementar um componente ou diretiva de moeda BRL reutilizavel para o campo `valor`.
-5. Integrar o frontend aos endpoints do contrato REST, centralizar mensagens e rotulos em portugues e evitar estruturas visuais paralelas que conflitem com Bootstrap.
+2. Adotar o Design System do gov.br no frontend como referencia principal de componentes, navegacao, formularios e acessibilidade visual.
+3. Usar Bootstrap apenas quando necessario para suporte estrutural compativel com o padrao do gov.br.
+4. Configurar roteamento para `livros`, `autores`, `assuntos` e `relatorios`.
+5. Implementar um componente ou diretiva de moeda BRL reutilizavel para o campo `valor`.
+6. Integrar o frontend aos endpoints do contrato REST, centralizar mensagens e rotulos em portugues e evitar estruturas visuais paralelas que conflitem com o Design System do gov.br.
 
 ## 4. Fluxo minimo de validacao
 
@@ -39,6 +40,7 @@
 5. Confirmar que mensagens de validacao e feedback aparecem em portugues.
 6. Gerar o relatorio por autor em JSON e PDF.
 7. Verificar emissao de telemetria compativel com OpenTelemetry para pelo menos uma operacao principal.
+8. Verificar que navegacao, formularios e feedbacks principais seguem o padrao visual e de interacao do Design System do gov.br.
 
 ## 5. Testes esperados
 
