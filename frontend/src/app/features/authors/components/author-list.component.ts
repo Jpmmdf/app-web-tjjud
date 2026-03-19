@@ -45,6 +45,27 @@ export class AuthorListComponent implements OnInit {
     await this.catalog.loadAuthors({ page });
   }
 
+  protected async sortBy(field: 'id' | 'name'): Promise<void> {
+    const nextOption = this.nextSortOption(field);
+    this.sortControl.setValue(nextOption);
+    await this.catalog.loadAuthors({
+      query: this.authorSearchControl.value,
+      page: 0,
+      ...this.fromSortOption(nextOption),
+    });
+  }
+
+  protected sortIndicator(field: 'id' | 'name'): string {
+    const current = this.sortControl.value;
+    if ((field === 'id' && current === 'idAsc') || (field === 'name' && current === 'nameAsc')) {
+      return '↑';
+    }
+    if ((field === 'id' && current === 'idDesc') || (field === 'name' && current === 'nameDesc')) {
+      return '↓';
+    }
+    return '';
+  }
+
   protected hasPreviousPage(): boolean {
     return this.catalog.authorPage().page > 0;
   }
@@ -72,6 +93,14 @@ export class AuthorListComponent implements OnInit {
       return direction === 'DESC' ? 'idDesc' : 'idAsc';
     }
     return direction === 'DESC' ? 'nameDesc' : 'nameAsc';
+  }
+
+  private nextSortOption(field: 'id' | 'name'): AuthorSortOption {
+    const current = this.sortControl.value;
+    if (field === 'id') {
+      return current === 'idAsc' ? 'idDesc' : 'idAsc';
+    }
+    return current === 'nameAsc' ? 'nameDesc' : 'nameAsc';
   }
 }
 

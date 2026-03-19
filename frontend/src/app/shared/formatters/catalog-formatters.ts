@@ -7,6 +7,15 @@ export function formatCurrencyTotal(value: number): string {
   }).format(value);
 }
 
+export function formatCurrencyValue(value: string | number | null | undefined): string {
+  if (value == null || value === '') {
+    return formatCurrencyTotal(0);
+  }
+
+  const amount = typeof value === 'number' ? value : Number.parseFloat(value);
+  return formatCurrencyTotal(Number.isNaN(amount) ? 0 : amount);
+}
+
 export function formatTimestamp(timestamp: string | null | undefined): string {
   if (!timestamp) {
     return ptBrCatalogMessages.common.noExecution;

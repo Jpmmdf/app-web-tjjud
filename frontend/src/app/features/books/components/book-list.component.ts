@@ -5,7 +5,7 @@ import { ptBrCatalogMessages } from '../../../core/i18n/pt-br';
 import { Book } from '../../../core/models/books.models';
 import { SortDirection } from '../../../core/models/common.models';
 import { CatalogFacadeService } from '../../../core/state/catalog-facade.service';
-import { joinAuthorNames, joinSubjectDescriptions } from '../../../shared/formatters/catalog-formatters';
+import { formatCurrencyValue, joinAuthorNames, joinSubjectDescriptions } from '../../../shared/formatters/catalog-formatters';
 
 @Component({
   selector: 'app-book-list',
@@ -61,6 +61,16 @@ export class BookListComponent implements OnInit {
     await this.catalog.loadBooks({ page });
   }
 
+  protected async sortBy(field: 'title' | 'publicationYear' | 'price'): Promise<void> {
+    const nextOption = this.nextSortOption(field);
+    this.sortControl.setValue(nextOption);
+    await this.catalog.loadBooks({
+      ...this.bookFiltersForm.getRawValue(),
+      page: 0,
+      ...this.fromSortOption(nextOption),
+    });
+  }
+
   protected bookAuthors(book: Book): string {
     return joinAuthorNames(book.authors);
   }
@@ -69,12 +79,35 @@ export class BookListComponent implements OnInit {
     return joinSubjectDescriptions(book.subjects);
   }
 
+  protected bookPrice(book: Book): string {
+    return formatCurrencyValue(book.price);
+  }
+
   protected hasPreviousPage(): boolean {
     return this.catalog.bookPage().page > 0;
   }
 
   protected hasNextPage(): boolean {
     return this.catalog.bookPage().page + 1 < this.catalog.bookPage().totalPages;
+  }
+
+  protected sortIndicator(field: 'title' | 'publicationYear' | 'price'): string {
+    const current = this.sortControl.value;
+    if (
+      (field === 'title' && current === 'titleAsc') ||
+      (field === 'publicationYear' && current === 'yearAsc') ||
+      (field === 'price' && current === 'priceAsc')
+    ) {
+      return '↑';
+    }
+    if (
+      (field === 'title' && current === 'titleDesc') ||
+      (field === 'publicationYear' && current === 'yearDesc') ||
+      (field === 'price' && current === 'priceDesc')
+    ) {
+      return '↓';
+    }
+    return '';
   }
 
   private fromSortOption(option: BookSortOption): { sortField: string; sortDirection: SortDirection } {
@@ -103,6 +136,17 @@ export class BookListComponent implements OnInit {
       return direction === 'DESC' ? 'priceDesc' : 'priceAsc';
     }
     return direction === 'DESC' ? 'titleDesc' : 'titleAsc';
+  }
+
+  private nextSortOption(field: 'title' | 'publicationYear' | 'price'): BookSortOption {
+    const current = this.sortControl.value;
+    if (field === 'publicationYear') {
+      return current === 'yearAsc' ? 'yearDesc' : 'yearAsc';
+    }
+    if (field === 'price') {
+      return current === 'priceAsc' ? 'priceDesc' : 'priceAsc';
+    }
+    return current === 'titleAsc' ? 'titleDesc' : 'titleAsc';
   }
 }
 

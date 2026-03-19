@@ -64,6 +64,67 @@
   letter-spacing: 0.12em;
 }
 
+.table-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  font-weight: 700;
+}
+
+.table-sort__icon {
+  min-width: 0.75rem;
+  color: var(--accent-700);
+}
+
+.action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--accent-700);
+  text-decoration: none;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+
+.action-icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
+}
+
+.action-icon:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent-700);
+  box-shadow: var(--shadow-soft);
+}
+
+.action-icon:focus-visible {
+  outline: 2px solid var(--accent-700);
+  outline-offset: 2px;
+}
+
+.action-icon--danger {
+  color: var(--danger-700);
+  border-color: rgba(201, 42, 42, 0.3);
+}
+
+.action-icon--danger:hover {
+  border-color: var(--danger-700);
+  background: var(--danger-100);
+}
+
 .br-table tbody tr:last-child td {
   border-bottom: 0;
 }
