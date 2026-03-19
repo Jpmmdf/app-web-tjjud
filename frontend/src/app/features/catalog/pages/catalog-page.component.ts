@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit, inject } from '@angular/core';
 import { ptBrCatalogMessages } from '../../../core/i18n/pt-br';
 import { CatalogFacadeService } from '../../../core/state/catalog-facade.service';
@@ -11,12 +11,11 @@ import { SubjectPanelComponent } from '../../subjects/components/subject-panel.c
   selector: 'app-catalog-page',
   standalone: true,
   imports: [
-    CommonModule,
     AuthorPanelComponent,
     SubjectPanelComponent,
     BookPanelComponent,
-    ReportPanelComponent,
-  ],
+    ReportPanelComponent
+],
   templateUrl: './catalog-page.component.html',
 })
 export class CatalogPageComponent implements OnInit {

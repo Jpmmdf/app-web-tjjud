@@ -38,8 +38,9 @@ export class BrlCurrencyMaskDirective implements ControlValueAccessor {
     this.elementRef.nativeElement.disabled = isDisabled;
   }
 
-  @HostListener('input', ['$event.target.value'])
-  handleInput(rawValue: string): void {
+  @HostListener('input', ['$event'])
+  handleInput(event: Event): void {
+    const rawValue = (event.target as HTMLInputElement | null)?.value ?? '';
     const modelValue = this.toModelValue(rawValue);
     this.render(this.toDisplayValue(modelValue));
     this.onChange(modelValue);

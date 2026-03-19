@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ptBrCatalogMessages } from '../../../core/i18n/pt-br';
@@ -8,7 +8,7 @@ import { formatTimestamp, joinSubjectDescriptions } from '../../../shared/format
 @Component({
   selector: 'app-report-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './report-panel.component.html',
 })
 export class ReportPanelComponent {

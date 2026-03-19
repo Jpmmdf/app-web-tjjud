@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ptBrCatalogMessages } from '../../../core/i18n/pt-br';
@@ -8,7 +8,7 @@ import { CatalogFacadeService } from '../../../core/state/catalog-facade.service
 @Component({
   selector: 'app-subject-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './subject-panel.component.html',
 })
 export class SubjectPanelComponent {

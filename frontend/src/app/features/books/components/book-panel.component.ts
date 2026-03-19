@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ptBrCatalogMessages } from '../../../core/i18n/pt-br';
@@ -11,7 +11,7 @@ import { joinAuthorNames, joinSubjectDescriptions } from '../../../shared/format
 @Component({
   selector: 'app-book-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, BrlCurrencyMaskDirective],
+  imports: [ReactiveFormsModule, BrlCurrencyMaskDirective],
   templateUrl: './book-panel.component.html',
 })
 export class BookPanelComponent {

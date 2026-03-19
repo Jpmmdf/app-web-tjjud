@@ -51,7 +51,7 @@ jobs:
         run: ./mvnw --batch-mode verify
 
       - name: Publicar artefato do backend
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: backend-jar
           path: backend/target/backend-0.0.1-SNAPSHOT.jar
@@ -94,7 +94,7 @@ jobs:
         run: npm run build
 
       - name: Publicar artefato do frontend
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-dist
           path: frontend/dist/frontend/browser
