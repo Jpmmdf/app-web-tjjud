@@ -79,8 +79,33 @@ public class ApiExceptionHandler {
         String detail = messages.get("problem.conflito.detalhe");
         if (ex instanceof ConflictException conflictException) {
             detail = messages.get(conflictException.getMessageKey(), conflictException.getMessageArguments());
+        } else if (ex instanceof DataIntegrityViolationException dataIntegrityViolationException) {
+            detail = resolveDataIntegrityDetail(dataIntegrityViolationException);
         }
         return respond(HttpStatus.CONFLICT, messages.get("problem.conflito.titulo"), detail, request, List.of());
+    }
+
+    private String resolveDataIntegrityDetail(DataIntegrityViolationException ex) {
+        String details = (ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage());
+        if (details == null) {
+            return messages.get("problem.conflito.detalhe");
+        }
+        if (details.contains("ux_autor_nome_ci")) {
+            return messages.get("error.autor.duplicado.generico");
+        }
+        if (details.contains("ux_assunto_descricao_ci")) {
+            return messages.get("error.assunto.duplicado.generico");
+        }
+        if (details.contains("ux_livro_identidade_ci")) {
+            return messages.get("error.livro.duplicado");
+        }
+        if (details.contains("fk_livro_autor_autor")) {
+            return messages.get("error.autor.exclusao.vinculado");
+        }
+        if (details.contains("fk_livro_assunto_assunto")) {
+            return messages.get("error.assunto.exclusao.vinculado");
+        }
+        return messages.get("problem.conflito.detalhe");
     }
 
     @ExceptionHandler(Exception.class)
