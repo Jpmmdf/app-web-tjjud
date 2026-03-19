@@ -16,12 +16,13 @@
   - Micronaut ou Quarkus: rejeitados por adicionarem custo de decisao sem ganho necessario para o escopo.
   - JDBC puro: rejeitado porque aumenta o volume de codigo para um desafio com foco mais amplo.
 
-## Decision 3: Angular standalone com formularios reativos
+## Decision 3: Angular standalone com formularios reativos e Bootstrap
 
-- **Decision**: Implementar o frontend em Angular com componentes standalone, Angular Router, HttpClient e formularios reativos tipados.
-- **Rationale**: Atende ao stack solicitado, simplifica a organizacao por feature e facilita validacao de formularios, listagens e tela de relatorio.
+- **Decision**: Implementar o frontend em Angular com componentes standalone, Angular Router, HttpClient, formularios reativos tipados e Bootstrap como base visual responsiva.
+- **Rationale**: Atende ao stack solicitado, simplifica a organizacao por feature, acelera a construcao de layout responsivo e reduz a necessidade de CSS estrutural customizado para formularios, listagens e tela de relatorio.
 - **Alternatives considered**:
   - Angular com `NgModule` em todas as features: rejeitado porque adiciona boilerplate sem necessidade.
+  - CSS autoral completo sem framework visual base: rejeitada porque aumenta custo de montagem e reduz consistencia entre telas para um escopo demonstrativo.
   - Outra SPA framework: rejeitada porque o pedido explicito foi Angular.
 
 ## Decision 4: PostgreSQL com modelagem normalizada e migrations versionadas

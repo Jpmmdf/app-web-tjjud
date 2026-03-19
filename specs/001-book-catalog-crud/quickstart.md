@@ -25,9 +25,10 @@
 ## 3. Estruturar frontend
 
 1. Criar o projeto em `frontend/` com Angular.
-2. Configurar roteamento para `livros`, `autores`, `assuntos` e `relatorios`.
-3. Implementar um componente ou diretiva de moeda BRL reutilizavel para o campo `valor`.
-4. Integrar o frontend aos endpoints do contrato REST e centralizar mensagens e rotulos em portugues.
+2. Adicionar Bootstrap ao frontend e configurar a base visual responsiva para layout, grid, formularios, tabelas e navegacao.
+3. Configurar roteamento para `livros`, `autores`, `assuntos` e `relatorios`.
+4. Implementar um componente ou diretiva de moeda BRL reutilizavel para o campo `valor`.
+5. Integrar o frontend aos endpoints do contrato REST, centralizar mensagens e rotulos em portugues e evitar estruturas visuais paralelas que conflitem com Bootstrap.
 
 ## 4. Fluxo minimo de validacao
 

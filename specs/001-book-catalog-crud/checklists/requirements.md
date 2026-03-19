@@ -32,5 +32,5 @@
 ## Notes
 
 - Nenhum marcador de esclarecimento permaneceu aberto.
-- Por solicitacao explicita do usuario, a especificacao passou a registrar duas diretrizes tecnicas transversais: externalizacao de mensagens via i18n/properties e suporte a OpenTelemetry.
+- Por solicitacao explicita do usuario, a especificacao passou a registrar diretrizes tecnicas transversais para externalizacao de mensagens via i18n/properties, suporte a OpenTelemetry e uso de Bootstrap no frontend.
 - Demais diretrizes de implementacao, como stack especifica e detalhamento tecnico da API, permanecem formalizadas principalmente na etapa `/speckit.plan`.
