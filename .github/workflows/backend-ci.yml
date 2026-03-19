@@ -57,5 +57,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: backend-jar
-          path: backend/target/backend-0.0.1-SNAPSHOT.jar
+          path: backend/target/backend-*.jar
           if-no-files-found: error
