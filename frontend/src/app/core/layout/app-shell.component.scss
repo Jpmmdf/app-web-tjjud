@@ -38,10 +38,18 @@
 }
 
 .app-nav__version {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-alt);
   color: var(--ink-600);
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 .app-nav__links {

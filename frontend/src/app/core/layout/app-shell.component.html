@@ -3,7 +3,13 @@
     <div class="app-nav__inner container-xxl">
       <div class="app-nav__brand-group">
         <a class="app-nav__brand" routerLink="/visao-geral">{{ appTexts.menu.serviceName }}</a>
-        <span class="app-nav__version">{{ appTexts.menu.versionLabel(appVersion) }}</span>
+        <span
+          class="app-nav__version"
+          [attr.aria-label]="appTexts.menu.versionTooltip(appVersion)"
+          [attr.title]="appTexts.menu.versionTooltip(appVersion)"
+        >
+          {{ appTexts.menu.versionLabel(appVersion) }}
+        </span>
       </div>
 
       <nav class="app-nav__links" id="main-navigation" [attr.aria-label]="appTexts.menu.label">

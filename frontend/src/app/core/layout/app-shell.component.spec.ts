@@ -52,12 +52,14 @@ describe('AppShellComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
+    const versionBadge = compiled.querySelector('.app-nav__version');
     expect(compiled.querySelector('header.app-nav')).not.toBeNull();
     expect(compiled.querySelector('nav#main-navigation')).not.toBeNull();
     expect(compiled.querySelector('main#main-content')).not.toBeNull();
     expect(compiled.querySelector('footer')).toBeNull();
     expect(compiled.textContent).toContain('Catálogo editorial');
     expect(compiled.textContent).toContain(`Versão ${packageJson.version}`);
+    expect(versionBadge?.getAttribute('title')).toBe(`Versão atual da aplicação: ${packageJson.version}`);
   });
 
   it('should refresh catalog data on init', async () => {
