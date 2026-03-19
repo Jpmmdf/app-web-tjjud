@@ -4,8 +4,8 @@ Portal central da solucao API-first implementada para o desafio TJJUD.
 
 ## O que existe aqui
 
-- backend `Spring Boot` com CRUD de autores, assuntos e livros
-- frontend `Angular 20` com formularios reativos e mascara BRL para o campo de valor
+- backend `Spring Boot 4 / Java 21` com CRUD de autores, assuntos e livros
+- frontend `Angular 21` com formularios reativos e mascara BRL para o campo de valor
 - banco `PostgreSQL 16` com modelagem normalizada e view `vw_relatorio_livros_por_autor`
 - exportacao PDF do relatorio por autor
 - documentacao cloud-native e diagramas C4 gerados a partir de `Structurizr DSL`

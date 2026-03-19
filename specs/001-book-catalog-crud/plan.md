@@ -7,18 +7,18 @@
 
 ## Summary
 
-Implementar uma aplicacao web de cadastro de livros em dois projetos, com `contracts/openapi.yaml` como fonte de verdade para o contrato REST. O backend em Spring Boot entregara CRUD de livros, autores e assuntos, validacoes especificas, relatorio por autor alimentado por view de banco, exportacao em PDF, mensagens externalizadas em portugues e telemetria compativel com OpenTelemetry. O frontend em Angular consumira o contrato da API, usara formularios reativos, centralizara mensagens da interface e tera componente reutilizavel de mascara monetaria em reais para o campo de valor.
+Implementar uma aplicacao web de cadastro de livros em dois projetos, com `contracts/openapi.yaml` como fonte de verdade para o contrato REST. O backend em Spring Boot entregara CRUD de livros, autores e assuntos, validacoes especificas, relatorio por autor alimentado por view de banco, exportacao em PDF, mensagens externalizadas em portugues e telemetria compativel com OpenTelemetry. O frontend em Angular consumira o contrato da API, usara formularios reativos, Bootstrap como base visual responsiva, centralizara mensagens da interface e tera componente reutilizavel de mascara monetaria em reais para o campo de valor.
 
 ## Technical Context
 
 **Language/Version**: Java 21 LTS, TypeScript 5.x, SQL (PostgreSQL 16+)  
-**Primary Dependencies**: Spring Boot 3.x (Web, Validation, Data JPA, Actuator), Flyway, springdoc-openapi, OpenTelemetry/OTLP, bundles de mensagens via i18n ou `properties`, Angular 19+ com componentes standalone, Angular Reactive Forms, Angular HttpClient  
+**Primary Dependencies**: Spring Boot 4.x (Web, Validation, Data JPA, Actuator), Flyway, springdoc-openapi, OpenTelemetry/OTLP, OpenPDF, bundles de mensagens via i18n ou `properties`, Angular 21+ com componentes standalone, Angular Reactive Forms, Angular HttpClient, Bootstrap 5  
 **Storage**: PostgreSQL 16+ com schema normalizado, constraints, indices e view de relatorio  
 **Testing**: JUnit 5, Spring Boot Test, MockMvc, Testcontainers para PostgreSQL, Angular unit tests, Playwright para fluxo critico ponta a ponta  
 **Target Platform**: Navegadores modernos no frontend e API REST executando em Linux/macOS localmente ou em container  
 **Project Type**: web application (Angular SPA + Spring Boot REST API)  
 **Performance Goals**: p95 menor que 300 ms para operacoes de CRUD e consulta simples; geracao do relatorio em ate 5 s para base com 10 mil livros  
-**Constraints**: abordagem API-first obrigatoria, valor monetario com precisao decimal e mascara BRL, view de banco obrigatoria para o relatorio, aderencia ao modelo fornecido com melhorias apenas de qualidade/performance, mensagens de erro especificas em portugues com i18n/properties, suporte a OpenTelemetry e setup reproduzivel para demonstracao  
+**Constraints**: abordagem API-first obrigatoria, valor monetario com precisao decimal e mascara BRL, view de banco obrigatoria para o relatorio, aderencia ao modelo fornecido com melhorias apenas de qualidade/performance, mensagens de erro especificas em portugues com i18n/properties, suporte a OpenTelemetry, uso de Bootstrap no frontend e setup reproduzivel para demonstracao  
 **Scale/Scope**: desafio tecnico com 4 areas principais de interface, base pequena a media, dezenas de usuarios concorrentes e ate 10 mil livros catalogados
 
 ## Constitution Check
@@ -96,8 +96,8 @@ frontend/
 
 - Adotar PostgreSQL como banco principal pela combinacao de constraints robustas, suporte nativo a view, tipos numericos confiaveis para moeda e boa integracao com Spring Boot/Testcontainers.
 - Representar valor monetario como decimal canonico na API e `NUMERIC(12,2)` no banco, com `BigDecimal` no backend e mascara `pt-BR` no frontend para evitar erros de ponto flutuante.
-- Implementar a interface web com Angular standalone e formularios reativos, usando um controle reutilizavel de moeda em vez de acoplamento a uma biblioteca de mascara de baixa manutencao.
-- Gerar o relatorio a partir de uma view relacional do banco e renderiza-lo via JasperReports no backend para exportacao PDF, mantendo uma consulta JSON equivalente para inspecao e testes.
+- Implementar a interface web com Angular standalone, formularios reativos e Bootstrap como base visual, usando um controle reutilizavel de moeda em vez de acoplamento a uma biblioteca de mascara de baixa manutencao.
+- Gerar o relatorio a partir de uma view relacional do banco e renderiza-lo via OpenPDF no backend para exportacao PDF, mantendo uma consulta JSON equivalente para inspecao e testes.
 - Validar integracao com testes em camadas: unitarios para regras, integracao para persistencia/view, contrato para API e E2E para o fluxo principal.
 - Externalizar mensagens de negocio e validacao em mecanismo centralizado de i18n/properties, com `pt-BR` como idioma padrao da demonstracao.
 - Instrumentar API e runtime com suporte a OpenTelemetry para traces, metricas e correlacao de logs nas operacoes principais.
@@ -116,6 +116,7 @@ frontend/
 ### Frontend
 
 - Angular com componentes standalone, roteamento por feature e formularios reativos tipados.
+- Bootstrap 5 como base de grid, espacemento, formularios, tabelas, botoes e responsividade, com customizacoes pontuais apenas quando necessario.
 - `CurrencyInputComponent` ou diretiva equivalente para entrada de `valor`, exibindo `R$ 1.234,56` e persistindo decimal canonico.
 - Servicos HTTP gerados ou alinhados ao contrato OpenAPI, com adaptadores finos para a camada de tela.
 - Paginas separadas para listagem/formulario de autores, assuntos e livros, mais tela de relatorio com filtros simples.
@@ -140,7 +141,7 @@ frontend/
 ## Implementation Milestones
 
 1. Estruturar `backend/` com Spring Boot, Flyway, PostgreSQL, validacao, tratamento de erros, i18n/properties e OpenTelemetry.
-2. Estruturar `frontend/` com Angular, navegacao principal, layout simples e estilos base.
+2. Estruturar `frontend/` com Angular, Bootstrap, navegacao principal, layout simples e estilos base.
 3. Entregar CRUD de autores e assuntos.
 4. Entregar CRUD de livros com relacionamentos e mascara monetaria.
 5. Entregar view, consulta e exportacao do relatorio por autor.
@@ -155,7 +156,7 @@ frontend/
 - **Risco**: duplicidade indevida nas tabelas de associacao e no relatorio.  
   **Mitigacao**: chave composta, restricao unica e validacoes de dominio antes de persistir.
 - **Risco**: relatorio PDF adicionar peso excessivo ao escopo.  
-  **Mitigacao**: manter layout simples no JasperReports e reutilizar a view para JSON e PDF.
+  **Mitigacao**: manter layout simples com OpenPDF e reutilizar a view para JSON e PDF.
 - **Risco**: mensagens dispersas gerarem inconsistencias entre portugues e ingles.  
   **Mitigacao**: centralizar mensagens em i18n/properties e validar textos dos fluxos principais.
 - **Risco**: observabilidade insuficiente dificultar diagnostico em demonstracao ou deploy.  
