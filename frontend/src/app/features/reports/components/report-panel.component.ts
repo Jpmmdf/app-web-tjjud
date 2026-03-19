@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ptBrCatalogMessages } from '../../../core/i18n/pt-br';
 import { SortDirection } from '../../../core/models/common.models';
 import { CatalogFacadeService } from '../../../core/state/catalog-facade.service';
-import { formatTimestamp, joinSubjectDescriptions } from '../../../shared/formatters/catalog-formatters';
+import { formatCurrencyValue, formatTimestamp, joinSubjectDescriptions } from '../../../shared/formatters/catalog-formatters';
 
 @Component({
   selector: 'app-report-panel',
@@ -48,6 +48,10 @@ export class ReportPanelComponent {
 
   protected reportSubjects(subjects: ReadonlyArray<{ description: string }>): string {
     return joinSubjectDescriptions(subjects);
+  }
+
+  protected reportPrice(price: string): string {
+    return formatCurrencyValue(price);
   }
 
   protected async goToPage(page: number): Promise<void> {

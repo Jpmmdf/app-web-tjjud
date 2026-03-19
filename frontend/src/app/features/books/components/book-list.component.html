@@ -30,15 +30,6 @@
           }
         </select>
 
-        <select class="form-select" [formControl]="sortControl" [attr.aria-label]="commonTexts.sortBy">
-          <option value="titleAsc">{{ texts.sortOptions.titleAsc }}</option>
-          <option value="titleDesc">{{ texts.sortOptions.titleDesc }}</option>
-          <option value="yearDesc">{{ texts.sortOptions.yearDesc }}</option>
-          <option value="yearAsc">{{ texts.sortOptions.yearAsc }}</option>
-          <option value="priceDesc">{{ texts.sortOptions.priceDesc }}</option>
-          <option value="priceAsc">{{ texts.sortOptions.priceAsc }}</option>
-        </select>
-
         <button type="submit" class="btn btn-primary">{{ commonTexts.apply }}</button>
         <button type="button" class="button button--ghost btn btn-outline-secondary" (click)="resetBookFilters()">{{ commonTexts.reset }}</button>
       </form>
@@ -59,11 +50,26 @@
           <caption>{{ texts.listTitle }}</caption>
           <thead>
             <tr>
-              <th scope="col">Livro</th>
+              <th scope="col">
+                <button type="button" class="table-sort" (click)="sortBy('title')">
+                  <span>Livro</span>
+                  <span class="table-sort__icon">{{ sortIndicator('title') }}</span>
+                </button>
+              </th>
               <th scope="col">{{ texts.card.publisher }}</th>
               <th scope="col">{{ texts.card.edition }}</th>
-              <th scope="col">{{ texts.card.year }}</th>
-              <th scope="col">Valor</th>
+              <th scope="col">
+                <button type="button" class="table-sort" (click)="sortBy('publicationYear')">
+                  <span>{{ texts.card.year }}</span>
+                  <span class="table-sort__icon">{{ sortIndicator('publicationYear') }}</span>
+                </button>
+              </th>
+              <th scope="col">
+                <button type="button" class="table-sort" (click)="sortBy('price')">
+                  <span>Valor</span>
+                  <span class="table-sort__icon">{{ sortIndicator('price') }}</span>
+                </button>
+              </th>
               <th scope="col">{{ texts.card.authors }}</th>
               <th scope="col">{{ texts.card.subjects }}</th>
               <th scope="col" class="actions-column">Ações</th>
@@ -81,16 +87,31 @@
                 <td [attr.data-th]="texts.card.publisher">{{ book.publisher }}</td>
                 <td [attr.data-th]="texts.card.edition">{{ book.edition }}</td>
                 <td [attr.data-th]="texts.card.year">{{ book.publicationYear }}</td>
-                <td data-th="Valor"><strong>{{ book.price }}</strong></td>
+                <td data-th="Valor"><strong>{{ bookPrice(book) }}</strong></td>
                 <td [attr.data-th]="texts.card.authors">{{ bookAuthors(book) }}</td>
                 <td [attr.data-th]="texts.card.subjects">{{ bookSubjects(book) }}</td>
                 <td data-th="Ações">
                   <div class="entity-list__actions">
-                    <a class="button button--ghost btn btn-outline-secondary btn-sm" [routerLink]="['/livros', book.id, 'editar']">
-                      {{ commonTexts.edit }}
+                    <a
+                      class="action-icon action-icon--secondary"
+                      [routerLink]="['/livros', book.id, 'editar']"
+                      [attr.aria-label]="texts.actions.editAriaLabel(book.title)"
+                      [attr.title]="commonTexts.edit"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04a1.003 1.003 0 0 0 0-1.42l-2.5-2.5a1.003 1.003 0 0 0-1.42 0l-1.96 1.96 3.75 3.75 2.13-1.79z" />
+                      </svg>
                     </a>
-                    <button type="button" class="button button--danger btn btn-outline-danger btn-sm" (click)="deleteBook(book)">
-                      {{ commonTexts.delete }}
+                    <button
+                      type="button"
+                      class="action-icon action-icon--danger"
+                      [attr.aria-label]="texts.actions.deleteAriaLabel(book.title)"
+                      [attr.title]="commonTexts.delete"
+                      (click)="deleteBook(book)"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 7h12v2H6V7zm2 3h8l-.7 9H8.7L8 10zm3-6h2l1 1h4v2H6V5h4l1-1z" />
+                      </svg>
                     </button>
                   </div>
                 </td>

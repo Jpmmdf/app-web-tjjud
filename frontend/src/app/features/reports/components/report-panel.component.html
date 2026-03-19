@@ -57,7 +57,7 @@
               <li>
                 <div>
                   <strong>{{ book.title }}</strong>
-                  <p>{{ book.publisher }} • {{ book.publicationYear }} • {{ book.price }}</p>
+                  <p>{{ book.publisher }} • {{ book.publicationYear }} • {{ reportPrice(book.price) }}</p>
                 </div>
 
                 <small>{{ reportSubjects(book.subjects) }}</small>

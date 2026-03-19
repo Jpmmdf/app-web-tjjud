@@ -21,6 +21,7 @@ export class BrlCurrencyMaskDirective implements ControlValueAccessor {
   private readonly elementRef = inject(ElementRef<HTMLInputElement>);
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
+  private hasUserInteracted = false;
 
   writeValue(value: string | null): void {
     this.render(this.toDisplayValue(value));
@@ -40,14 +41,29 @@ export class BrlCurrencyMaskDirective implements ControlValueAccessor {
 
   @HostListener('input', ['$event'])
   handleInput(event: Event): void {
+    this.hasUserInteracted = true;
     const rawValue = (event.target as HTMLInputElement | null)?.value ?? '';
     const modelValue = this.toModelValue(rawValue);
     this.render(this.toDisplayValue(modelValue));
     this.onChange(modelValue);
   }
 
+  @HostListener('focus')
+  handleFocus(): void {
+    if (!this.elementRef.nativeElement.value) {
+      const initialValue = '0.00';
+      this.hasUserInteracted = true;
+      this.render(this.toDisplayValue(initialValue));
+      this.onChange(initialValue);
+    }
+  }
+
   @HostListener('blur')
   handleBlur(): void {
+    const currentModelValue = this.toModelValue(this.elementRef.nativeElement.value);
+    const normalizedValue = this.hasUserInteracted ? currentModelValue || '0.00' : currentModelValue;
+    this.render(this.toDisplayValue(normalizedValue));
+    this.onChange(normalizedValue);
     this.onTouched();
   }
 

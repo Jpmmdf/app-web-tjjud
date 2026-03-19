@@ -15,12 +15,6 @@
           [placeholder]="texts.searchPlaceholder"
           [attr.aria-label]="texts.searchAriaLabel"
         />
-        <select class="form-select" [formControl]="sortControl" [attr.aria-label]="commonTexts.sortBy">
-          <option value="nameAsc">{{ texts.sortOptions.nameAsc }}</option>
-          <option value="nameDesc">{{ texts.sortOptions.nameDesc }}</option>
-          <option value="idAsc">{{ texts.sortOptions.idAsc }}</option>
-          <option value="idDesc">{{ texts.sortOptions.idDesc }}</option>
-        </select>
         <button type="submit" class="btn btn-primary">{{ commonTexts.filter }}</button>
       </form>
 
@@ -40,8 +34,18 @@
           <caption>{{ texts.listTitle }}</caption>
           <thead>
             <tr>
-              <th scope="col">Identificador</th>
-              <th scope="col">Nome</th>
+              <th scope="col">
+                <button type="button" class="table-sort" (click)="sortBy('id')">
+                  <span>Identificador</span>
+                  <span class="table-sort__icon">{{ sortIndicator('id') }}</span>
+                </button>
+              </th>
+              <th scope="col">
+                <button type="button" class="table-sort" (click)="sortBy('name')">
+                  <span>Nome</span>
+                  <span class="table-sort__icon">{{ sortIndicator('name') }}</span>
+                </button>
+              </th>
               <th scope="col" class="actions-column">Ações</th>
             </tr>
           </thead>
@@ -54,11 +58,26 @@
                 </td>
                 <td data-th="Ações">
                   <div class="entity-list__actions">
-                    <a class="button button--ghost btn btn-outline-secondary btn-sm" [routerLink]="['/autores', author.id, 'editar']">
-                      {{ commonTexts.edit }}
+                    <a
+                      class="action-icon action-icon--secondary"
+                      [routerLink]="['/autores', author.id, 'editar']"
+                      [attr.aria-label]="texts.actions.editAriaLabel(author.name)"
+                      [attr.title]="commonTexts.edit"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04a1.003 1.003 0 0 0 0-1.42l-2.5-2.5a1.003 1.003 0 0 0-1.42 0l-1.96 1.96 3.75 3.75 2.13-1.79z" />
+                      </svg>
                     </a>
-                    <button type="button" class="button button--danger btn btn-outline-danger btn-sm" (click)="deleteAuthor(author)">
-                      {{ commonTexts.delete }}
+                    <button
+                      type="button"
+                      class="action-icon action-icon--danger"
+                      [attr.aria-label]="texts.actions.deleteAriaLabel(author.name)"
+                      [attr.title]="commonTexts.delete"
+                      (click)="deleteAuthor(author)"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 7h12v2H6V7zm2 3h8l-.7 9H8.7L8 10zm3-6h2l1 1h4v2H6V5h4l1-1z" />
+                      </svg>
                     </button>
                   </div>
                 </td>

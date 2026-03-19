@@ -45,6 +45,27 @@ export class SubjectListComponent implements OnInit {
     await this.catalog.loadSubjects({ page });
   }
 
+  protected async sortBy(field: 'id' | 'description'): Promise<void> {
+    const nextOption = this.nextSortOption(field);
+    this.sortControl.setValue(nextOption);
+    await this.catalog.loadSubjects({
+      query: this.subjectSearchControl.value,
+      page: 0,
+      ...this.fromSortOption(nextOption),
+    });
+  }
+
+  protected sortIndicator(field: 'id' | 'description'): string {
+    const current = this.sortControl.value;
+    if ((field === 'id' && current === 'idAsc') || (field === 'description' && current === 'descriptionAsc')) {
+      return '↑';
+    }
+    if ((field === 'id' && current === 'idDesc') || (field === 'description' && current === 'descriptionDesc')) {
+      return '↓';
+    }
+    return '';
+  }
+
   protected hasPreviousPage(): boolean {
     return this.catalog.subjectPage().page > 0;
   }
@@ -72,6 +93,14 @@ export class SubjectListComponent implements OnInit {
       return direction === 'DESC' ? 'idDesc' : 'idAsc';
     }
     return direction === 'DESC' ? 'descriptionDesc' : 'descriptionAsc';
+  }
+
+  private nextSortOption(field: 'id' | 'description'): SubjectSortOption {
+    const current = this.sortControl.value;
+    if (field === 'id') {
+      return current === 'idAsc' ? 'idDesc' : 'idAsc';
+    }
+    return current === 'descriptionAsc' ? 'descriptionDesc' : 'descriptionAsc';
   }
 }
 
