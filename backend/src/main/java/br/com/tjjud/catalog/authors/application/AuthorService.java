@@ -41,14 +41,18 @@ public class AuthorService {
 
     @Transactional
     public AuthorResponse create(AuthorUpsertRequest request) {
-        Author author = new Author(sanitizeRequired(request.name()));
+        String name = sanitizeRequired(request.name());
+        ensureUniqueName(name, null);
+        Author author = new Author(name);
         return AuthorResponse.from(authorRepository.save(author));
     }
 
     @Transactional
     public AuthorResponse update(Long authorId, AuthorUpsertRequest request) {
         Author author = findEntity(authorId);
-        author.changeName(sanitizeRequired(request.name()));
+        String name = sanitizeRequired(request.name());
+        ensureUniqueName(name, authorId);
+        author.changeName(name);
         return AuthorResponse.from(authorRepository.save(author));
     }
 
@@ -82,5 +86,14 @@ public class AuthorService {
             throw new BusinessValidationException("INVALID_TEXT_FIELD", "error.autor.nome.vazio");
         }
         return sanitized;
+    }
+
+    private void ensureUniqueName(String name, Long currentId) {
+        boolean alreadyExists = currentId == null
+                ? authorRepository.existsByNameIgnoreCase(name)
+                : authorRepository.existsByNameIgnoreCaseAndIdNot(name, currentId);
+        if (alreadyExists) {
+            throw new ConflictException("error.autor.duplicado", name);
+        }
     }
 }

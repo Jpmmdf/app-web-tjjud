@@ -9,6 +9,7 @@ import br.com.tjjud.catalog.books.infra.persistence.BookRepository;
 import br.com.tjjud.catalog.shared.api.PageMetadata;
 import br.com.tjjud.catalog.shared.api.PageResponse;
 import br.com.tjjud.catalog.shared.exception.BusinessValidationException;
+import br.com.tjjud.catalog.shared.exception.ConflictException;
 import br.com.tjjud.catalog.shared.exception.ResourceNotFoundException;
 import br.com.tjjud.catalog.shared.util.MoneyMapper;
 import br.com.tjjud.catalog.subjects.domain.Subject;
@@ -96,6 +97,8 @@ public class BookService {
     }
 
     private void applyRequest(Book book, BookUpsertRequest request) {
+        String title = sanitizeRequired(request.title(), "error.livro.titulo.vazio");
+        String publisher = sanitizeRequired(request.publisher(), "error.livro.editora.vazia");
         List<Long> authorIds = request.authorIds() == null ? List.of() : request.authorIds();
         List<Long> subjectIds = request.subjectIds() == null ? List.of() : request.subjectIds();
 
@@ -105,10 +108,11 @@ public class BookService {
 
         Set<Author> authors = resolveAuthors(uniqueAuthorIds);
         Set<Subject> subjects = resolveSubjects(uniqueSubjectIds);
+        ensureUniqueBook(title, publisher, request.edition(), request.publicationYear(), book.getId());
 
         book.update(
-                sanitizeRequired(request.title(), "error.livro.titulo.vazio"),
-                sanitizeRequired(request.publisher(), "error.livro.editora.vazia"),
+                title,
+                publisher,
                 request.edition(),
                 request.publicationYear(),
                 MoneyMapper.parse(request.price()));
@@ -165,5 +169,16 @@ public class BookService {
             throw new BusinessValidationException("INVALID_TEXT_FIELD", messageKey);
         }
         return sanitized;
+    }
+
+    private void ensureUniqueBook(String title, String publisher, Integer edition, Integer publicationYear, Long currentId) {
+        boolean alreadyExists = currentId == null
+                ? bookRepository.existsByTitleIgnoreCaseAndPublisherIgnoreCaseAndEditionAndPublicationYear(
+                        title, publisher, edition, publicationYear)
+                : bookRepository.existsByTitleIgnoreCaseAndPublisherIgnoreCaseAndEditionAndPublicationYearAndIdNot(
+                        title, publisher, edition, publicationYear, currentId);
+        if (alreadyExists) {
+            throw new ConflictException("error.livro.duplicado");
+        }
     }
 }

@@ -13,6 +13,12 @@ import org.springframework.data.repository.query.Param;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
+    boolean existsByTitleIgnoreCaseAndPublisherIgnoreCaseAndEditionAndPublicationYear(
+            String title, String publisher, Integer edition, Integer publicationYear);
+
+    boolean existsByTitleIgnoreCaseAndPublisherIgnoreCaseAndEditionAndPublicationYearAndIdNot(
+            String title, String publisher, Integer edition, Integer publicationYear, Long id);
+
     @Query(
             value = """
                     select b.id

@@ -88,6 +88,30 @@ class CatalogApiIntegrationTest {
     }
 
     @Test
+    void shouldRejectDuplicatedAuthor() throws Exception {
+        createAuthor("Machado de Assis");
+
+        mockMvc.perform(post("/api/v1/authors")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new AuthorUpsertRequest("Machado de Assis"))))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.title").value("Conflito"))
+                .andExpect(jsonPath("$.detail").value("Já existe um autor cadastrado com o nome \"Machado de Assis\"."));
+    }
+
+    @Test
+    void shouldRejectDuplicatedSubject() throws Exception {
+        createSubject("Romance");
+
+        mockMvc.perform(post("/api/v1/subjects")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new SubjectUpsertRequest("Romance"))))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.title").value("Conflito"))
+                .andExpect(jsonPath("$.detail").value("Já existe um assunto cadastrado com a descrição \"Romance\"."));
+    }
+
+    @Test
     void shouldCreateBookAndQueryDetails() throws Exception {
         long authorA = createAuthor("Machado de Assis");
         long authorB = createAuthor("Jose de Alencar");
@@ -114,6 +138,30 @@ class CatalogApiIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items", hasSize(1)))
                 .andExpect(jsonPath("$.items[0].id").value(bookId));
+    }
+
+    @Test
+    void shouldRejectDuplicatedBook() throws Exception {
+        long authorId = createAuthor("Machado de Assis");
+        long subjectId = createSubject("Romance");
+        BookUpsertRequest request = new BookUpsertRequest(
+                "Dom Casmurro",
+                "Editora Exemplo",
+                3,
+                1899,
+                "129.90",
+                List.of(authorId),
+                List.of(subjectId));
+
+        createBook(request);
+
+        mockMvc.perform(post("/api/v1/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(request)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.title").value("Conflito"))
+                .andExpect(jsonPath("$.detail")
+                        .value("Já existe um livro cadastrado com a mesma combinação de título, editora, edição e ano de publicação."));
     }
 
     @Test
@@ -162,7 +210,9 @@ class CatalogApiIntegrationTest {
                 List.of(subjectId)));
 
         mockMvc.perform(delete("/api/v1/authors/{authorId}", authorId))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail")
+                        .value("O autor não pode ser excluído porque está vinculado a um ou mais livros."));
 
         mockMvc.perform(get("/api/v1/reports/books-by-author"))
                 .andExpect(status().isOk())
@@ -180,6 +230,25 @@ class CatalogApiIntegrationTest {
                         throw new AssertionError("Expected PDF content");
                     }
                 });
+    }
+
+    @Test
+    void shouldBlockDeletingReferencedSubjectWithSpecificMessage() throws Exception {
+        long authorId = createAuthor("Machado de Assis");
+        long subjectId = createSubject("Romance");
+        createBook(new BookUpsertRequest(
+                "Memorias Postumas",
+                "Editora Exemplo",
+                1,
+                1881,
+                "59.90",
+                List.of(authorId),
+                List.of(subjectId)));
+
+        mockMvc.perform(delete("/api/v1/subjects/{subjectId}", subjectId))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail")
+                        .value("O assunto não pode ser excluído porque está vinculado a um ou mais livros."));
     }
 
     private long createAuthor(String name) throws Exception {
