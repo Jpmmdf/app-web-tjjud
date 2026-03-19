@@ -8,4 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AuthorRepository extends JpaRepository<Author, Long> {
 
     Page<Author> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    boolean existsByNameIgnoreCase(String name);
+
+    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
 }

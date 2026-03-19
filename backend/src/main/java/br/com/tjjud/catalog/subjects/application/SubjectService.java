@@ -42,14 +42,18 @@ public class SubjectService {
 
     @Transactional
     public SubjectResponse create(SubjectUpsertRequest request) {
-        Subject subject = new Subject(sanitizeRequired(request.description()));
+        String description = sanitizeRequired(request.description());
+        ensureUniqueDescription(description, null);
+        Subject subject = new Subject(description);
         return SubjectResponse.from(subjectRepository.save(subject));
     }
 
     @Transactional
     public SubjectResponse update(Long subjectId, SubjectUpsertRequest request) {
         Subject subject = findEntity(subjectId);
-        subject.changeDescription(sanitizeRequired(request.description()));
+        String description = sanitizeRequired(request.description());
+        ensureUniqueDescription(description, subjectId);
+        subject.changeDescription(description);
         return SubjectResponse.from(subjectRepository.save(subject));
     }
 
@@ -83,5 +87,14 @@ public class SubjectService {
             throw new BusinessValidationException("INVALID_TEXT_FIELD", "error.assunto.descricao.vazia");
         }
         return sanitized;
+    }
+
+    private void ensureUniqueDescription(String description, Long currentId) {
+        boolean alreadyExists = currentId == null
+                ? subjectRepository.existsByDescriptionIgnoreCase(description)
+                : subjectRepository.existsByDescriptionIgnoreCaseAndIdNot(description, currentId);
+        if (alreadyExists) {
+            throw new ConflictException("error.assunto.duplicado", description);
+        }
     }
 }
