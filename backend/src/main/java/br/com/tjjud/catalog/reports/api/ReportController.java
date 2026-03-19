@@ -43,7 +43,7 @@ public class ReportController {
         byte[] content = reportService.exportBooksByAuthor(authorId);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline()
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
                         .filename(messages.get("report.arquivo.nome"))
                         .build()
                         .toString())

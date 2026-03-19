@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { appendNumberParam, withQueryPage } from './api-helpers';
@@ -19,11 +19,12 @@ export class ReportsApiService {
     return this.http.get<AuthorBookReport>(this.baseUrl, { params });
   }
 
-  exportBooksByAuthorReport(authorId?: number | null): Observable<Blob> {
+  exportBooksByAuthorReport(authorId?: number | null): Observable<HttpResponse<Blob>> {
     const params = appendNumberParam(new HttpParams(), 'authorId', authorId);
     return this.http.get(`${this.baseUrl}/export`, {
       params,
       responseType: 'blob',
+      observe: 'response',
     });
   }
 }
