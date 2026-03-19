@@ -1,26 +1,9 @@
 name: Backend Docker Image
 
 on:
-  workflow_call:
-    inputs:
-      version:
-        description: Semantic version to publish
-        required: true
-        type: string
-      git_tag:
-        description: Git tag created by Release Please
-        required: true
-        type: string
-      push_latest:
-        description: Also push the latest tag
-        required: false
-        default: true
-        type: boolean
-    secrets:
-      DOCKER_USERNAME:
-        required: true
-      DOCKERHUB_TOKEN:
-        required: true
+  push:
+    tags:
+      - "backend-v*"
   workflow_dispatch:
     inputs:
       version:
@@ -63,11 +46,23 @@ jobs:
       - name: Definir tags da imagem
         id: tags
         env:
-          VERSION: ${{ inputs.version }}
-          GIT_TAG: ${{ inputs.git_tag }}
-          PUSH_LATEST: ${{ inputs.push_latest }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_GIT_TAG: ${{ inputs.git_tag }}
+          INPUT_PUSH_LATEST: ${{ inputs.push_latest }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
+          if [[ "${EVENT_NAME}" == "push" ]]; then
+            VERSION="${REF_NAME#backend-v}"
+            GIT_TAG="${REF_NAME}"
+            PUSH_LATEST="true"
+          else
+            VERSION="${INPUT_VERSION}"
+            GIT_TAG="${INPUT_GIT_TAG}"
+            PUSH_LATEST="${INPUT_PUSH_LATEST}"
+          fi
+
           {
             echo "tags<<EOF"
             echo "${IMAGE_NAME}:${VERSION}"

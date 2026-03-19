@@ -1,0 +1,41 @@
+name: Auto Approve Release PRs
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  auto-approve:
+    name: Auto Approve Release PR
+    if: >-
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'release-please--branches--') &&
+      startsWith(github.event.pull_request.title, 'chore(main): release ') &&
+      github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.RELEASE_PLEASE_REVIEW_TOKEN }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Validar token do aprovador
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Configure o secret RELEASE_PLEASE_REVIEW_TOKEN com um PAT de outro usuario ou bot com permissao para aprovar PRs."
+            exit 1
+          fi
+
+      - name: Aprovar PR de release
+        run: |
+          gh pr review "$PR_NUMBER" \
+            --repo "$GITHUB_REPOSITORY" \
+            --approve \
+            --body "Aprovacao automatica da PR de release."

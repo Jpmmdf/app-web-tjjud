@@ -16,6 +16,7 @@ Portal central da solucao API-first implementada para o desafio TJJUD.
 - **API**: endpoints, fluxos principais e pontos de observabilidade
 - **Dados**: modelo relacional, tabelas associativas e view do relatorio
 - **Operacao**: compose, health checks, configuracao externa e sinais de observabilidade
+- **Release**: fluxo de versionamento, tags e publicacao das imagens Docker
 - **Onboarding**: caminho minimo para subir o ambiente e validar a entrega
 
 ## Fluxo principal
