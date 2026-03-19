@@ -5,7 +5,7 @@ Aplicacao API-first para cadastro de livros, autores e assuntos com relatorio po
 ## Stack
 
 - `backend/`: Spring Boot 3.5, Java 21, JPA, Flyway, OpenPDF, Testcontainers
-- `frontend/`: Angular 19 standalone, Reactive Forms, mascara BRL customizada
+- `frontend/`: Angular 20 standalone, Reactive Forms, mascara BRL customizada
 - `docs/`: MkDocs + Structurizr DSL para documentacao cloud-native e diagramas C4
 - `docker-compose.yml`: orquestracao local de PostgreSQL, API e SPA
 
