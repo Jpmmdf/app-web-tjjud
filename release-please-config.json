@@ -6,7 +6,8 @@
       "release-type": "maven",
       "component": "backend",
       "package-name": "backend",
-      "include-component-in-tag": true
+      "include-component-in-tag": true,
+      "skip-snapshot": true
     },
     "frontend": {
       "release-type": "node",

@@ -104,8 +104,8 @@ jobs:
           manifest-file: .release-please-manifest.json
           skip-labeling: true
 
-  auto-approve-release-prs:
-    name: Auto Approve Release PRs
+  auto-merge-release-prs:
+    name: Auto Merge Release PRs
     needs: release-please
     if: ${{ needs.release-please.result == 'success' }}
     runs-on: ubuntu-latest
@@ -127,9 +127,10 @@ jobs:
           app-id: ${{ secrets.AUTOMATION_APP_ID }}
           private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
+          permission-contents: write
           permission-pull-requests: write
 
-      - name: Aprovar PRs de release abertas pelo Release Please
+      - name: Aprovar e mesclar PRs de release abertas pelo Release Please
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
@@ -138,7 +139,7 @@ jobs:
               --repo "$GITHUB_REPOSITORY" \
               --state open \
               --base main \
-              --json number,title,headRefName,author \
+              --json number,title,headRefName,author,reviewDecision \
               --jq '.[] | select(.author.login == "app/github-actions") | select(.headRefName | startswith("release-please--branches--")) | select(.title | startswith("chore(main): release ")) | @base64'
           )"
 
@@ -152,11 +153,19 @@ jobs:
 
             pr_json="$(printf '%s' "$encoded_pr" | base64 --decode)"
             pr_number="$(printf '%s' "$pr_json" | jq -r '.number')"
+            review_decision="$(printf '%s' "$pr_json" | jq -r '.reviewDecision // empty')"
 
-            gh pr review "$pr_number" \
+            if [ "$review_decision" != "APPROVED" ]; then
+              gh pr review "$pr_number" \
+                --repo "$GITHUB_REPOSITORY" \
+                --approve \
+                --body "Aprovacao automatica da PR de release."
+            fi
+
+            gh pr merge "$pr_number" \
               --repo "$GITHUB_REPOSITORY" \
-              --approve \
-              --body "Aprovacao automatica da PR de release."
+              --merge \
+              --delete-branch
           done <<< "$RELEASE_PRS"
 
   publish-backend:
