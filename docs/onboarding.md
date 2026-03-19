@@ -3,7 +3,7 @@
 ## Pre-requisitos
 
 - Java 21
-- Node.js 20+
+- Node.js 24 LTS
 - Docker Desktop
 - Python 3 com `pip`
 

@@ -5,7 +5,7 @@ workspace "TJJUD Editorial Platform" "Cloud-native model for the TJJUD editorial
         reviewer = person "Avaliador tecnico" "Revisa a entrega funcional, a arquitetura e a documentacao."
 
         platform = softwareSystem "Plataforma Editorial TJJUD" "Solucao API-first para catalogo editorial, relatorio por autor e documentacao cloud-native." {
-            web = container "Catalog Web" "SPA administrativa para CRUD, filtros e exportacao PDF." "Angular 19 standalone + Nginx"
+            web = container "Catalog Web" "SPA administrativa para CRUD, filtros e exportacao PDF." "Angular 20 standalone + Nginx"
             api = container "Catalog API" "API REST, regras de negocio, validacoes, relatorio e PDF." "Spring Boot 3.5 / Java 21" {
                 shared = component "Shared API Layer" "DTOs, tratador global de erros, validacoes e MoneyMapper."
                 authors = component "Author Slice" "Controlador, servico e repositorio da entidade autor."
