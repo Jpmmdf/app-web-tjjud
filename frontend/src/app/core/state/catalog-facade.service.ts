@@ -1,9 +1,16 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { CatalogApiService } from '../api/catalog-api.service';
+import { AuthorListRequest, AuthorsApiService } from '../api/authors-api.service';
+import { BookListRequest, BooksApiService } from '../api/books-api.service';
+import { ReportListRequest, ReportsApiService } from '../api/reports-api.service';
+import { SubjectListRequest, SubjectsApiService } from '../api/subjects-api.service';
 import { ptBrCatalogMessages } from '../i18n/pt-br';
-import { Author, AuthorBookReport, Book, BookUpsertPayload, ProblemResponse, Subject } from '../models/catalog.models';
+import { Author } from '../models/authors.models';
+import { Book, BookUpsertPayload } from '../models/books.models';
+import { PageMetadata, ProblemResponse, SortDirection } from '../models/common.models';
+import { AuthorBookReport } from '../models/reports.models';
+import { Subject } from '../models/subjects.models';
 import { formatCurrencyTotal } from '../../shared/formatters/catalog-formatters';
 
 export interface FlashMessage {
@@ -18,9 +25,35 @@ export interface BookFilters {
   subjectId: number | null;
 }
 
+interface ListState {
+  page: number;
+  size: number;
+  sortField: string;
+  sortDirection: SortDirection;
+}
+
+interface AuthorListState extends ListState {
+  query: string;
+}
+
+interface SubjectListState extends ListState {
+  query: string;
+}
+
+interface BookListState extends ListState, BookFilters {}
+
+interface ReportListState extends ListState {
+  authorId: number | null;
+}
+
+const DEFAULT_PAGE_SIZE = 10;
+
 @Injectable({ providedIn: 'root' })
 export class CatalogFacadeService {
-  private readonly api = inject(CatalogApiService);
+  private readonly authorsApi = inject(AuthorsApiService);
+  private readonly subjectsApi = inject(SubjectsApiService);
+  private readonly booksApi = inject(BooksApiService);
+  private readonly reportsApi = inject(ReportsApiService);
   private readonly messages = ptBrCatalogMessages;
 
   readonly loading = signal(true);
@@ -31,21 +64,50 @@ export class CatalogFacadeService {
   readonly subjects = signal<Subject[]>([]);
   readonly books = signal<Book[]>([]);
   readonly report = signal<AuthorBookReport | null>(null);
+  readonly authorOptions = signal<Author[]>([]);
+  readonly subjectOptions = signal<Subject[]>([]);
 
-  readonly currentAuthorQuery = signal('');
-  readonly currentSubjectQuery = signal('');
-  readonly currentBookFilters = signal<BookFilters>({
+  readonly authorPage = signal<PageMetadata>(emptyPageMetadata(DEFAULT_PAGE_SIZE));
+  readonly subjectPage = signal<PageMetadata>(emptyPageMetadata(DEFAULT_PAGE_SIZE));
+  readonly bookPage = signal<PageMetadata>(emptyPageMetadata(DEFAULT_PAGE_SIZE));
+  readonly reportPage = signal<PageMetadata>(emptyPageMetadata(DEFAULT_PAGE_SIZE));
+
+  readonly currentAuthorList = signal<AuthorListState>({
+    query: '',
+    page: 0,
+    size: DEFAULT_PAGE_SIZE,
+    sortField: 'name',
+    sortDirection: 'ASC',
+  });
+  readonly currentSubjectList = signal<SubjectListState>({
+    query: '',
+    page: 0,
+    size: DEFAULT_PAGE_SIZE,
+    sortField: 'description',
+    sortDirection: 'ASC',
+  });
+  readonly currentBookList = signal<BookListState>({
     title: '',
     authorId: null,
     subjectId: null,
+    page: 0,
+    size: DEFAULT_PAGE_SIZE,
+    sortField: 'title',
+    sortDirection: 'ASC',
   });
-  readonly currentReportAuthorId = signal<number | null>(null);
+  readonly currentReportList = signal<ReportListState>({
+    authorId: null,
+    page: 0,
+    size: DEFAULT_PAGE_SIZE,
+    sortField: 'authorName',
+    sortDirection: 'ASC',
+  });
 
   readonly isBusy = computed(() => this.pendingRequests() > 0);
-  readonly authorCount = computed(() => this.authors().length);
-  readonly subjectCount = computed(() => this.subjects().length);
-  readonly bookCount = computed(() => this.books().length);
-  readonly reportGroupCount = computed(() => this.report()?.authors.length ?? 0);
+  readonly authorCount = computed(() => this.authorPage().totalElements);
+  readonly subjectCount = computed(() => this.subjectPage().totalElements);
+  readonly bookCount = computed(() => this.bookPage().totalElements);
+  readonly reportGroupCount = computed(() => this.reportPage().totalElements);
   readonly catalogGrossValue = computed(() =>
     this.books().reduce((total, book) => total + Number.parseFloat(book.price), 0),
   );
@@ -53,12 +115,7 @@ export class CatalogFacadeService {
 
   async refreshAll(): Promise<void> {
     this.loading.set(true);
-    await Promise.all([
-      this.loadAuthors(),
-      this.loadSubjects(),
-      this.loadBooks(),
-      this.loadReport(),
-    ]);
+    await Promise.all([this.loadAuthors(), this.loadSubjects(), this.loadBooks(), this.loadReport(), this.loadReferenceOptions()]);
     this.loading.set(false);
   }
 
@@ -66,14 +123,16 @@ export class CatalogFacadeService {
     this.flash.set(null);
   }
 
-  async loadAuthors(query = this.currentAuthorQuery()): Promise<void> {
-    this.currentAuthorQuery.set(query);
+  async loadAuthors(partial: Partial<AuthorListState> = {}): Promise<void> {
+    const request = { ...this.currentAuthorList(), ...partial };
+    this.currentAuthorList.set(request);
     const response = await this.runRequest(
-      () => firstValueFrom(this.api.listAuthors(query)),
+      () => firstValueFrom(this.authorsApi.list(request)),
       this.messages.authors.messages.loadError,
     );
     if (response) {
       this.authors.set(response.items);
+      this.authorPage.set(response.page);
     }
   }
 
@@ -81,8 +140,8 @@ export class CatalogFacadeService {
     const response = await this.runRequest(
       () =>
         authorId == null
-          ? firstValueFrom(this.api.createAuthor(payload))
-          : firstValueFrom(this.api.updateAuthor(authorId, payload)),
+          ? firstValueFrom(this.authorsApi.create(payload))
+          : firstValueFrom(this.authorsApi.update(authorId, payload)),
       authorId == null ? this.messages.authors.messages.createError : this.messages.authors.messages.updateError,
     );
     if (!response) {
@@ -103,7 +162,7 @@ export class CatalogFacadeService {
     }
 
     const deleted = await this.runAction(
-      () => firstValueFrom(this.api.deleteAuthor(author.id)),
+      () => firstValueFrom(this.authorsApi.delete(author.id)),
       this.messages.authors.messages.deleteError,
     );
     if (!deleted) {
@@ -118,14 +177,16 @@ export class CatalogFacadeService {
     return true;
   }
 
-  async loadSubjects(query = this.currentSubjectQuery()): Promise<void> {
-    this.currentSubjectQuery.set(query);
+  async loadSubjects(partial: Partial<SubjectListState> = {}): Promise<void> {
+    const request = { ...this.currentSubjectList(), ...partial };
+    this.currentSubjectList.set(request);
     const response = await this.runRequest(
-      () => firstValueFrom(this.api.listSubjects(query)),
+      () => firstValueFrom(this.subjectsApi.list(request)),
       this.messages.subjects.messages.loadError,
     );
     if (response) {
       this.subjects.set(response.items);
+      this.subjectPage.set(response.page);
     }
   }
 
@@ -133,8 +194,8 @@ export class CatalogFacadeService {
     const response = await this.runRequest(
       () =>
         subjectId == null
-          ? firstValueFrom(this.api.createSubject(payload))
-          : firstValueFrom(this.api.updateSubject(subjectId, payload)),
+          ? firstValueFrom(this.subjectsApi.create(payload))
+          : firstValueFrom(this.subjectsApi.update(subjectId, payload)),
       subjectId == null ? this.messages.subjects.messages.createError : this.messages.subjects.messages.updateError,
     );
     if (!response) {
@@ -155,7 +216,7 @@ export class CatalogFacadeService {
     }
 
     const deleted = await this.runAction(
-      () => firstValueFrom(this.api.deleteSubject(subject.id)),
+      () => firstValueFrom(this.subjectsApi.delete(subject.id)),
       this.messages.subjects.messages.deleteError,
     );
     if (!deleted) {
@@ -170,15 +231,16 @@ export class CatalogFacadeService {
     return true;
   }
 
-  async loadBooks(filters: Partial<BookFilters> = this.currentBookFilters()): Promise<void> {
-    const normalizedFilters = this.normalizeBookFilters(filters);
-    this.currentBookFilters.set(normalizedFilters);
+  async loadBooks(partial: Partial<BookListState> = {}): Promise<void> {
+    const request = this.normalizeBookList({ ...this.currentBookList(), ...partial });
+    this.currentBookList.set(request);
     const response = await this.runRequest(
-      () => firstValueFrom(this.api.listBooks(normalizedFilters)),
+      () => firstValueFrom(this.booksApi.list(request)),
       this.messages.books.messages.loadError,
     );
     if (response) {
       this.books.set(response.items);
+      this.bookPage.set(response.page);
     }
   }
 
@@ -186,8 +248,8 @@ export class CatalogFacadeService {
     const response = await this.runRequest(
       () =>
         bookId == null
-          ? firstValueFrom(this.api.createBook(payload))
-          : firstValueFrom(this.api.updateBook(bookId, payload)),
+          ? firstValueFrom(this.booksApi.create(payload))
+          : firstValueFrom(this.booksApi.update(bookId, payload)),
       bookId == null ? this.messages.books.messages.createError : this.messages.books.messages.updateError,
     );
     if (!response) {
@@ -208,7 +270,7 @@ export class CatalogFacadeService {
     }
 
     const deleted = await this.runAction(
-      () => firstValueFrom(this.api.deleteBook(book.id)),
+      () => firstValueFrom(this.booksApi.delete(book.id)),
       this.messages.books.messages.deleteError,
     );
     if (!deleted) {
@@ -223,22 +285,61 @@ export class CatalogFacadeService {
     return true;
   }
 
-  async loadReport(authorId = this.currentReportAuthorId()): Promise<void> {
-    const normalizedAuthorId = authorId ?? null;
-    this.currentReportAuthorId.set(normalizedAuthorId);
+  async loadReport(partial: Partial<ReportListState> = {}): Promise<void> {
+    const request = { ...this.currentReportList(), ...partial };
+    this.currentReportList.set(request);
     const response = await this.runRequest(
-      () => firstValueFrom(this.api.getBooksByAuthorReport(normalizedAuthorId)),
+      () => firstValueFrom(this.reportsApi.getBooksByAuthorReport(request)),
       this.messages.reports.messages.loadError,
     );
     if (response) {
       this.report.set(response);
+      this.reportPage.set(response.page);
     }
   }
 
-  async downloadReport(authorId = this.currentReportAuthorId()): Promise<boolean> {
+  async loadReferenceOptions(): Promise<void> {
+    const [authors, subjects] = await Promise.all([
+      this.runRequest(
+        () =>
+          firstValueFrom(
+            this.authorsApi.list({
+              query: '',
+              page: 0,
+              size: 100,
+              sortField: 'name',
+              sortDirection: 'ASC',
+            }),
+          ),
+        this.messages.authors.messages.loadError,
+      ),
+      this.runRequest(
+        () =>
+          firstValueFrom(
+            this.subjectsApi.list({
+              query: '',
+              page: 0,
+              size: 100,
+              sortField: 'description',
+              sortDirection: 'ASC',
+            }),
+          ),
+        this.messages.subjects.messages.loadError,
+      ),
+    ]);
+
+    if (authors) {
+      this.authorOptions.set(authors.items);
+    }
+    if (subjects) {
+      this.subjectOptions.set(subjects.items);
+    }
+  }
+
+  async downloadReport(authorId = this.currentReportList().authorId): Promise<boolean> {
     const normalizedAuthorId = authorId ?? null;
     const blob = await this.runRequest(
-      () => firstValueFrom(this.api.exportBooksByAuthorReport(normalizedAuthorId)),
+      () => firstValueFrom(this.reportsApi.exportBooksByAuthorReport(normalizedAuthorId)),
       this.messages.reports.messages.exportError,
     );
     if (!blob) {
@@ -255,9 +356,10 @@ export class CatalogFacadeService {
     return true;
   }
 
-  private normalizeBookFilters(filters: Partial<BookFilters>): BookFilters {
+  private normalizeBookList(filters: BookListState): BookListState {
     return {
-      title: filters.title?.trim() ?? '',
+      ...filters,
+      title: filters.title.trim(),
       authorId: filters.authorId ?? null,
       subjectId: filters.subjectId ?? null,
     };
@@ -299,4 +401,13 @@ export class CatalogFacadeService {
   private showSuccess(title: string, detail: string): void {
     this.flash.set({ kind: 'success', title, detail });
   }
+}
+
+function emptyPageMetadata(size: number): PageMetadata {
+  return {
+    page: 0,
+    size,
+    totalElements: 0,
+    totalPages: 0,
+  };
 }

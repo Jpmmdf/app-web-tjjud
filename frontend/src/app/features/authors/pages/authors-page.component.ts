@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { AuthorPanelComponent } from '../components/author-panel.component';
+import { AuthorListComponent } from '../components/author-list.component';
 
 @Component({
   selector: 'app-authors-page',
   standalone: true,
-  imports: [AuthorPanelComponent],
-  template: '<app-author-panel></app-author-panel>',
+  imports: [AuthorListComponent],
+  template: '<app-author-list></app-author-list>',
 })
 export class AuthorsPageComponent {}

@@ -30,6 +30,8 @@
 4. Configurar roteamento para `livros`, `autores`, `assuntos` e `relatorios`.
 5. Implementar um componente ou diretiva de moeda BRL reutilizavel para o campo `valor`.
 6. Integrar o frontend aos endpoints do contrato REST, centralizar mensagens e rotulos em portugues e evitar estruturas visuais paralelas que conflitem com o Design System do gov.br.
+7. Separar no frontend as rotas e telas de listagem das rotas e telas de criacao/edicao para autores, assuntos e livros.
+8. Consumir ordenacao por campo e paginacao fornecidas pelo backend nas listagens principais, mantendo no frontend apenas os controles e o estado de navegacao.
 
 ## 4. Fluxo minimo de validacao
 
@@ -39,8 +41,9 @@
 4. Editar o livro e confirmar persistencia dos relacionamentos.
 5. Confirmar que mensagens de validacao e feedback aparecem em portugues.
 6. Gerar o relatorio por autor em JSON e PDF.
-7. Verificar emissao de telemetria compativel com OpenTelemetry para pelo menos uma operacao principal.
-8. Verificar que navegacao, formularios e feedbacks principais seguem o padrao visual e de interacao do Design System do gov.br.
+7. Validar ordenacao por campo e mudanca de pagina em autores, assuntos, livros e relatorios.
+8. Verificar emissao de telemetria compativel com OpenTelemetry para pelo menos uma operacao principal.
+9. Verificar que navegacao, formularios e feedbacks principais seguem o padrao visual e de interacao do Design System do gov.br.
 
 ## 5. Testes esperados
 

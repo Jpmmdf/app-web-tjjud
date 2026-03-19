@@ -104,6 +104,15 @@
   background: var(--surface-alt);
 }
 
+.list-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 720px) {
   .report-card__list li,
   .report-card__header {

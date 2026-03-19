@@ -64,6 +64,7 @@ class CatalogApiIntegrationTest {
         mockMvc.perform(get("/api/v1/authors").param("q", "Machado"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items", hasSize(1)))
+                .andExpect(jsonPath("$.page.totalElements").value(1))
                 .andExpect(jsonPath("$.items[0].name").value("Machado de Assis"));
 
         mockMvc.perform(put("/api/v1/authors/{authorId}", authorId)
@@ -83,6 +84,7 @@ class CatalogApiIntegrationTest {
         mockMvc.perform(get("/api/v1/subjects").param("q", "Roma"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items", hasSize(1)))
+                .andExpect(jsonPath("$.page.totalElements").value(1))
                 .andExpect(jsonPath("$.items[0].id").value(subjectId))
                 .andExpect(jsonPath("$.items[0].description").value("Romance"));
     }
@@ -214,12 +216,17 @@ class CatalogApiIntegrationTest {
                 .andExpect(jsonPath("$.detail")
                         .value("O autor não pode ser excluído porque está vinculado a um ou mais livros."));
 
-        mockMvc.perform(get("/api/v1/reports/books-by-author"))
+        mockMvc.perform(get("/api/v1/reports/books-by-author")
+                        .param("sortField", "bookCount")
+                        .param("sortDirection", "DESC")
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.authors", hasSize(1)))
-                .andExpect(jsonPath("$.authors[0].authorId").value(authorId))
-                .andExpect(jsonPath("$.authors[0].books", hasSize(1)))
-                .andExpect(jsonPath("$.authors[0].books[0].subjects", hasSize(1)));
+                .andExpect(jsonPath("$.items", hasSize(1)))
+                .andExpect(jsonPath("$.page.totalElements").value(1))
+                .andExpect(jsonPath("$.items[0].authorId").value(authorId))
+                .andExpect(jsonPath("$.items[0].books", hasSize(1)))
+                .andExpect(jsonPath("$.items[0].books[0].subjects", hasSize(1)));
 
         mockMvc.perform(get("/api/v1/reports/books-by-author/export"))
                 .andExpect(status().isOk())

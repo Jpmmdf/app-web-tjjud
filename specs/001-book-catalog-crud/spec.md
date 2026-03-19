@@ -106,13 +106,17 @@ Como usuario do sistema, quero acessar rapidamente as telas principais e consult
 - **FR-012**: O sistema MUST preservar a integridade referencial entre livros, autores, assuntos e tabelas de associacao durante criacao, alteracao e exclusao.
 - **FR-013**: O sistema MUST gerar um relatorio baseado em uma view de banco de dados que consolide livros, autores e assuntos com agrupamento por autor.
 - **FR-014**: O sistema MUST respeitar o modelo logico fornecido para livro, autor, assunto e entidades de associacao, admitindo apenas ajustes estruturais voltados a desempenho sem alterar o comportamento esperado.
-- **FR-015**: O sistema MUST disponibilizar listagens e consultas suficientes para localizar registros antes de editar, excluir ou emitir relatorios.
+- **FR-015**: O sistema MUST disponibilizar listagens e consultas suficientes para localizar registros antes de editar, excluir ou emitir relatorios, com suporte a paginacao em todas as consultas listaveis.
 - **FR-016**: O projeto MUST incluir scripts e instrucoes que permitam recriar a estrutura do banco de dados, a view do relatorio e o processo de implantacao para a apresentacao tecnica.
 - **FR-017**: O sistema MUST apresentar mensagens, rotulos e feedbacks destinados ao usuario em portugues do Brasil nos fluxos principais de cadastro, consulta, exclusao e relatorio.
 - **FR-018**: O sistema MUST manter as mensagens destinadas ao usuario em mecanismo centralizado de internacionalizacao ou arquivos de configuracao equivalentes, evitando literais dispersos pelo codigo.
 - **FR-019**: A aplicacao MUST suportar telemetria compativel com OpenTelemetry para rastrear requisicoes, operacoes criticas e integracoes relevantes durante execucao local e em ambiente alvo.
 - **FR-020**: O frontend MUST utilizar Bootstrap como base do sistema visual, do layout responsivo e dos componentes estruturais principais das telas de cadastro, consulta e relatorio.
 - **FR-021**: O frontend MUST adotar o Design System do gov.br como referencia oficial para componentes, estilos, navegacao e acessibilidade das telas principais, preservando aderencia visual e comportamental ao padrao institucional.
+- **FR-022**: O frontend MUST segregar a experiencia de criacao e edicao da experiencia de listagem e consulta, evitando que formulários de manutencao compartilhem a mesma superficie principal das listagens de autores, assuntos e livros.
+- **FR-023**: O sistema MUST permitir ordenar as listagens de autores, assuntos e livros por campo explicito do recurso, com indicacao clara do criterio ativo no frontend.
+- **FR-024**: O backend MUST executar a ordenacao das consultas listaveis com base em parametros de campo e direcao recebidos pela API, evitando que o frontend reordene localmente como fonte de verdade.
+- **FR-025**: O sistema MUST suportar paginacao consistente nas listagens de autores, assuntos, livros e relatorios consultaveis, incluindo metadados suficientes para navegacao entre paginas.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -137,3 +141,6 @@ Como usuario do sistema, quero acessar rapidamente as telas principais e consult
 - **SC-008**: Os fluxos principais de CRUD e emissao de relatorio podem ser acompanhados por telemetria compativel com OpenTelemetry, com rastros exportaveis para um coletor ou backend observavel.
 - **SC-009**: As telas principais da demonstracao apresentam comportamento responsivo e padrao visual consistente baseado na biblioteca definida para o frontend, sem necessidade de estrutura paralela conflitante para formularios, grids e navegacao.
 - **SC-010**: As telas principais da demonstracao seguem padroes verificaveis do Design System do gov.br para navegacao, formularios, feedbacks e acessibilidade visual, sem divergencias perceptiveis nos fluxos principais.
+- **SC-011**: Um usuario consegue acessar a listagem de autores, assuntos ou livros e iniciar um fluxo separado de criacao ou edicao sem perder contexto de navegacao, em no maximo 2 interacoes por entidade.
+- **SC-012**: Um usuario consegue alterar a ordenacao das listagens principais por campo e identificar o resultado esperado em ate 1 interacao adicional, sem recarregar manualmente a pagina.
+- **SC-013**: Um usuario consegue navegar entre paginas das listagens principais e manter filtros e ordenacao ativos sem perda de contexto em 100% dos fluxos validados.

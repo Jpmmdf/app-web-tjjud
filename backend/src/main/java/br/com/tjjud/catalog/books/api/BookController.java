@@ -2,6 +2,7 @@ package br.com.tjjud.catalog.books.api;
 
 import br.com.tjjud.catalog.books.application.BookService;
 import br.com.tjjud.catalog.shared.api.PageResponse;
+import br.com.tjjud.catalog.shared.api.SortDirection;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -36,8 +37,10 @@ public class BookController {
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Long authorId,
-            @RequestParam(required = false) Long subjectId) {
-        return bookService.list(title, authorId, subjectId, page, size);
+            @RequestParam(required = false) Long subjectId,
+            @RequestParam(defaultValue = "title") String sortField,
+            @RequestParam(defaultValue = "ASC") SortDirection sortDirection) {
+        return bookService.list(title, authorId, subjectId, page, size, sortField, sortDirection);
     }
 
     @GetMapping("/{bookId}")

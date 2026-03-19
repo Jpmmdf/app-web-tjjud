@@ -80,3 +80,11 @@
 - **Alternatives considered**:
   - Bootstrap como base exclusiva: rejeitada porque nao garante aderencia ao padrao visual e comportamental exigido.
   - CSS autoral inspirado no gov.br sem referencia explicita ao design system: rejeitada porque aumenta risco de divergencia e subjetividade na implementacao.
+
+## Decision 11: Paginacao e ordenacao server-side por campo explicito
+
+- **Decision**: Todas as consultas listaveis devem expor paginacao e ordenacao por campo explicito no backend, com o frontend atuando apenas como consumidor e controlador da experiencia.
+- **Rationale**: Centralizar a ordenacao e a paginacao no backend garante consistencia, reduz divergencias entre clientes, melhora escalabilidade e permite uso de indices e constraints do banco para consultas previsiveis.
+- **Alternatives considered**:
+  - Ordenacao e paginacao apenas no frontend: rejeitada porque nao escala, cria inconsistencias entre clientes e viola a fonte de verdade da consulta.
+  - Ordenacao server-side sem declaracao explicita de campos permitidos: rejeitada porque aumenta risco de contrato ambiguo e de exposicao indevida da persistencia.

@@ -1,6 +1,7 @@
 package br.com.tjjud.catalog.subjects.api;
 
 import br.com.tjjud.catalog.shared.api.PageResponse;
+import br.com.tjjud.catalog.shared.api.SortDirection;
 import br.com.tjjud.catalog.subjects.application.SubjectService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -34,8 +35,10 @@ public class SubjectController {
     public PageResponse<SubjectResponse> list(
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size,
-            @RequestParam(required = false) String q) {
-        return subjectService.list(q, page, size);
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "description") String sortField,
+            @RequestParam(defaultValue = "ASC") SortDirection sortDirection) {
+        return subjectService.list(q, page, size, sortField, sortDirection);
     }
 
     @GetMapping("/{subjectId}")

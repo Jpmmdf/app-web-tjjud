@@ -2,6 +2,7 @@ package br.com.tjjud.catalog.authors.api;
 
 import br.com.tjjud.catalog.authors.application.AuthorService;
 import br.com.tjjud.catalog.shared.api.PageResponse;
+import br.com.tjjud.catalog.shared.api.SortDirection;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -34,8 +35,10 @@ public class AuthorController {
     public PageResponse<AuthorResponse> list(
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size,
-            @RequestParam(required = false) String q) {
-        return authorService.list(q, page, size);
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "name") String sortField,
+            @RequestParam(defaultValue = "ASC") SortDirection sortDirection) {
+        return authorService.list(q, page, size, sortField, sortDirection);
     }
 
     @GetMapping("/{authorId}")

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { SubjectPanelComponent } from '../components/subject-panel.component';
+import { SubjectListComponent } from '../components/subject-list.component';
 
 @Component({
   selector: 'app-subjects-page',
   standalone: true,
-  imports: [SubjectPanelComponent],
-  template: '<app-subject-panel></app-subject-panel>',
+  imports: [SubjectListComponent],
+  template: '<app-subject-list></app-subject-list>',
 })
 export class SubjectsPageComponent {}

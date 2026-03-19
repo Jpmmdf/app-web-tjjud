@@ -1,0 +1,86 @@
+<section class="panel panel--govbr card border-0">
+  <div class="panel__header d-flex flex-column flex-xl-row justify-content-between align-items-xl-start">
+    <div>
+      <p class="eyebrow">{{ texts.eyebrow }}</p>
+      <h2>{{ texts.title }}</h2>
+      <p class="text-muted mb-0">{{ texts.listDetail }}</p>
+    </div>
+
+    <div class="list-actions">
+      <form class="toolbar" (ngSubmit)="loadSubjects()">
+        <input
+          class="form-control"
+          type="search"
+          [formControl]="subjectSearchControl"
+          [placeholder]="texts.searchPlaceholder"
+          [attr.aria-label]="texts.searchAriaLabel"
+        />
+        <select class="form-select" [formControl]="sortControl" [attr.aria-label]="commonTexts.sortBy">
+          <option value="descriptionAsc">{{ texts.sortOptions.descriptionAsc }}</option>
+          <option value="descriptionDesc">{{ texts.sortOptions.descriptionDesc }}</option>
+          <option value="idAsc">{{ texts.sortOptions.idAsc }}</option>
+          <option value="idDesc">{{ texts.sortOptions.idDesc }}</option>
+        </select>
+        <button type="submit" class="btn btn-primary">{{ commonTexts.filter }}</button>
+      </form>
+
+      <a class="btn btn-outline-secondary" routerLink="/assuntos/novo">{{ commonTexts.create }}</a>
+    </div>
+  </div>
+
+  <div class="list-shell card border-0 shadow-sm">
+    <div class="list-shell__header">
+      <h3>{{ texts.listTitle }}</h3>
+      <span class="badge rounded-pill text-bg-light">{{ commonTexts.records(catalog.subjects().length) }}</span>
+    </div>
+
+    @if (catalog.subjects().length > 0) {
+      <div class="br-table table-responsive">
+        <table>
+          <caption>{{ texts.listTitle }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Identificador</th>
+              <th scope="col">Descrição</th>
+              <th scope="col" class="actions-column">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (subject of catalog.subjects(); track subject.id) {
+              <tr>
+                <td data-th="Identificador">{{ commonTexts.identifier(subject.id) }}</td>
+                <td data-th="Descrição">
+                  <strong>{{ subject.description }}</strong>
+                </td>
+                <td data-th="Ações">
+                  <div class="entity-list__actions">
+                    <a class="button button--ghost btn btn-outline-secondary btn-sm" [routerLink]="['/assuntos', subject.id, 'editar']">
+                      {{ commonTexts.edit }}
+                    </a>
+                    <button type="button" class="button button--danger btn btn-outline-danger btn-sm" (click)="deleteSubject(subject)">
+                      {{ commonTexts.delete }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="list-pagination">
+        <span>{{ commonTexts.pageLabel(catalog.subjectPage().page, catalog.subjectPage().totalPages) }}</span>
+        <span>{{ commonTexts.totalRecords(catalog.subjectPage().totalElements) }}</span>
+        <div class="entity-list__actions">
+          <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!hasPreviousPage()" (click)="goToPage(catalog.subjectPage().page - 1)">
+            {{ commonTexts.previousPage }}
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="!hasNextPage()" (click)="goToPage(catalog.subjectPage().page + 1)">
+            {{ commonTexts.nextPage }}
+          </button>
+        </div>
+      </div>
+    } @else {
+      <p class="empty-state">{{ texts.emptyState }}</p>
+    }
+  </div>
+</section>

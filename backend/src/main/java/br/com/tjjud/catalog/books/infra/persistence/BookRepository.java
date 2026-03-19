@@ -28,7 +28,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                     where (:title = '' or upper(b.title) like concat('%', upper(:title), '%'))
                       and (:authorId is null or a.id = :authorId)
                       and (:subjectId is null or s.id = :subjectId)
-                    group by b.id, b.title
+                    group by b.id, b.title, b.publicationYear, b.price
                     """,
             countQuery = """
                     select count(distinct b.id)
