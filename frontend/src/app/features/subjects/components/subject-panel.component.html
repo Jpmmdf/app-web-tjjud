@@ -1,5 +1,5 @@
-<section id="subjects" class="panel">
-  <div class="panel__header">
+<section id="subjects" class="panel card border-0">
+  <div class="panel__header d-flex flex-column flex-xl-row justify-content-between align-items-xl-start">
     <div>
       <p class="eyebrow">{{ texts.eyebrow }}</p>
       <h2>{{ texts.title }}</h2>
@@ -7,40 +7,41 @@
 
     <form class="toolbar" (ngSubmit)="loadSubjects()">
       <input
+        class="form-control"
         type="search"
         [formControl]="subjectSearchControl"
         [placeholder]="texts.searchPlaceholder"
         [attr.aria-label]="texts.searchAriaLabel"
       />
-      <button type="submit">{{ commonTexts.filter }}</button>
+      <button type="submit" class="btn btn-primary">{{ commonTexts.filter }}</button>
     </form>
   </div>
 
   <div class="panel__content panel__content--split">
-    <form class="card-form" [formGroup]="subjectForm" (ngSubmit)="submitSubject()" novalidate>
+    <form class="card-form card border-0 shadow-sm" [formGroup]="subjectForm" (ngSubmit)="submitSubject()" novalidate>
       <div class="card-form__header">
         <h3>{{ texts.formTitle(editingSubjectId() !== null) }}</h3>
-        <button type="button" class="button button--ghost" (click)="resetSubjectForm()">{{ commonTexts.clear }}</button>
+        <button type="button" class="button button--ghost btn btn-outline-secondary" (click)="resetSubjectForm()">{{ commonTexts.clear }}</button>
       </div>
 
       <label class="field">
-        <span>{{ texts.fieldLabel }}</span>
-        <input type="text" formControlName="description" maxlength="20" [placeholder]="texts.fieldPlaceholder" />
+        <span class="form-label mb-0">{{ texts.fieldLabel }}</span>
+        <input class="form-control" type="text" formControlName="description" maxlength="20" [placeholder]="texts.fieldPlaceholder" />
       </label>
 
       @if (subjectForm.controls.description.touched && subjectForm.controls.description.invalid) {
-        <p class="field-error">{{ texts.fieldError }}</p>
+        <p class="field-error invalid-feedback d-block">{{ texts.fieldError }}</p>
       }
 
-      <button type="submit" class="button button--primary" [disabled]="subjectForm.invalid || catalog.isBusy()">
+      <button type="submit" class="button button--primary btn btn-primary align-self-start" [disabled]="subjectForm.invalid || catalog.isBusy()">
         {{ texts.submitLabel(editingSubjectId() !== null) }}
       </button>
     </form>
 
-    <div class="list-shell">
+    <div class="list-shell card border-0 shadow-sm">
       <div class="list-shell__header">
         <h3>{{ texts.listTitle }}</h3>
-        <span>{{ commonTexts.records(catalog.subjects().length) }}</span>
+        <span class="badge rounded-pill text-bg-light">{{ commonTexts.records(catalog.subjects().length) }}</span>
       </div>
 
       @if (catalog.subjects().length > 0) {
@@ -53,8 +54,8 @@
               </div>
 
               <div class="entity-list__actions">
-                <button type="button" class="button button--ghost" (click)="editSubject(subject)">{{ commonTexts.edit }}</button>
-                <button type="button" class="button button--danger" (click)="deleteSubject(subject)">{{ commonTexts.delete }}</button>
+                <button type="button" class="button button--ghost btn btn-outline-secondary btn-sm" (click)="editSubject(subject)">{{ commonTexts.edit }}</button>
+                <button type="button" class="button button--danger btn btn-outline-danger btn-sm" (click)="deleteSubject(subject)">{{ commonTexts.delete }}</button>
               </div>
             </li>
           }

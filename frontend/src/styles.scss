@@ -1,3 +1,21 @@
+@use 'bootstrap/scss/bootstrap' with (
+  $font-family-sans-serif: ('Space Grotesk', sans-serif),
+  $headings-font-family: ('Fraunces', serif),
+  $body-bg: #efe6da,
+  $body-color: #18232d,
+  $primary: #0f766e,
+  $secondary: #3f4e5d,
+  $danger: #b54732,
+  $light: #fffaf5,
+  $border-radius: 1rem,
+  $border-radius-lg: 1.5rem,
+  $border-radius-xl: 2rem,
+  $input-border-radius: 1rem,
+  $btn-border-radius: 999px,
+  $card-border-radius: 1.5rem,
+  $card-border-color: rgba(24, 35, 45, 0.08)
+);
+
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap');
 
 :root {
@@ -105,7 +123,8 @@ app-root {
 
 .chip-button,
 .button,
-.toolbar button {
+.toolbar button,
+.btn {
   appearance: none;
   border: 0;
   border-radius: 999px;
@@ -123,7 +142,8 @@ app-root {
 
 .chip-button:hover,
 .button:hover,
-.toolbar button:hover {
+.toolbar button:hover,
+.btn:hover {
   transform: translateY(-1px);
 }
 
@@ -250,7 +270,9 @@ app-root {
 }
 
 input,
-select {
+select,
+.form-control,
+.form-select {
   width: 100%;
   padding: 0.85rem 1rem;
   border-radius: 16px;
@@ -331,7 +353,8 @@ select:focus {
 }
 
 .button,
-.toolbar button {
+.toolbar button,
+.btn {
   padding: 0.8rem 1.05rem;
 }
 
@@ -352,7 +375,9 @@ select:focus {
 }
 
 .button[disabled],
-.toolbar button[disabled] {
+.toolbar button[disabled],
+.btn[disabled],
+.btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
