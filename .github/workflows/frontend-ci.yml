@@ -1,14 +1,8 @@
 name: Frontend CI
 
 on:
+  workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - "frontend/**"
-      - ".nvmrc"
-      - ".github/workflows/frontend-ci.yml"
   pull_request:
     branches:
       - main

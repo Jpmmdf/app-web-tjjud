@@ -1,0 +1,182 @@
+name: Main Delivery
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".nvmrc"
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+concurrency:
+  group: main-delivery-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  detect-changes:
+    name: Detectar mudancas
+    runs-on: ubuntu-latest
+    outputs:
+      backend_changed: ${{ steps.filter.outputs.backend_changed }}
+      frontend_changed: ${{ steps.filter.outputs.frontend_changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Detectar areas alteradas
+        id: filter
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          backend_changed=false
+          frontend_changed=false
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] || [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            backend_changed=true
+            frontend_changed=true
+          else
+            changed_files="$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA")"
+
+            if printf '%s\n' "$changed_files" | grep -q '^backend/'; then
+              backend_changed=true
+            fi
+
+            if printf '%s\n' "$changed_files" | grep -Eq '^(frontend/|\.nvmrc$)'; then
+              frontend_changed=true
+            fi
+          fi
+
+          echo "backend_changed=$backend_changed" >> "$GITHUB_OUTPUT"
+          echo "frontend_changed=$frontend_changed" >> "$GITHUB_OUTPUT"
+
+  backend-ci:
+    name: Backend CI
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.backend_changed == 'true' }}
+    uses: ./.github/workflows/backend-ci.yml
+
+  frontend-ci:
+    name: Frontend CI
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.frontend_changed == 'true' }}
+    uses: ./.github/workflows/frontend-ci.yml
+
+  release-please:
+    name: Release Please
+    needs:
+      - detect-changes
+      - backend-ci
+      - frontend-ci
+    if: >-
+      always() &&
+      (needs.detect-changes.outputs.backend_changed == 'true' || needs.detect-changes.outputs.frontend_changed == 'true') &&
+      (needs.backend-ci.result == 'success' || needs.backend-ci.result == 'skipped') &&
+      (needs.frontend-ci.result == 'success' || needs.frontend-ci.result == 'skipped')
+    runs-on: ubuntu-latest
+    outputs:
+      backend_release_created: ${{ steps.release.outputs['backend--release_created'] }}
+      backend_version: ${{ steps.release.outputs['backend--version'] }}
+      backend_tag_name: ${{ steps.release.outputs['backend--tag_name'] }}
+      frontend_release_created: ${{ steps.release.outputs['frontend--release_created'] }}
+      frontend_version: ${{ steps.release.outputs['frontend--version'] }}
+      frontend_tag_name: ${{ steps.release.outputs['frontend--tag_name'] }}
+    steps:
+      - name: Release Please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          skip-labeling: true
+
+  auto-approve-release-prs:
+    name: Auto Approve Release PRs
+    needs: release-please
+    if: ${{ needs.release-please.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validar secrets do GitHub App
+        env:
+          AUTOMATION_APP_ID: ${{ secrets.AUTOMATION_APP_ID }}
+          AUTOMATION_APP_PRIVATE_KEY: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+        run: |
+          if [ -z "$AUTOMATION_APP_ID" ] || [ -z "$AUTOMATION_APP_PRIVATE_KEY" ]; then
+            echo "::error::Configure os secrets AUTOMATION_APP_ID e AUTOMATION_APP_PRIVATE_KEY para gerar o token do GitHub App."
+            exit 1
+          fi
+
+      - name: Gerar token do GitHub App
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          permission-pull-requests: write
+
+      - name: Aprovar PRs de release abertas pelo Release Please
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          RELEASE_PRS="$(
+            gh pr list \
+              --repo "$GITHUB_REPOSITORY" \
+              --state open \
+              --base main \
+              --json number,title,headRefName,author \
+              --jq '.[] | select(.author.login == "app/github-actions") | select(.headRefName | startswith("release-please--branches--")) | select(.title | startswith("chore(main): release ")) | @base64'
+          )"
+
+          if [ -z "$RELEASE_PRS" ]; then
+            echo "Nenhuma PR de release pendente para aprovar."
+            exit 0
+          fi
+
+          while IFS= read -r encoded_pr; do
+            [ -z "$encoded_pr" ] && continue
+
+            pr_json="$(printf '%s' "$encoded_pr" | base64 --decode)"
+            pr_number="$(printf '%s' "$pr_json" | jq -r '.number')"
+
+            gh pr review "$pr_number" \
+              --repo "$GITHUB_REPOSITORY" \
+              --approve \
+              --body "Aprovacao automatica da PR de release."
+          done <<< "$RELEASE_PRS"
+
+  publish-backend:
+    name: Publish Backend Image
+    needs: release-please
+    if: ${{ needs.release-please.outputs.backend_release_created == 'true' }}
+    uses: ./.github/workflows/backend-image.yml
+    with:
+      version: ${{ needs.release-please.outputs.backend_version }}
+      git_tag: ${{ needs.release-please.outputs.backend_tag_name }}
+      push_latest: true
+    secrets: inherit
+
+  publish-frontend:
+    name: Publish Frontend Image
+    needs: release-please
+    if: ${{ needs.release-please.outputs.frontend_release_created == 'true' }}
+    uses: ./.github/workflows/frontend-image.yml
+    with:
+      version: ${{ needs.release-please.outputs.frontend_version }}
+      git_tag: ${{ needs.release-please.outputs.frontend_tag_name }}
+      push_latest: true
+    secrets: inherit

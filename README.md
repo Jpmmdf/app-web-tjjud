@@ -43,10 +43,11 @@ Fluxo configurado:
 1. Abrir PR normal para a `main`.
 2. Rodar CI de `backend` e `frontend` nessa PR.
 3. Fazer merge na `main`.
-4. O `release-please` abre ou atualiza as PRs de release do `backend` e do `frontend`.
-5. Essas PRs de release podem ser autoaprovadas.
-6. Ao fazer merge da PR de release, o `release-please` cria a tag e a GitHub Release usando `GITHUB_TOKEN`.
-7. No mesmo workflow, quando uma release real e criada, os jobs reutilizaveis publicam a imagem correspondente no Docker Hub.
+4. Uma pipeline unica na `main` executa a CI relevante antes do `release-please`.
+5. O `release-please` abre ou atualiza as PRs de release do `backend` e do `frontend`.
+6. Essas PRs de release podem ser autoaprovadas no mesmo workflow.
+7. Ao fazer merge da PR de release, o `release-please` cria a tag e a GitHub Release usando `GITHUB_TOKEN`.
+8. No mesmo workflow, quando uma release real e criada, os jobs reutilizaveis publicam a imagem correspondente no Docker Hub.
 
 As pipelines normais de CI nao rodam nas PRs de release do `release-please`, para evitar trabalho duplicado.
 
