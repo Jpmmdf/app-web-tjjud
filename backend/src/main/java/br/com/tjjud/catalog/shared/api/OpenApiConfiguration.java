@@ -12,11 +12,14 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfiguration {
 
     @Bean
-    OpenAPI catalogOpenApi(@Value("${server.port:8080}") String serverPort) {
+    OpenAPI catalogOpenApi(
+            @Value("${server.port:8080}") String serverPort,
+            @Value("${spring.application.version:local}") String applicationVersion) {
         return new OpenAPI()
                 .info(new Info()
                         .title("Catálogo editorial API")
-                        .description("API para gerenciar autores, assuntos, livros e relatórios do catálogo editorial."))
+                        .description("API para gerenciar autores, assuntos, livros e relatórios do catálogo editorial.")
+                        .version(applicationVersion))
                 .servers(List.of(new Server()
                         .url("http://localhost:" + serverPort)
                         .description("Servidor local da API")));
