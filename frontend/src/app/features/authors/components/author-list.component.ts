@@ -45,7 +45,7 @@ export class AuthorListComponent implements OnInit {
     await this.catalog.loadAuthors({ page });
   }
 
-  protected async sortBy(field: 'id' | 'name'): Promise<void> {
+  protected async sortBy(field: 'name'): Promise<void> {
     const nextOption = this.nextSortOption(field);
     this.sortControl.setValue(nextOption);
     await this.catalog.loadAuthors({
@@ -55,12 +55,12 @@ export class AuthorListComponent implements OnInit {
     });
   }
 
-  protected sortIndicator(field: 'id' | 'name'): string {
+  protected sortIndicator(field: 'name'): string {
     const current = this.sortControl.value;
-    if ((field === 'id' && current === 'idAsc') || (field === 'name' && current === 'nameAsc')) {
+    if (field === 'name' && current === 'nameAsc') {
       return '↑';
     }
-    if ((field === 'id' && current === 'idDesc') || (field === 'name' && current === 'nameDesc')) {
+    if (field === 'name' && current === 'nameDesc') {
       return '↓';
     }
     return '';
@@ -75,33 +75,20 @@ export class AuthorListComponent implements OnInit {
   }
 
   private fromSortOption(option: AuthorSortOption): { sortField: string; sortDirection: SortDirection } {
-    switch (option) {
-      case 'nameDesc':
-        return { sortField: 'name', sortDirection: 'DESC' };
-      case 'idAsc':
-        return { sortField: 'id', sortDirection: 'ASC' };
-      case 'idDesc':
-        return { sortField: 'id', sortDirection: 'DESC' };
-      case 'nameAsc':
-      default:
-        return { sortField: 'name', sortDirection: 'ASC' };
+    if (option === 'nameDesc') {
+      return { sortField: 'name', sortDirection: 'DESC' };
     }
+    return { sortField: 'name', sortDirection: 'ASC' };
   }
 
   private toSortOption(field: string, direction: SortDirection): AuthorSortOption {
-    if (field === 'id') {
-      return direction === 'DESC' ? 'idDesc' : 'idAsc';
-    }
     return direction === 'DESC' ? 'nameDesc' : 'nameAsc';
   }
 
-  private nextSortOption(field: 'id' | 'name'): AuthorSortOption {
+  private nextSortOption(field: 'name'): AuthorSortOption {
     const current = this.sortControl.value;
-    if (field === 'id') {
-      return current === 'idAsc' ? 'idDesc' : 'idAsc';
-    }
     return current === 'nameAsc' ? 'nameDesc' : 'nameAsc';
   }
 }
 
-type AuthorSortOption = 'nameAsc' | 'nameDesc' | 'idAsc' | 'idDesc';
+type AuthorSortOption = 'nameAsc' | 'nameDesc';

@@ -207,7 +207,6 @@ export const ptBrCatalogMessages = {
     },
     emptyState: 'Nenhum livro encontrado para a combinação atual de filtros.',
     card: {
-      bookIdentifier: (id: number) => `Livro #${id}`,
       publisher: 'Editora',
       edition: 'Edição',
       year: 'Ano',
@@ -230,12 +229,21 @@ export const ptBrCatalogMessages = {
   reports: {
     eyebrow: 'View relacional + exportação',
     title: 'Relatório por autor',
+    detail: 'Acompanhe a distribuição dos livros por autor, aplique recortes e exporte a visão consolidada em PDF.',
     filterAriaLabel: 'Filtrar relatório por autor',
+    filterSectionTitle: 'Filtros do relatório',
+    filterSectionDetail: 'Defina o autor, a ordenação e atualize o recorte antes de exportar.',
     clearFilter: 'Limpar filtro',
     exportPdf: 'Exportar PDF',
     summary: {
       authors: 'Autores no relatório',
+      books: 'Livros no recorte',
+      scope: 'Recorte atual',
       generatedAt: 'Gerado em',
+    },
+    results: {
+      title: 'Autores listados',
+      detail: (authors: number, books: number) => `${authors} autor(es) e ${books} livro(s) exibidos nesta página.`,
     },
     sortOptions: {
       authorNameAsc: 'Autor de A a Z',
@@ -244,7 +252,12 @@ export const ptBrCatalogMessages = {
       bookCountAsc: 'Menos livros',
     },
     card: {
-      authorIdentifier: (id: number) => `Autor #${id}`,
+      booksLabel: 'Livros vinculados',
+      publisherLabel: 'Editora',
+      yearLabel: 'Ano',
+      editionLabel: 'Edição',
+      subjectsLabel: 'Assuntos',
+      noSubjects: 'Sem assuntos associados',
     },
     emptyState: 'O relatório ainda não possui linhas para o filtro atual.',
     messages: {

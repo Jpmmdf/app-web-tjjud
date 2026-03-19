@@ -45,7 +45,7 @@ export class SubjectListComponent implements OnInit {
     await this.catalog.loadSubjects({ page });
   }
 
-  protected async sortBy(field: 'id' | 'description'): Promise<void> {
+  protected async sortBy(field: 'description'): Promise<void> {
     const nextOption = this.nextSortOption(field);
     this.sortControl.setValue(nextOption);
     await this.catalog.loadSubjects({
@@ -55,12 +55,12 @@ export class SubjectListComponent implements OnInit {
     });
   }
 
-  protected sortIndicator(field: 'id' | 'description'): string {
+  protected sortIndicator(field: 'description'): string {
     const current = this.sortControl.value;
-    if ((field === 'id' && current === 'idAsc') || (field === 'description' && current === 'descriptionAsc')) {
+    if (field === 'description' && current === 'descriptionAsc') {
       return '↑';
     }
-    if ((field === 'id' && current === 'idDesc') || (field === 'description' && current === 'descriptionDesc')) {
+    if (field === 'description' && current === 'descriptionDesc') {
       return '↓';
     }
     return '';
@@ -75,33 +75,20 @@ export class SubjectListComponent implements OnInit {
   }
 
   private fromSortOption(option: SubjectSortOption): { sortField: string; sortDirection: SortDirection } {
-    switch (option) {
-      case 'descriptionDesc':
-        return { sortField: 'description', sortDirection: 'DESC' };
-      case 'idAsc':
-        return { sortField: 'id', sortDirection: 'ASC' };
-      case 'idDesc':
-        return { sortField: 'id', sortDirection: 'DESC' };
-      case 'descriptionAsc':
-      default:
-        return { sortField: 'description', sortDirection: 'ASC' };
+    if (option === 'descriptionDesc') {
+      return { sortField: 'description', sortDirection: 'DESC' };
     }
+    return { sortField: 'description', sortDirection: 'ASC' };
   }
 
   private toSortOption(field: string, direction: SortDirection): SubjectSortOption {
-    if (field === 'id') {
-      return direction === 'DESC' ? 'idDesc' : 'idAsc';
-    }
     return direction === 'DESC' ? 'descriptionDesc' : 'descriptionAsc';
   }
 
-  private nextSortOption(field: 'id' | 'description'): SubjectSortOption {
+  private nextSortOption(field: 'description'): SubjectSortOption {
     const current = this.sortControl.value;
-    if (field === 'id') {
-      return current === 'idAsc' ? 'idDesc' : 'idAsc';
-    }
     return current === 'descriptionAsc' ? 'descriptionDesc' : 'descriptionAsc';
   }
 }
 
-type SubjectSortOption = 'descriptionAsc' | 'descriptionDesc' | 'idAsc' | 'idDesc';
+type SubjectSortOption = 'descriptionAsc' | 'descriptionDesc';

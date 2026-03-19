@@ -1,5 +1,6 @@
 site/
 .venv/
+.codex/
 frontend/.angular/
 frontend/dist/
 docs/assets/structurizr/

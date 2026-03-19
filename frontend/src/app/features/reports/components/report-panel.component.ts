@@ -1,10 +1,10 @@
-
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ptBrCatalogMessages } from '../../../core/i18n/pt-br';
 import { SortDirection } from '../../../core/models/common.models';
+import type { ReportBookItem } from '../../../core/models/reports.models';
 import { CatalogFacadeService } from '../../../core/state/catalog-facade.service';
-import { formatCurrencyValue, formatTimestamp, joinSubjectDescriptions } from '../../../shared/formatters/catalog-formatters';
+import { formatCurrencyValue, formatTimestamp } from '../../../shared/formatters/catalog-formatters';
 
 @Component({
   selector: 'app-report-panel',
@@ -46,12 +46,28 @@ export class ReportPanelComponent {
     return formatTimestamp(timestamp);
   }
 
-  protected reportSubjects(subjects: ReadonlyArray<{ description: string }>): string {
-    return joinSubjectDescriptions(subjects);
+  protected visibleBookCount(): number {
+    return (this.catalog.report()?.items ?? []).reduce((total, group) => total + group.books.length, 0);
   }
 
   protected reportPrice(price: string): string {
     return formatCurrencyValue(price);
+  }
+
+  protected activeAuthorLabel(): string {
+    const activeAuthorId = this.catalog.currentReportList().authorId;
+    if (activeAuthorId === null) {
+      return this.commonTexts.allAuthors;
+    }
+    return this.catalog.authorOptions().find((author) => author.id === activeAuthorId)?.name ?? this.commonTexts.allAuthors;
+  }
+
+  protected bookMeta(book: ReportBookItem): string[] {
+    return [
+      `${this.texts.card.publisherLabel}: ${book.publisher}`,
+      `${this.texts.card.yearLabel}: ${book.publicationYear}`,
+      `${this.texts.card.editionLabel}: ${book.edition}`,
+    ];
   }
 
   protected async goToPage(page: number): Promise<void> {
