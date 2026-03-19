@@ -1,19 +1,21 @@
-name: Application CI
+name: Frontend CI
 
 on:
   workflow_dispatch:
   push:
-    paths-ignore:
-      - "docs/**"
-      - "mkdocs.yml"
-      - "requirements-docs.txt"
-      - "scripts/export-structurizr.sh"
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".nvmrc"
+      - ".github/workflows/frontend-ci.yml"
   pull_request:
-    paths-ignore:
-      - "docs/**"
-      - "mkdocs.yml"
-      - "requirements-docs.txt"
-      - "scripts/export-structurizr.sh"
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".nvmrc"
+      - ".github/workflows/frontend-ci.yml"
 
 permissions:
   contents: read
@@ -22,41 +24,10 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 concurrency:
-  group: application-ci-${{ github.workflow }}-${{ github.ref }}
+  group: frontend-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  backend:
-    name: Backend
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: backend
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Configurar Java 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "21"
-          cache: maven
-
-      - name: Garantir permissao do Maven Wrapper
-        run: chmod +x mvnw
-
-      - name: Executar verify do backend
-        run: ./mvnw --batch-mode verify
-
-      - name: Publicar artefato do backend
-        uses: actions/upload-artifact@v7
-        with:
-          name: backend-jar
-          path: backend/target/backend-0.0.1-SNAPSHOT.jar
-          if-no-files-found: error
-
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
