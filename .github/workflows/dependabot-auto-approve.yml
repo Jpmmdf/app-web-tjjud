@@ -1,4 +1,4 @@
-name: Auto Approve Release PRs
+name: Auto Approve Dependabot PRs
 
 on:
   pull_request_target:
@@ -14,12 +14,12 @@ permissions:
 
 jobs:
   auto-approve:
-    name: Auto Approve Release PR
+    name: Auto Approve Dependabot PR
     if: >-
       github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
-      startsWith(github.event.pull_request.head.ref, 'release-please--branches--') &&
-      startsWith(github.event.pull_request.title, 'chore(main): release ') &&
+      startsWith(github.event.pull_request.head.ref, 'dependabot/') &&
       github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
@@ -42,7 +42,7 @@ jobs:
           owner: ${{ github.repository_owner }}
           permission-pull-requests: write
 
-      - name: Aprovar PR de release
+      - name: Aprovar PR do Dependabot
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -50,4 +50,4 @@ jobs:
           gh pr review "$PR_NUMBER" \
             --repo "$GITHUB_REPOSITORY" \
             --approve \
-            --body "Aprovacao automatica da PR de release."
+            --body "Aprovacao automatica da PR do Dependabot."
