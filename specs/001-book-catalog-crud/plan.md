@@ -12,7 +12,7 @@ Implementar uma aplicacao web de cadastro de livros em dois projetos, com `contr
 ## Technical Context
 
 **Language/Version**: Java 21 LTS, TypeScript 5.x, SQL (PostgreSQL 16+)  
-**Primary Dependencies**: Spring Boot 3.x (Web, Validation, Data JPA, Actuator), Flyway, springdoc-openapi, OpenTelemetry/OTLP, bundles de mensagens via i18n ou `properties`, Angular 19+ com componentes standalone, Angular Reactive Forms, Angular HttpClient, Bootstrap 5  
+**Primary Dependencies**: Spring Boot 4.x (Web, Validation, Data JPA, Actuator), Flyway, springdoc-openapi, OpenTelemetry/OTLP, OpenPDF, bundles de mensagens via i18n ou `properties`, Angular 21+ com componentes standalone, Angular Reactive Forms, Angular HttpClient, Bootstrap 5  
 **Storage**: PostgreSQL 16+ com schema normalizado, constraints, indices e view de relatorio  
 **Testing**: JUnit 5, Spring Boot Test, MockMvc, Testcontainers para PostgreSQL, Angular unit tests, Playwright para fluxo critico ponta a ponta  
 **Target Platform**: Navegadores modernos no frontend e API REST executando em Linux/macOS localmente ou em container  
@@ -97,7 +97,7 @@ frontend/
 - Adotar PostgreSQL como banco principal pela combinacao de constraints robustas, suporte nativo a view, tipos numericos confiaveis para moeda e boa integracao com Spring Boot/Testcontainers.
 - Representar valor monetario como decimal canonico na API e `NUMERIC(12,2)` no banco, com `BigDecimal` no backend e mascara `pt-BR` no frontend para evitar erros de ponto flutuante.
 - Implementar a interface web com Angular standalone, formularios reativos e Bootstrap como base visual, usando um controle reutilizavel de moeda em vez de acoplamento a uma biblioteca de mascara de baixa manutencao.
-- Gerar o relatorio a partir de uma view relacional do banco e renderiza-lo via JasperReports no backend para exportacao PDF, mantendo uma consulta JSON equivalente para inspecao e testes.
+- Gerar o relatorio a partir de uma view relacional do banco e renderiza-lo via OpenPDF no backend para exportacao PDF, mantendo uma consulta JSON equivalente para inspecao e testes.
 - Validar integracao com testes em camadas: unitarios para regras, integracao para persistencia/view, contrato para API e E2E para o fluxo principal.
 - Externalizar mensagens de negocio e validacao em mecanismo centralizado de i18n/properties, com `pt-BR` como idioma padrao da demonstracao.
 - Instrumentar API e runtime com suporte a OpenTelemetry para traces, metricas e correlacao de logs nas operacoes principais.
@@ -156,7 +156,7 @@ frontend/
 - **Risco**: duplicidade indevida nas tabelas de associacao e no relatorio.  
   **Mitigacao**: chave composta, restricao unica e validacoes de dominio antes de persistir.
 - **Risco**: relatorio PDF adicionar peso excessivo ao escopo.  
-  **Mitigacao**: manter layout simples no JasperReports e reutilizar a view para JSON e PDF.
+  **Mitigacao**: manter layout simples com OpenPDF e reutilizar a view para JSON e PDF.
 - **Risco**: mensagens dispersas gerarem inconsistencias entre portugues e ingles.  
   **Mitigacao**: centralizar mensagens em i18n/properties e validar textos dos fluxos principais.
 - **Risco**: observabilidade insuficiente dificultar diagnostico em demonstracao ou deploy.  

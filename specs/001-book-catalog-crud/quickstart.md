@@ -3,9 +3,9 @@
 ## Prerequisites
 
 - Java 21
-- Maven 3.9+
-- Node.js 22 LTS
-- npm 10+
+- Maven 3.9.14+
+- Node.js 24 LTS
+- npm 11+
 - Docker e Docker Compose
 
 ## 1. Subir infraestrutura local
@@ -17,7 +17,7 @@
 ## 2. Estruturar backend
 
 1. Criar o projeto em `backend/` com Spring Boot.
-2. Adicionar dependencias de Web, Validation, Data JPA, Flyway, PostgreSQL, Actuator, springdoc-openapi, OpenTelemetry e mecanismo de mensagens via i18n/properties.
+2. Adicionar dependencias de Web, Validation, Data JPA, Flyway, PostgreSQL, Actuator, springdoc-openapi, OpenTelemetry, OpenPDF e mecanismo de mensagens via i18n/properties.
 3. Configurar profile local apontando para o PostgreSQL do Docker e exportador OpenTelemetry compativel com o ambiente.
 4. Criar migrations iniciais para tabelas, constraints, indices e `vw_relatorio_livros_por_autor`.
 5. Implementar endpoints conforme [openapi.yaml](./contracts/openapi.yaml), com mensagens em portugues externalizadas.

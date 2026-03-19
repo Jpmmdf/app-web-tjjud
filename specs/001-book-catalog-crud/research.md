@@ -8,9 +8,9 @@
   - Documentacao derivada do codigo: rejeitada porque enfraquece a disciplina contract-first.
   - GraphQL: rejeitada porque o escopo do desafio e CRUD relacional simples com relatorio e se adapta melhor a REST.
 
-## Decision 2: Spring Boot 3.x com Java 21 no backend
+## Decision 2: Spring Boot 4.x com Java 21 no backend
 
-- **Decision**: Usar Spring Boot 3.x sobre Java 21 LTS com Spring Web, Validation, Data JPA, Actuator, springdoc-openapi e JasperReports.
+- **Decision**: Usar Spring Boot 4.x sobre Java 21 LTS com Spring Web, Validation, Data JPA, Actuator, springdoc-openapi e OpenPDF.
 - **Rationale**: Atende ao stack solicitado, oferece produtividade para CRUD e validacoes, integra bem com PostgreSQL/Flyway e permite expor a API com tratamento estruturado de erros.
 - **Alternatives considered**:
   - Micronaut ou Quarkus: rejeitados por adicionarem custo de decisao sem ganho necessario para o escopo.
@@ -43,11 +43,11 @@
 
 ## Decision 6: Relatorio por autor com view de banco e exportacao PDF
 
-- **Decision**: Criar a view `vw_relatorio_livros_por_autor` no banco, consultar essa view no backend e gerar PDF via JasperReports, mantendo endpoint JSON para inspecao e testes.
-- **Rationale**: Atende diretamente ao requisito de relatorio baseado em view no banco e permite uma entrega simples, demonstravel e auditavel.
+- **Decision**: Criar a view `vw_relatorio_livros_por_autor` no banco, consultar essa view no backend e gerar PDF via OpenPDF, mantendo endpoint JSON para inspecao e testes.
+- **Rationale**: Atende diretamente ao requisito de relatorio baseado em view no banco e permite uma entrega simples, demonstravel e auditavel, sem introduzir um motor de relatorios mais pesado do que o necessario para o layout atual.
 - **Alternatives considered**:
   - Relatorio apenas em HTML/Angular: rejeitado porque nao atende integralmente ao requisito de componente de relatorio.
-  - JasperReports consultando tabelas diretamente: rejeitado porque o enunciado pede origem em view.
+  - JasperReports: rejeitado porque adiciona peso e acoplamento desnecessarios para um PDF tabular simples.
 
 ## Decision 7: Estrategia de testes em quatro niveis
 
