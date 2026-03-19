@@ -1,7 +1,6 @@
 name: Auto Approve Release PRs
 
 on:
-  workflow_dispatch:
   workflow_run:
     workflows:
       - Release Please
@@ -16,11 +15,8 @@ jobs:
   auto-approve:
     name: Auto Approve Release PR
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (
-        github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.head_branch == 'main'
-      )
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
     steps:
       - name: Validar secrets do GitHub App
@@ -46,13 +42,12 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          REVIEWER_LOGIN="$(gh api user --jq '.login')"
           RELEASE_PRS="$(
             gh pr list \
               --repo "$GITHUB_REPOSITORY" \
               --state open \
               --base main \
-              --json number,title,headRefName,author,reviewDecision \
+              --json number,title,headRefName,author \
               --jq '.[] | select(.author.login == "app/github-actions") | select(.headRefName | startswith("release-please--branches--")) | select(.title | startswith("chore(main): release ")) | @base64'
           )"
 
@@ -66,19 +61,6 @@ jobs:
 
             pr_json="$(printf '%s' "$encoded_pr" | base64 --decode)"
             pr_number="$(printf '%s' "$pr_json" | jq -r '.number')"
-            review_decision="$(printf '%s' "$pr_json" | jq -r '.reviewDecision // empty')"
-
-            if [ "$review_decision" = "APPROVED" ]; then
-              echo "PR #$pr_number ja aprovada. Pulando."
-              continue
-            fi
-
-            existing_review="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$pr_number/reviews" --jq ".[] | select(.user.login == \"$REVIEWER_LOGIN\" and .state == \"APPROVED\") | .id" | head -n 1)"
-
-            if [ -n "$existing_review" ]; then
-              echo "PR #$pr_number ja aprovada por $REVIEWER_LOGIN. Pulando."
-              continue
-            fi
 
             gh pr review "$pr_number" \
               --repo "$GITHUB_REPOSITORY" \
