@@ -55,7 +55,7 @@
           </div>
 
           @if (showAuthorTooShort()) {
-            <p class="lookup-feedback">{{ texts.filters.searchTooShort }}</p>
+            <p class="lookup-feedback">{{ texts.filters.authorLookupHint }}</p>
           } @else if (showEmptyAuthorSearch()) {
             <p class="lookup-feedback">{{ texts.filters.noAuthorMatches }}</p>
           }
@@ -86,7 +86,7 @@
           </div>
 
           @if (showSubjectTooShort()) {
-            <p class="lookup-feedback">{{ texts.filters.searchTooShort }}</p>
+            <p class="lookup-feedback">{{ texts.filters.subjectLookupHint }}</p>
           } @else if (showEmptySubjectSearch()) {
             <p class="lookup-feedback">{{ texts.filters.noSubjectMatches }}</p>
           }

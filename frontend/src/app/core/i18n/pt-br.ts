@@ -152,7 +152,7 @@ export const ptBrCatalogMessages = {
     eyebrow: 'Acervo principal',
     title: 'Livros',
     filters: {
-      titleLabel: 'Titulo',
+      titleLabel: 'Título',
       authorLabel: 'Autor',
       subjectLabel: 'Assunto',
       titlePlaceholder: 'Filtrar por título',
@@ -164,7 +164,6 @@ export const ptBrCatalogMessages = {
       authorLookupHint: 'Informe pelo menos 2 letras para buscar autores no banco.',
       subjectLookupHint: 'Informe pelo menos 2 letras para buscar assuntos no banco.',
       searchAction: 'Buscar',
-      searchTooShort: 'Digite ao menos 2 caracteres para pesquisar.',
       noAuthorMatches: 'Nenhum autor encontrado para o trecho informado.',
       noSubjectMatches: 'Nenhum assunto encontrado para o trecho informado.',
       selectedAuthor: (name: string) => `Autor selecionado: ${name}`,
