@@ -102,7 +102,7 @@ describe('CatalogPageComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Catálogo editorial TJJUD');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Catálogo editorial');
     expect(compiled.textContent).toContain('Cadastre e mantenha a base de autores.');
   });
 });

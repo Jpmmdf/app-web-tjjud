@@ -1,24 +1,25 @@
 <div class="app-surface">
-  <div class="shell container-xxl py-4 py-lg-5">
-    <header class="topbar">
-      <div class="topbar__brand">
-        <span class="topbar__eyebrow">{{ appTexts.menu.systemName }}</span>
-        <strong>{{ appTexts.menu.serviceName }}</strong>
-      </div>
+  <header class="app-nav" role="banner">
+    <div class="app-nav__inner container-xxl">
+      <a class="app-nav__brand" routerLink="/visao-geral">{{ appTexts.menu.serviceName }}</a>
 
-      <nav class="topnav" [attr.aria-label]="appTexts.menu.label">
+      <nav class="app-nav__links" id="main-navigation" [attr.aria-label]="appTexts.menu.label">
         @for (item of navigationItems; track item.path) {
           <a
-            class="topnav__link"
+            class="app-nav__link"
             [routerLink]="item.path"
-            routerLinkActive="topnav__link--active"
-            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="app-nav__link--active"
+            #routeLink="routerLinkActive"
+            [attr.aria-current]="routeLink.isActive ? 'page' : null"
           >
             {{ item.label }}
           </a>
         }
       </nav>
-    </header>
+    </div>
+  </header>
+
+  <div class="shell shell--nav-fixed container-xxl py-4 py-lg-5">
 
     @if (catalog.flash(); as flashMessage) {
       <section
@@ -38,16 +39,16 @@
       </section>
     }
 
-    @if (catalog.loading()) {
-      <section class="panel panel--loading card border-0 mt-4">
-        <p class="eyebrow">{{ appTexts.loading.eyebrow }}</p>
-        <h2>{{ appTexts.loading.title }}</h2>
-        <p>{{ appTexts.loading.detail }}</p>
-      </section>
-    } @else {
-      <main class="workspace d-grid gap-4 mt-4">
+    <main class="workspace d-grid gap-4 mt-4" id="main-content" tabindex="-1">
+      @if (catalog.loading()) {
+        <section class="panel panel--loading card border-0">
+          <p class="eyebrow">{{ appTexts.loading.eyebrow }}</p>
+          <h2>{{ appTexts.loading.title }}</h2>
+          <p>{{ appTexts.loading.detail }}</p>
+        </section>
+      } @else {
         <router-outlet></router-outlet>
-      </main>
-    }
+      }
+    </main>
   </div>
 </div>

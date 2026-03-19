@@ -26,7 +26,7 @@ export const ptBrCatalogMessages = {
   },
   app: {
     eyebrow: 'API-first • Spring Boot • Angular • PostgreSQL',
-    title: 'Catálogo editorial TJJUD',
+    title: 'Catálogo editorial',
     lead:
       'Operação única para autores, assuntos, livros e relatórios por autor, com consistência relacional e valor monetário mascarado em reais.',
     navigation: [
@@ -59,12 +59,6 @@ export const ptBrCatalogMessages = {
     },
     menu: {
       label: 'Menu principal',
-      home: 'Painel de navegação',
-      button: 'Abrir menu principal',
-      close: 'Fechar menu principal',
-      section: 'Navegação',
-      quickAccess: 'Acesso rápido',
-      systemName: 'Tribunal de Justiça',
       serviceName: 'Catálogo editorial',
     },
     overview: {
@@ -96,6 +90,10 @@ export const ptBrCatalogMessages = {
     createTitle: 'Novo autor',
     editTitle: 'Editar autor',
     backToList: 'Voltar para autores',
+    actions: {
+      editAriaLabel: (name: string) => `Editar autor ${name}`,
+      deleteAriaLabel: (name: string) => `Excluir autor ${name}`,
+    },
     emptyState: 'Nenhum autor encontrado para o filtro informado.',
     confirmDelete: (name: string) => `Excluir o autor "${name}"?`,
     messages: {
@@ -131,6 +129,10 @@ export const ptBrCatalogMessages = {
     createTitle: 'Novo assunto',
     editTitle: 'Editar assunto',
     backToList: 'Voltar para assuntos',
+    actions: {
+      editAriaLabel: (description: string) => `Editar assunto ${description}`,
+      deleteAriaLabel: (description: string) => `Excluir assunto ${description}`,
+    },
     emptyState: 'Nenhum assunto encontrado para o filtro informado.',
     confirmDelete: (description: string) => `Excluir o assunto "${description}"?`,
     messages: {
@@ -185,6 +187,10 @@ export const ptBrCatalogMessages = {
     createTitle: 'Novo livro',
     editTitle: 'Editar livro',
     backToList: 'Voltar para livros',
+    actions: {
+      editAriaLabel: (title: string) => `Editar livro ${title}`,
+      deleteAriaLabel: (title: string) => `Excluir livro ${title}`,
+    },
     emptyState: 'Nenhum livro encontrado para a combinação atual de filtros.',
     card: {
       bookIdentifier: (id: number) => `Livro #${id}`,
