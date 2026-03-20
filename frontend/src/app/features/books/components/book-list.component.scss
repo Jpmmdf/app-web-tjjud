@@ -314,4 +314,18 @@
   .lookup-filter__controls {
     grid-template-columns: 1fr;
   }
+
+  .lookup-results {
+    position: static;
+    margin-top: 0.35rem;
+  }
+
+  .active-filters {
+    flex-direction: column;
+  }
+
+  .active-filter-chip {
+    width: 100%;
+    justify-content: space-between;
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import packageJson from '../../../../package.json';
 import { ptBrCatalogMessages } from '../i18n/pt-br';
@@ -19,8 +19,17 @@ export class AppShellComponent implements OnInit {
   protected readonly commonTexts = ptBrCatalogMessages.common;
   protected readonly navigationItems: readonly NavigationItem[] = this.appTexts.navigation;
   protected readonly appVersion = packageJson.version;
+  protected readonly mobileNavOpen = signal(false);
 
   async ngOnInit(): Promise<void> {
     await this.catalog.refreshAll();
+  }
+
+  protected toggleMobileNavigation(): void {
+    this.mobileNavOpen.update((open) => !open);
+  }
+
+  protected closeMobileNavigation(): void {
+    this.mobileNavOpen.set(false);
   }
 }

@@ -62,6 +62,26 @@ describe('AppShellComponent', () => {
     expect(versionBadge?.getAttribute('title')).toBe(`Versão atual da aplicação: ${packageJson.version}`);
   });
 
+  it('should toggle mobile navigation state from the menu button', async () => {
+    const fixture = TestBed.createComponent(AppShellComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const menuButton = compiled.querySelector('.app-nav__toggle') as HTMLButtonElement;
+    const navigation = compiled.querySelector('#main-navigation') as HTMLElement;
+
+    expect(menuButton.getAttribute('aria-expanded')).toBe('false');
+    expect(navigation.classList.contains('app-nav__links--open')).toBeFalse();
+
+    menuButton.click();
+    fixture.detectChanges();
+
+    expect(menuButton.getAttribute('aria-expanded')).toBe('true');
+    expect(navigation.classList.contains('app-nav__links--open')).toBeTrue();
+  });
+
   it('should refresh catalog data on init', async () => {
     const fixture = TestBed.createComponent(AppShellComponent);
     fixture.detectChanges();

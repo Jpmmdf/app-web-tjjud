@@ -809,6 +809,42 @@ textarea:focus {
     padding-inline: var(--space-1);
   }
 
+  .panel__header > .btn,
+  .panel__header > a,
+  .form-actions > .btn,
+  .form-actions > a,
+  .form-actions > button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .toolbar,
+  .toolbar--wide {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar > *,
+  .toolbar--wide > * {
+    width: 100%;
+  }
+
+  .list-pagination {
+    align-items: stretch;
+  }
+
+  .list-pagination > span {
+    width: 100%;
+  }
+
+  .list-pagination .entity-list__actions {
+    width: 100%;
+  }
+
+  .list-pagination .entity-list__actions > * {
+    flex: 1 1 100%;
+  }
+
   .list-shell__header,
   .report-card__header,
   .report-card__list li,
@@ -819,5 +855,76 @@ textarea:focus {
 
   .panel {
     padding: var(--space-2);
+  }
+}
+
+@media (max-width: 860px) {
+  .br-table {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .br-table table {
+    min-width: 0 !important;
+  }
+
+  .br-table thead {
+    display: none;
+  }
+
+  .br-table tbody {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .br-table tbody tr {
+    display: grid;
+    gap: var(--space-half);
+    padding: var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface-base);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .br-table tbody tr:hover td {
+    background: transparent;
+  }
+
+  .br-table td {
+    display: grid;
+    grid-template-columns: minmax(7.5rem, 9rem) minmax(0, 1fr);
+    gap: var(--space-1);
+    align-items: start;
+    padding: 0.15rem 0 !important;
+    border-bottom: 0 !important;
+  }
+
+  .br-table td::before {
+    content: attr(data-th);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--ink-700);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .br-table td:last-child {
+    grid-template-columns: 1fr;
+    gap: var(--space-base);
+    margin-top: var(--space-base);
+    padding-top: var(--space-base) !important;
+    border-top: 1px solid var(--line-soft) !important;
+  }
+
+  .br-table td .entity-list__actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .br-table td .entity-list__actions > * {
+    flex: 0 0 auto;
   }
 }

@@ -1,5 +1,5 @@
 <div class="app-surface">
-  <header class="app-nav" role="banner">
+  <header class="app-nav" [class.app-nav--menu-open]="mobileNavOpen()" role="banner">
     <div class="app-nav__inner container-xxl">
       <div class="app-nav__brand-group">
         <a class="app-nav__brand" routerLink="/visao-geral">{{ appTexts.menu.serviceName }}</a>
@@ -12,7 +12,28 @@
         </span>
       </div>
 
-      <nav class="app-nav__links" id="main-navigation" [attr.aria-label]="appTexts.menu.label">
+      <button
+        type="button"
+        class="app-nav__toggle"
+        [attr.aria-expanded]="mobileNavOpen()"
+        aria-controls="main-navigation"
+        [attr.aria-label]="mobileNavOpen() ? appTexts.menu.closeNavigation : appTexts.menu.openNavigation"
+        (click)="toggleMobileNavigation()"
+      >
+        <span class="app-nav__toggle-icon" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <span>{{ mobileNavOpen() ? appTexts.menu.closeLabel : appTexts.menu.openLabel }}</span>
+      </button>
+
+      <nav
+        class="app-nav__links"
+        [class.app-nav__links--open]="mobileNavOpen()"
+        id="main-navigation"
+        [attr.aria-label]="appTexts.menu.label"
+      >
         @for (item of navigationItems; track item.path) {
           <a
             class="app-nav__link"
@@ -20,6 +41,7 @@
             routerLinkActive="app-nav__link--active"
             #routeLink="routerLinkActive"
             [attr.aria-current]="routeLink.isActive ? 'page' : null"
+            (click)="closeMobileNavigation()"
           >
             {{ item.label }}
           </a>
