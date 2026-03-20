@@ -44,14 +44,13 @@ Fluxo configurado:
 2. Rodar CI de `backend` e `frontend` nessa PR.
 3. Fazer merge na `main`.
 4. Uma pipeline unica na `main` executa a CI relevante novamente.
-5. Para cada componente alterado, a pipeline le a versao atual em `backend/pom.xml` ou `frontend/package.json`.
+5. Para cada componente alterado, a pipeline calcula a proxima versao com base nas tags ja existentes.
 6. A pipeline cria a tag do componente, publica a GitHub Release e depois publica a imagem correspondente no Docker Hub.
 
-O fluxo nao usa mais `release-please`. A versao publicada vem direto dos arquivos versionados no proprio PR mergeado.
+O fluxo nao usa mais `release-please`. A versao publicada passa a ser gerida pela propria pipeline.
 Esse desenho assume que a `main` esta protegida e recebe alteracoes apenas por PR aprovada e mergeada.
-Se necessario, a pipeline `Main Delivery` tambem pode ser executada manualmente pelo GitHub Actions e, nesse modo, ela roda backend e frontend completos sem depender da deteccao por pasta alterada.
+Se necessario, a pipeline `Main Delivery` tambem pode ser executada manualmente pelo GitHub Actions e, nesse modo, ela roda backend e frontend completos sem depender da deteccao por pasta alterada. Na execucao manual, voce pode escolher se o incremento de versao sera `patch`, `minor` ou `major` para cada componente.
 
-Se um componente mudou e a tag daquela versao ja existir para outro commit, a pipeline falha. Isso força o bump de versao antes do merge na `main`.
 As imagens publicadas recebem `X.Y.Z` e `latest`.
 
 Secrets necessarios no repositorio:

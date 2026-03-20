@@ -1,4 +1,5 @@
 FROM maven:3.9.13-eclipse-temurin-21 AS build
+ARG APP_VERSION=local
 WORKDIR /workspace
 
 COPY .mvn .mvn
@@ -7,9 +8,12 @@ COPY src src
 RUN ./mvnw --batch-mode -DskipTests package
 
 FROM eclipse-temurin:21-jre-alpine
+ARG APP_VERSION=local
 WORKDIR /app
 
 RUN apk add --no-cache wget
+LABEL org.opencontainers.image.version=$APP_VERSION
+ENV APP_VERSION=$APP_VERSION
 
 COPY --from=build /workspace/target/backend-*.jar app.jar
 
