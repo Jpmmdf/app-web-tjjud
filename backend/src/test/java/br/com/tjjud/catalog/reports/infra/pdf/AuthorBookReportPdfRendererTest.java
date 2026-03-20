@@ -64,6 +64,10 @@ class AuthorBookReportPdfRendererTest {
         assertTrue(extractedText.contains("Machado de Assis"));
         assertTrue(extractedText.contains("Dom Casmurro"));
         assertTrue(extractedText.contains("Detalhes editoriais"));
+        assertTrue(extractedText.contains("Ano: 1899"));
+        assertTrue(extractedText.contains("Ano: 1881"));
+        assertFalse(extractedText.contains("Ano: 1.899"));
+        assertFalse(extractedText.contains("Ano: 1.881"));
         assertTrue(extractedText.contains("Sem assuntos associados"));
     }
 
