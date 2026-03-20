@@ -68,8 +68,8 @@ export class BookFormComponent implements OnInit {
 
     const rawValue = this.bookForm.getRawValue();
     const payload: BookUpsertPayload = {
-      title: rawValue.title.trim(),
-      publisher: rawValue.publisher.trim(),
+      title: this.normalizeTextValue(rawValue.title),
+      publisher: this.normalizeTextValue(rawValue.publisher),
       edition: rawValue.edition,
       publicationYear: rawValue.publicationYear,
       price: rawValue.price,
@@ -167,6 +167,10 @@ export class BookFormComponent implements OnInit {
   }
 
   private normalizeTerm(value: string): string {
-    return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    return this.normalizeTextValue(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
+
+  private normalizeTextValue(value: string): string {
+    return value.trim().replace(/\s+/g, ' ');
   }
 }

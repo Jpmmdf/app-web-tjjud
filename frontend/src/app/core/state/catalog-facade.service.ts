@@ -476,10 +476,14 @@ export class CatalogFacadeService {
   private normalizeBookList(filters: BookListState): BookListState {
     return {
       ...filters,
-      title: filters.title.trim(),
+      title: this.normalizeTextValue(filters.title),
       authorId: filters.authorId ?? null,
       subjectId: filters.subjectId ?? null,
     };
+  }
+
+  private normalizeTextValue(value: string): string {
+    return value.trim().replace(/\s+/g, ' ');
   }
 
   private async runRequest<T>(operation: () => Promise<T>, fallbackMessage: string): Promise<T | undefined> {

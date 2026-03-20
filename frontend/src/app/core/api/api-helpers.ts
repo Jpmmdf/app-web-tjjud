@@ -10,8 +10,8 @@ export function withQueryPage(params: HttpParams, request: QueryPageRequest): Ht
 }
 
 export function appendStringParam(params: HttpParams, key: string, value?: string | null): HttpParams {
-  const trimmed = value?.trim();
-  return trimmed ? params.set(key, trimmed) : params;
+  const normalized = normalizeTextParam(value);
+  return normalized ? params.set(key, normalized) : params;
 }
 
 export function appendNumberParam(params: HttpParams, key: string, value?: number | null): HttpParams {
@@ -20,4 +20,13 @@ export function appendNumberParam(params: HttpParams, key: string, value?: numbe
 
 export function reverseDirection(direction: SortDirection): SortDirection {
   return direction === 'ASC' ? 'DESC' : 'ASC';
+}
+
+function normalizeTextParam(value?: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value.trim().replace(/\s+/g, ' ');
+  return normalized.length > 0 ? normalized : null;
 }

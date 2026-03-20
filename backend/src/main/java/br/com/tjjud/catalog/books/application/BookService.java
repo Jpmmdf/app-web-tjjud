@@ -14,6 +14,7 @@ import br.com.tjjud.catalog.shared.exception.BusinessValidationException;
 import br.com.tjjud.catalog.shared.exception.ConflictException;
 import br.com.tjjud.catalog.shared.exception.ResourceNotFoundException;
 import br.com.tjjud.catalog.shared.util.MoneyMapper;
+import br.com.tjjud.catalog.shared.util.TextNormalizer;
 import br.com.tjjud.catalog.subjects.domain.Subject;
 import br.com.tjjud.catalog.subjects.infra.persistence.SubjectRepository;
 import io.micrometer.observation.annotation.Observed;
@@ -166,8 +167,8 @@ public class BookService {
         if (value == null) {
             return "";
         }
-        String sanitized = value.trim();
-        return sanitized;
+        String sanitized = TextNormalizer.normalize(value);
+        return sanitized == null ? "" : sanitized;
     }
 
     private String sanitizeRequired(String value, String messageKey) {

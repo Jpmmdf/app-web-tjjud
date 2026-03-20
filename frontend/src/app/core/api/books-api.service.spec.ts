@@ -23,7 +23,7 @@ describe('BooksApiService', () => {
   it('should request paged books with filters', () => {
     service
       .list({
-        title: 'Dom',
+        title: '  Dom   Casmurro  ',
         authorId: 7,
         subjectId: 3,
         page: 1,
@@ -35,7 +35,7 @@ describe('BooksApiService', () => {
 
     const request = httpTesting.expectOne((req) => req.url === '/api/v1/books');
     expect(request.request.method).toBe('GET');
-    expect(request.request.params.get('title')).toBe('Dom');
+    expect(request.request.params.get('title')).toBe('Dom Casmurro');
     expect(request.request.params.get('authorId')).toBe('7');
     expect(request.request.params.get('subjectId')).toBe('3');
     expect(request.request.params.get('page')).toBe('1');
