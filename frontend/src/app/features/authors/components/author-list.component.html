@@ -17,7 +17,7 @@
       <span class="badge rounded-pill text-bg-light">{{ commonTexts.records(catalog.authors().length) }}</span>
     </div>
 
-    <form class="toolbar list-toolbar" (ngSubmit)="loadAuthors()">
+    <form class="toolbar list-toolbar" (submit)="submitFilters($event)">
       <input
         class="form-control"
         type="search"
