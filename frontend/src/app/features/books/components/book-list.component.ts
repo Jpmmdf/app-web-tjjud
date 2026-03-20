@@ -91,34 +91,52 @@ export class BookListComponent implements OnInit {
   }
 
   protected async searchAuthors(): Promise<void> {
-    const query = this.bookFiltersForm.controls.authorQuery.value.trim();
+    if (this.authorLookupBusy()) {
+      return;
+    }
+
+    const query = this.normalizeLookupQuery(this.bookFiltersForm.controls.authorQuery.value);
     this.authorLookupTouched.set(true);
+    this.bookFiltersForm.controls.authorQuery.setValue(query, { emitEvent: false });
 
     if (query.length < 2) {
       this.authorMatches.set([]);
       return;
     }
 
+    this.authorMatches.set([]);
     this.authorLookupBusy.set(true);
     try {
-      this.authorMatches.set(await this.catalog.searchAuthorOptions(query));
+      const results = await this.catalog.searchAuthorOptions(query);
+      if (this.normalizeLookupQuery(this.bookFiltersForm.controls.authorQuery.value) === query) {
+        this.authorMatches.set(results);
+      }
     } finally {
       this.authorLookupBusy.set(false);
     }
   }
 
   protected async searchSubjects(): Promise<void> {
-    const query = this.bookFiltersForm.controls.subjectQuery.value.trim();
+    if (this.subjectLookupBusy()) {
+      return;
+    }
+
+    const query = this.normalizeLookupQuery(this.bookFiltersForm.controls.subjectQuery.value);
     this.subjectLookupTouched.set(true);
+    this.bookFiltersForm.controls.subjectQuery.setValue(query, { emitEvent: false });
 
     if (query.length < 2) {
       this.subjectMatches.set([]);
       return;
     }
 
+    this.subjectMatches.set([]);
     this.subjectLookupBusy.set(true);
     try {
-      this.subjectMatches.set(await this.catalog.searchSubjectOptions(query));
+      const results = await this.catalog.searchSubjectOptions(query);
+      if (this.normalizeLookupQuery(this.bookFiltersForm.controls.subjectQuery.value) === query) {
+        this.subjectMatches.set(results);
+      }
     } finally {
       this.subjectLookupBusy.set(false);
     }
@@ -157,22 +175,22 @@ export class BookListComponent implements OnInit {
   }
 
   protected showAuthorTooShort(): boolean {
-    const query = this.bookFiltersForm.controls.authorQuery.value.trim();
+    const query = this.normalizeLookupQuery(this.bookFiltersForm.controls.authorQuery.value);
     return this.authorLookupTouched() && query.length > 0 && query.length < 2;
   }
 
   protected showSubjectTooShort(): boolean {
-    const query = this.bookFiltersForm.controls.subjectQuery.value.trim();
+    const query = this.normalizeLookupQuery(this.bookFiltersForm.controls.subjectQuery.value);
     return this.subjectLookupTouched() && query.length > 0 && query.length < 2;
   }
 
   protected showEmptyAuthorSearch(): boolean {
-    const query = this.bookFiltersForm.controls.authorQuery.value.trim();
+    const query = this.normalizeLookupQuery(this.bookFiltersForm.controls.authorQuery.value);
     return this.authorLookupTouched() && !this.authorLookupBusy() && query.length >= 2 && this.authorMatches().length === 0;
   }
 
   protected showEmptySubjectSearch(): boolean {
-    const query = this.bookFiltersForm.controls.subjectQuery.value.trim();
+    const query = this.normalizeLookupQuery(this.bookFiltersForm.controls.subjectQuery.value);
     return this.subjectLookupTouched() && !this.subjectLookupBusy() && query.length >= 2 && this.subjectMatches().length === 0;
   }
 
@@ -257,6 +275,10 @@ export class BookListComponent implements OnInit {
   private currentBookFilters(): { title: string; authorId: number | null; subjectId: number | null } {
     const { title, authorId, subjectId } = this.bookFiltersForm.getRawValue();
     return { title, authorId, subjectId };
+  }
+
+  private normalizeLookupQuery(value: string): string {
+    return value.trim().replace(/\s+/g, ' ');
   }
 
   private async restoreSelectedFilters(): Promise<void> {

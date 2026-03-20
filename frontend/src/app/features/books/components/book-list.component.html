@@ -40,9 +40,12 @@
                 formControlName="authorQuery"
                 [placeholder]="texts.filters.authorSearchPlaceholder"
                 [attr.aria-label]="texts.filters.authorAriaLabel"
+                autocomplete="off"
                 (keydown.enter)="searchAuthors(); $event.preventDefault()"
               />
-              <button type="button" class="btn btn-outline-secondary btn-sm" (click)="searchAuthors()">{{ texts.filters.searchAction }}</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="authorLookupBusy()" (click)="searchAuthors()">
+                {{ authorLookupBusy() ? texts.filters.searchingAction : texts.filters.searchAction }}
+              </button>
             </div>
 
             @if (authorMatches().length > 0) {
@@ -54,7 +57,9 @@
             }
           </div>
 
-          @if (showAuthorTooShort()) {
+          @if (authorLookupBusy()) {
+            <p class="lookup-feedback" aria-live="polite">{{ texts.filters.searchingAuthors }}</p>
+          } @else if (showAuthorTooShort()) {
             <p class="lookup-feedback">{{ texts.filters.authorLookupHint }}</p>
           } @else if (showEmptyAuthorSearch()) {
             <p class="lookup-feedback">{{ texts.filters.noAuthorMatches }}</p>
@@ -71,9 +76,12 @@
                 formControlName="subjectQuery"
                 [placeholder]="texts.filters.subjectSearchPlaceholder"
                 [attr.aria-label]="texts.filters.subjectAriaLabel"
+                autocomplete="off"
                 (keydown.enter)="searchSubjects(); $event.preventDefault()"
               />
-              <button type="button" class="btn btn-outline-secondary btn-sm" (click)="searchSubjects()">{{ texts.filters.searchAction }}</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="subjectLookupBusy()" (click)="searchSubjects()">
+                {{ subjectLookupBusy() ? texts.filters.searchingAction : texts.filters.searchAction }}
+              </button>
             </div>
 
             @if (subjectMatches().length > 0) {
@@ -85,7 +93,9 @@
             }
           </div>
 
-          @if (showSubjectTooShort()) {
+          @if (subjectLookupBusy()) {
+            <p class="lookup-feedback" aria-live="polite">{{ texts.filters.searchingSubjects }}</p>
+          } @else if (showSubjectTooShort()) {
             <p class="lookup-feedback">{{ texts.filters.subjectLookupHint }}</p>
           } @else if (showEmptySubjectSearch()) {
             <p class="lookup-feedback">{{ texts.filters.noSubjectMatches }}</p>

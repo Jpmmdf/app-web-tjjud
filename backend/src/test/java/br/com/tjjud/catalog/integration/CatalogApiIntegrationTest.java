@@ -103,6 +103,26 @@ class CatalogApiIntegrationTest {
     }
 
     @Test
+    void shouldNormalizeAuthorNameAndSearchQuery() throws Exception {
+        mockMvc.perform(post("/api/v1/authors")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new AuthorUpsertRequest("  Machado   de   Assis  "))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Machado de Assis"));
+
+        mockMvc.perform(get("/api/v1/authors").param("q", "  Machado   de  "))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items", hasSize(1)))
+                .andExpect(jsonPath("$.items[0].name").value("Machado de Assis"));
+
+        mockMvc.perform(post("/api/v1/authors")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new AuthorUpsertRequest("Machado    de Assis"))))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value("Já existe um autor cadastrado com o nome \"Machado de Assis\"."));
+    }
+
+    @Test
     void shouldRejectDuplicatedSubject() throws Exception {
         createSubject("Romance");
 
@@ -112,6 +132,27 @@ class CatalogApiIntegrationTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.title").value("Conflito"))
                 .andExpect(jsonPath("$.detail").value("Já existe um assunto cadastrado com a descrição \"Romance\"."));
+    }
+
+    @Test
+    void shouldNormalizeSubjectDescriptionAndSearchQuery() throws Exception {
+        mockMvc.perform(post("/api/v1/subjects")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new SubjectUpsertRequest("  Dados   abertos  "))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.description").value("Dados abertos"));
+
+        mockMvc.perform(get("/api/v1/subjects").param("q", "  Dados   abertos "))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items", hasSize(1)))
+                .andExpect(jsonPath("$.items[0].description").value("Dados abertos"));
+
+        mockMvc.perform(post("/api/v1/subjects")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new SubjectUpsertRequest("Dados    abertos"))))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail")
+                        .value("Já existe um assunto cadastrado com a descrição \"Dados abertos\"."));
     }
 
     @Test
