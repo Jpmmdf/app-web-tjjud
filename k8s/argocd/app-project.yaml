@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: app-web-tjjud
+  namespace: argocd
+spec:
+  description: Projeto GitOps do app-web-tjjud
+  sourceRepos:
+    - git@github.com:Jpmmdf/app-web-tjjud.git
+  destinations:
+    - namespace: app-web-tjjud-demo
+      server: https://kubernetes.default.svc
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

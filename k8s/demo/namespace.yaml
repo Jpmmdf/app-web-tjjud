@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-web-tjjud-demo
+  labels:
+    app.kubernetes.io/name: app-web-tjjud
+    app.kubernetes.io/instance: demo

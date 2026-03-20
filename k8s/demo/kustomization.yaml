@@ -1,0 +1,55 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: app-web-tjjud-demo
+
+resources:
+  - namespace.yaml
+  - postgres-service.yaml
+  - postgres-statefulset.yaml
+  - backend-service.yaml
+  - backend-deployment.yaml
+  - frontend-service.yaml
+  - frontend-deployment.yaml
+  - certificate.yaml
+  - ingress.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: app-web-tjjud-demo-versions
+    envs:
+      - versions.env
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: app-web-tjjud-demo-versions
+      fieldPath: data.BACKEND_IMAGE
+    targets:
+      - select:
+          kind: Deployment
+          name: backend
+        fieldPaths:
+          - spec.template.spec.containers.[name=backend].image
+  - source:
+      kind: ConfigMap
+      name: app-web-tjjud-demo-versions
+      fieldPath: data.FRONTEND_IMAGE
+    targets:
+      - select:
+          kind: Deployment
+          name: frontend
+        fieldPaths:
+          - spec.template.spec.containers.[name=frontend].image
+  - source:
+      kind: ConfigMap
+      name: app-web-tjjud-demo-versions
+      fieldPath: data.APP_VERSION
+    targets:
+      - select:
+          kind: Deployment
+          name: backend
+        fieldPaths:
+          - spec.template.spec.containers.[name=backend].env.[name=APP_VERSION].value
