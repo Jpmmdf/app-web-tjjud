@@ -29,6 +29,11 @@ export class SubjectListComponent implements OnInit {
     await this.loadSubjects();
   }
 
+  protected async submitFilters(event: SubmitEvent): Promise<void> {
+    event.preventDefault();
+    await this.loadSubjects();
+  }
+
   protected async loadSubjects(): Promise<void> {
     await this.catalog.loadSubjects({
       query: this.subjectSearchControl.value,

@@ -29,6 +29,11 @@ export class AuthorListComponent implements OnInit {
     await this.loadAuthors();
   }
 
+  protected async submitFilters(event: SubmitEvent): Promise<void> {
+    event.preventDefault();
+    await this.loadAuthors();
+  }
+
   protected async loadAuthors(): Promise<void> {
     await this.catalog.loadAuthors({
       query: this.authorSearchControl.value,

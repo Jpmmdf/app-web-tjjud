@@ -16,17 +16,19 @@
 
 .list-toolbar {
   width: 100%;
-  flex-wrap: nowrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 0.75rem;
 }
 
 .list-toolbar .form-control {
-  flex: 1 1 20rem;
-  width: auto;
+  width: 100%;
   min-width: 0;
 }
 
 .list-toolbar .btn {
-  flex: 0 0 auto;
+  min-width: 8.75rem;
 }
 
 .list-shell {
@@ -182,12 +184,12 @@
   .list-actions,
   .list-toolbar {
     width: 100%;
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: 1fr;
   }
 
   .list-actions > .btn,
   .list-toolbar .btn {
     width: 100%;
+    min-width: 0;
   }
 }
