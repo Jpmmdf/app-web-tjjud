@@ -11,7 +11,8 @@ public final class MoneyMapper {
 
     public static BigDecimal parse(String value) {
         try {
-            BigDecimal parsed = new BigDecimal(value).setScale(2, RoundingMode.UNNECESSARY);
+            String sanitized = value == null ? null : value.trim();
+            BigDecimal parsed = new BigDecimal(sanitized).setScale(2, RoundingMode.UNNECESSARY);
             if (parsed.signum() < 0) {
                 throw new BusinessValidationException("INVALID_PRICE", "error.valor.nao-negativo");
             }

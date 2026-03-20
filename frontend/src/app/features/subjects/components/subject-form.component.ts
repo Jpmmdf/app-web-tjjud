@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { SubjectsApiService } from '../../../core/api/subjects-api.service';
 import { ptBrCatalogMessages } from '../../../core/i18n/pt-br';
 import { CatalogFacadeService } from '../../../core/state/catalog-facade.service';
+import { normalizeTextValue } from '../../../shared/formatters/text-normalizer';
 
 @Component({
   selector: 'app-subject-form',
@@ -45,7 +46,7 @@ export class SubjectFormComponent implements OnInit {
     }
 
     const result = await this.catalog.saveSubject(this.editingSubjectId(), {
-      description: this.subjectForm.getRawValue().description.trim(),
+      description: normalizeTextValue(this.subjectForm.getRawValue().description),
     });
     if (result) {
       await this.router.navigate(['/assuntos']);

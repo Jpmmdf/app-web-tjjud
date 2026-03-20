@@ -1,5 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { QueryPageRequest, SortDirection } from '../models/common.models';
+import { normalizeTextValue } from '../../shared/formatters/text-normalizer';
 
 export function withQueryPage(params: HttpParams, request: QueryPageRequest): HttpParams {
   return params
@@ -23,10 +24,6 @@ export function reverseDirection(direction: SortDirection): SortDirection {
 }
 
 function normalizeTextParam(value?: string | null): string | null {
-  if (!value) {
-    return null;
-  }
-
-  const normalized = value.trim().replace(/\s+/g, ' ');
+  const normalized = normalizeTextValue(value);
   return normalized.length > 0 ? normalized : null;
 }
