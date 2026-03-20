@@ -89,16 +89,7 @@ jobs:
       - name: Descobrir versao do backend
         id: meta
         run: |
-          VERSION="$(
-            ruby <<'RUBY'
-            content = File.read('backend/pom.xml')
-            after_artifact = content.split('<artifactId>backend</artifactId>', 2)[1]
-            abort '' unless after_artifact
-            match = after_artifact.match(/<version>([^<]+)<\/version>/)
-            abort '' unless match
-            puts match[1]
-            RUBY
-          )"
+          VERSION="$(ruby -e "content = File.read('backend/pom.xml'); after_artifact = content.split('<artifactId>backend</artifactId>', 2)[1] or abort; match = after_artifact.match(/<version>([^<]+)<\\/version>/) or abort; puts match[1]")"
 
           if [ -z "$VERSION" ]; then
             echo "::error::Nao foi possivel descobrir a versao do backend em backend/pom.xml."
@@ -107,6 +98,11 @@ jobs:
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag_name=backend-v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Configurar identidade do Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Criar release do backend
         id: publish
@@ -180,6 +176,11 @@ jobs:
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag_name=frontend-v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Configurar identidade do Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Criar release do frontend
         id: publish
