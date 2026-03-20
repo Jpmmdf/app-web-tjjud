@@ -52,6 +52,7 @@ Esse desenho assume que a `main` esta protegida e recebe alteracoes apenas por P
 Se necessario, a pipeline `Main Delivery` tambem pode ser executada manualmente pelo GitHub Actions e, nesse modo, ela roda backend e frontend completos sem depender da deteccao por pasta alterada.
 
 Se um componente mudou e a tag daquela versao ja existir para outro commit, a pipeline falha. Isso força o bump de versao antes do merge na `main`.
+As imagens publicadas recebem `X.Y.Z` e `latest`.
 
 Secrets necessarios no repositorio:
 

@@ -30,7 +30,6 @@ Se um componente mudou e a tag da versao dele ja existe para outro commit, a pip
 As imagens recebem:
 
 - a versao semantica, por exemplo `1.2.3`
-- a tag Git completa, por exemplo `backend-v1.2.3`
 - `latest`
 
 ## Workflows

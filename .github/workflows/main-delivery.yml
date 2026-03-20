@@ -237,7 +237,6 @@ jobs:
     uses: ./.github/workflows/backend-image.yml
     with:
       version: ${{ needs.backend-release.outputs.version }}
-      git_tag: ${{ needs.backend-release.outputs.tag_name }}
       push_latest: true
     secrets: inherit
 
@@ -248,6 +247,5 @@ jobs:
     uses: ./.github/workflows/frontend-image.yml
     with:
       version: ${{ needs.frontend-release.outputs.version }}
-      git_tag: ${{ needs.frontend-release.outputs.tag_name }}
       push_latest: true
     secrets: inherit

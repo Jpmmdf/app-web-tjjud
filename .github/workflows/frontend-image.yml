@@ -7,10 +7,6 @@ on:
         description: Semantic version to publish
         required: true
         type: string
-      git_tag:
-        description: Git tag used for this frontend release
-        required: true
-        type: string
       push_latest:
         description: Also push the latest tag
         required: false
@@ -25,10 +21,6 @@ on:
     inputs:
       version:
         description: Semantic version to publish
-        required: true
-        type: string
-      git_tag:
-        description: Git tag used for this frontend release
         required: true
         type: string
       push_latest:
@@ -64,18 +56,15 @@ jobs:
         id: tags
         env:
           INPUT_VERSION: ${{ inputs.version }}
-          INPUT_GIT_TAG: ${{ inputs.git_tag }}
           INPUT_PUSH_LATEST: ${{ inputs.push_latest }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
         run: |
           VERSION="${INPUT_VERSION}"
-          GIT_TAG="${INPUT_GIT_TAG}"
           PUSH_LATEST="${INPUT_PUSH_LATEST}"
 
           {
             echo "tags<<EOF"
             echo "${IMAGE_NAME}:${VERSION}"
-            echo "${IMAGE_NAME}:${GIT_TAG}"
             if [[ "${PUSH_LATEST}" == "true" ]]; then
               echo "${IMAGE_NAME}:latest"
             fi
