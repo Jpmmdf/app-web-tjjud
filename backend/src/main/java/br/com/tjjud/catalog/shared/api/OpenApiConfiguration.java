@@ -13,7 +13,7 @@ public class OpenApiConfiguration {
 
     @Bean
     OpenAPI catalogOpenApi(
-            @Value("${server.port:8080}") String serverPort,
+            @Value("${app.api.public-url:http://localhost:${server.port}}") String publicUrl,
             @Value("${spring.application.version:local}") String applicationVersion) {
         return new OpenAPI()
                 .info(new Info()
@@ -21,7 +21,7 @@ public class OpenApiConfiguration {
                         .description("API para gerenciar autores, assuntos, livros e relatórios do catálogo editorial.")
                         .version(applicationVersion))
                 .servers(List.of(new Server()
-                        .url("http://localhost:" + serverPort)
-                        .description("Servidor local da API")));
+                        .url(publicUrl)
+                        .description("Servidor da API")));
     }
 }

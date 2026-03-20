@@ -50,6 +50,10 @@ class CatalogApiIntegrationTest {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("app.api.public-url", () -> "http://localhost:8080");
+        registry.add(
+                "app.cors.allowed-origins",
+                () -> "http://localhost:4200,https://front-demo.pavim.com.br");
     }
 
     @Autowired
@@ -88,6 +92,17 @@ class CatalogApiIntegrationTest {
                 .andExpect(jsonPath("$.page.totalElements").value(1))
                 .andExpect(jsonPath("$.items[0].id").value(subjectId))
                 .andExpect(jsonPath("$.items[0].description").value("Romance"));
+    }
+
+    @Test
+    void shouldAllowConfiguredOriginToCreateSubject() throws Exception {
+        mockMvc.perform(post("/api/v1/subjects")
+                        .header("Origin", "https://front-demo.pavim.com.br")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new SubjectUpsertRequest("Testes 1"))))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Access-Control-Allow-Origin", "https://front-demo.pavim.com.br"))
+                .andExpect(jsonPath("$.description").value("Testes 1"));
     }
 
     @Test
@@ -350,7 +365,7 @@ class CatalogApiIntegrationTest {
                 .andExpect(jsonPath("$.info.description")
                         .value("API para gerenciar autores, assuntos, livros e relatórios do catálogo editorial."))
                 .andExpect(jsonPath("$.info.version").value("local"))
-                .andExpect(jsonPath("$.servers[0].description").value("Servidor local da API"))
+                .andExpect(jsonPath("$.servers[0].description").value("Servidor da API"))
                 .andExpect(jsonPath("$.servers[0].url").value("http://localhost:8080"));
     }
 
