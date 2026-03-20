@@ -4,3 +4,5 @@ site/
 frontend/.angular/
 frontend/dist/
 docs/assets/structurizr/
+k8s/demo/secret.env
+k8s/demo/versions.env
