@@ -10,6 +10,7 @@ import br.com.tjjud.catalog.shared.api.SortFactory;
 import br.com.tjjud.catalog.shared.exception.BusinessValidationException;
 import br.com.tjjud.catalog.shared.exception.ConflictException;
 import br.com.tjjud.catalog.shared.exception.ResourceNotFoundException;
+import br.com.tjjud.catalog.shared.util.TextNormalizer;
 import io.micrometer.observation.annotation.Observed;
 import jakarta.transaction.Transactional;
 import java.util.Map;
@@ -78,11 +79,7 @@ public class AuthorService {
     }
 
     private String sanitize(String value) {
-        if (value == null) {
-            return null;
-        }
-        String sanitized = value.trim();
-        return sanitized.isEmpty() ? null : sanitized;
+        return TextNormalizer.normalize(value);
     }
 
     private String sanitizeRequired(String value) {
