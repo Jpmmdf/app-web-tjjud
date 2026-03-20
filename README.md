@@ -44,14 +44,16 @@ Fluxo configurado:
 2. Rodar CI de `backend` e `frontend` nessa PR.
 3. Fazer merge na `main`.
 4. Uma pipeline unica na `main` executa a CI relevante antes do `release-please`.
-5. O `release-please` abre ou atualiza as PRs de release do `backend` e do `frontend`.
-6. Essas PRs de release podem ser autoaprovadas e mescladas automaticamente no mesmo workflow.
-7. Ao fazer merge da PR de release, o `release-please` cria a tag e a GitHub Release usando `GITHUB_TOKEN`.
+5. O `release-please` abre ou atualiza uma PR unica de release, agrupando `backend` e `frontend` quando houver mudancas nos dois componentes.
+6. Essa PR de release pode ser autoaprovada e mesclada automaticamente no mesmo workflow.
+7. Ao fazer merge da PR de release, o `release-please` cria as tags e a GitHub Release usando `GITHUB_TOKEN`.
 8. No mesmo workflow, quando uma release real e criada, os jobs reutilizaveis publicam a imagem correspondente no Docker Hub.
 
 No backend, a estrategia Maven do `release-please` esta configurada com `skip-snapshot`, entao a PR de release usa a versao final em vez de `-SNAPSHOT`. No frontend, o `package.json` continua sendo atualizado pelo strategy `node` quando a release e fechada.
 
 As pipelines normais de CI nao rodam nas PRs de release do `release-please`, para evitar trabalho duplicado.
+
+O agrupamento em uma unica PR tambem evita conflitos recorrentes no arquivo `.release-please-manifest.json`, que antes era alterado por duas PRs de release abertas ao mesmo tempo.
 
 Secrets necessarios no repositorio:
 

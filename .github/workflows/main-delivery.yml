@@ -140,7 +140,7 @@ jobs:
               --state open \
               --base main \
               --json number,title,headRefName,author,reviewDecision \
-              --jq '.[] | select(.author.login == "app/github-actions") | select(.headRefName | startswith("release-please--branches--")) | select(.title | startswith("chore(main): release ")) | @base64'
+              --jq '.[] | select(.author.login == "app/github-actions") | select(.headRefName | startswith("release-please--branches--")) | select(.title | startswith("chore(main): release")) | @base64'
           )"
 
           if [ -z "$RELEASE_PRS" ]; then
