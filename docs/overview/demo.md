@@ -16,7 +16,6 @@
 
 ## Ambiente publicado
 
-- cluster Kubernetes: `31.220.89.105`
 - namespace da demo: `app-web-tjjud-demo`
 - GitOps: Argo CD sincronizando o caminho `k8s/demo`
 - banco: PostgreSQL stateful com PVC
