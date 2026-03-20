@@ -270,3 +270,71 @@ jobs:
       version: ${{ needs.frontend-release.outputs.version }}
       push_latest: true
     secrets: inherit
+
+  update-demo-deployment:
+    name: Update Demo Deployment
+    needs:
+      - detect-changes
+      - backend-release
+      - frontend-release
+      - publish-backend
+      - publish-frontend
+    if: >-
+      ${{
+        always() &&
+        (
+          (needs.detect-changes.outputs.backend_changed == 'true' && needs.publish-backend.result == 'success') ||
+          (needs.detect-changes.outputs.frontend_changed == 'true' && needs.publish-frontend.result == 'success')
+        )
+      }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Atualizar versoes do ambiente demo
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          BACKEND_CHANGED: ${{ needs.detect-changes.outputs.backend_changed }}
+          FRONTEND_CHANGED: ${{ needs.detect-changes.outputs.frontend_changed }}
+          BACKEND_VERSION: ${{ needs.backend-release.outputs.version }}
+          FRONTEND_VERSION: ${{ needs.frontend-release.outputs.version }}
+        run: |
+          FILE="k8s/demo/versions.env"
+          CURRENT_BACKEND_IMAGE="$(grep '^BACKEND_IMAGE=' "$FILE" | cut -d= -f2-)"
+          CURRENT_FRONTEND_IMAGE="$(grep '^FRONTEND_IMAGE=' "$FILE" | cut -d= -f2-)"
+          CURRENT_APP_VERSION="$(grep '^APP_VERSION=' "$FILE" | cut -d= -f2-)"
+
+          BACKEND_IMAGE="$CURRENT_BACKEND_IMAGE"
+          FRONTEND_IMAGE="$CURRENT_FRONTEND_IMAGE"
+          APP_VERSION="$CURRENT_APP_VERSION"
+
+          if [ "$BACKEND_CHANGED" = "true" ] && [ -n "$BACKEND_VERSION" ]; then
+            BACKEND_IMAGE="${DOCKER_USERNAME}/app-web-tjjud-backend:${BACKEND_VERSION}"
+            APP_VERSION="$BACKEND_VERSION"
+          fi
+
+          if [ "$FRONTEND_CHANGED" = "true" ] && [ -n "$FRONTEND_VERSION" ]; then
+            FRONTEND_IMAGE="${DOCKER_USERNAME}/app-web-tjjud-frontend:${FRONTEND_VERSION}"
+          fi
+
+          cat > "$FILE" <<EOF
+          BACKEND_IMAGE=$BACKEND_IMAGE
+          FRONTEND_IMAGE=$FRONTEND_IMAGE
+          APP_VERSION=$APP_VERSION
+          EOF
+
+      - name: Commitar atualizacao de deployment
+        run: |
+          if git diff --quiet -- k8s/demo/versions.env; then
+            echo "Nenhuma alteracao de versao para commitar."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add k8s/demo/versions.env
+          git commit -m "chore: update demo deployment versions"
+          git push origin HEAD:main
