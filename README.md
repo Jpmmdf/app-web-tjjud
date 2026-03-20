@@ -1,5 +1,12 @@
 # app-web-tjjud
 
+Acessos rapidos:
+
+- Demo: [https://front-demo.pavim.com.br](https://front-demo.pavim.com.br)
+- Swagger UI: [https://front-demo.pavim.com.br/swagger-ui.html](https://front-demo.pavim.com.br/swagger-ui.html)
+- OpenAPI JSON: [https://front-demo.pavim.com.br/api-docs](https://front-demo.pavim.com.br/api-docs)
+- Documentacao: [https://jpmmdf.github.io/app-web-tjjud/](https://jpmmdf.github.io/app-web-tjjud/)
+
 Aplicacao API-first para cadastro de livros, autores e assuntos com relatorio por autor, backend em Spring Boot, frontend em Angular e banco PostgreSQL.
 
 ## Stack
@@ -68,9 +75,6 @@ O `GITHUB_TOKEN` do workflow cria as tags e as GitHub Releases. O GitHub App con
 make docs-build
 make docs-serve
 ```
-
-- Portal publicado: [https://jpmmdf.github.io/app-web-tjjud/](https://jpmmdf.github.io/app-web-tjjud/)
-- Demo publicada: [https://front-demo.pavim.com.br](https://front-demo.pavim.com.br)
 
 ## Diagramas C4
 
