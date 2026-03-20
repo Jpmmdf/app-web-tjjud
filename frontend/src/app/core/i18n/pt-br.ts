@@ -25,10 +25,10 @@ export const ptBrCatalogMessages = {
     identifier: (id: number) => `ID ${id}`,
   },
   app: {
-    eyebrow: 'API-first • Spring Boot • Angular • PostgreSQL',
+    eyebrow: 'Autores, assuntos, livros e relatórios em um único fluxo',
     title: 'Catálogo editorial',
     lead:
-      'Operação única para autores, assuntos, livros e relatórios por autor, com consistência relacional e valor monetário mascarado em reais.',
+      'Centralize o trabalho do catálogo, acompanhe os totais da base e entre direto no módulo que precisa operar, sem perder o acesso rápido ao contrato da API.',
     navigation: [
       { path: '/visao-geral', label: 'Visão geral' },
       { path: '/autores', label: 'Autores' },
@@ -37,19 +37,28 @@ export const ptBrCatalogMessages = {
       { path: '/relatorios', label: 'Relatórios' },
     ] as const,
     sections: [
-      { path: '/autores', label: 'Autores', description: 'Cadastre e mantenha a base de autores.' },
-      { path: '/assuntos', label: 'Assuntos', description: 'Organize a taxonomia editorial do catálogo.' },
-      { path: '/livros', label: 'Livros', description: 'Gerencie o acervo com filtros, autores e assuntos.' },
-      { path: '/relatorios', label: 'Relatórios', description: 'Acompanhe a visão consolidada por autor e exporte em PDF.' },
+      { path: '/autores', label: 'Autores', description: 'Cadastre, revise e mantenha a base de autores disponível para os livros.' },
+      { path: '/assuntos', label: 'Assuntos', description: 'Organize a classificação editorial para facilitar o vínculo com o acervo.' },
+      { path: '/livros', label: 'Livros', description: 'Gerencie o catálogo completo com filtros, vínculos relacionais e dados editoriais.' },
+      { path: '/relatorios', label: 'Relatórios', description: 'Consulte a visão consolidada por autor e exporte o recorte em PDF.' },
     ] as const,
     links: {
       swagger: 'Swagger UI',
       openApi: 'OpenAPI',
     },
     stats: {
-      authors: 'Autores',
-      subjects: 'Assuntos',
-      books: 'Livros',
+      authors: {
+        label: 'Autores',
+        detail: 'Base pronta para associação aos livros e atualização contínua.',
+      },
+      subjects: {
+        label: 'Assuntos',
+        detail: 'Classificações editoriais disponíveis para organizar o acervo.',
+      },
+      books: {
+        label: 'Livros',
+        detail: 'Acervo consolidado para consulta, edição e acompanhamento operacional.',
+      },
     },
     loading: {
       eyebrow: 'Bootstrap inicial',
@@ -59,12 +68,27 @@ export const ptBrCatalogMessages = {
     menu: {
       label: 'Menu principal',
       serviceName: 'Catálogo editorial',
+      openLabel: 'Menu',
+      closeLabel: 'Fechar',
+      openNavigation: 'Abrir menu principal',
+      closeNavigation: 'Fechar menu principal',
       versionLabel: (version: string) => `Versão ${version}`,
       versionTooltip: (version: string) => `Versão atual da aplicação: ${version}`,
     },
     overview: {
       title: 'Visão geral do catálogo',
       detail: 'Acompanhe os totais do acervo e entre diretamente no fluxo operacional de cada funcionalidade.',
+      linksEyebrow: 'Integração',
+      linksTitle: 'Acesso rápido ao contrato da API',
+      linksDetail: 'Abra a documentação técnica para validar endpoints, schemas e testar a integração sem sair da visão geral.',
+      statsEyebrow: 'Panorama',
+      statsTitle: 'Totais consolidados da base',
+      statsDetail: 'Os números abaixo mostram o volume atual do catálogo e ajudam a identificar rapidamente onde atuar.',
+      modulesEyebrow: 'Operação',
+      modulesTitle: 'Entradas principais do fluxo',
+      modulesDetail: 'Escolha o módulo que deseja operar para cadastrar, revisar ou exportar informações do catálogo.',
+      cardEyebrow: 'Fluxo operacional',
+      cardAction: 'Abrir módulo',
     },
   },
   notifications: {

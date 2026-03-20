@@ -234,6 +234,10 @@
 }
 
 @media (max-width: 720px) {
+  .report-summary {
+    grid-template-columns: 1fr;
+  }
+
   .report-card__header,
   .report-book__headline {
     flex-direction: column;
@@ -241,5 +245,13 @@
 
   .report-toolbar__controls {
     flex-direction: column;
+  }
+
+  .report-toolbar__controls > * {
+    width: 100%;
+  }
+
+  .report-book__price {
+    align-self: flex-start;
   }
 }

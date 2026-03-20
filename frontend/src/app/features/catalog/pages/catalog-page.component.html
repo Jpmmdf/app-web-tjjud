@@ -1,45 +1,76 @@
 <section class="overview">
-  <div class="overview__hero">
-    <p class="eyebrow">{{ appTexts.eyebrow }}</p>
-    <h1>{{ appTexts.title }}</h1>
-    <p class="overview__lead">{{ appTexts.lead }}</p>
-
-    <div class="overview__links">
-      <a class="btn btn-outline-secondary" href="/swagger-ui.html" target="_blank" rel="noopener">
-        {{ appTexts.links.swagger }}
-      </a>
-
-      <a class="btn btn-outline-secondary" href="/api-docs" target="_blank" rel="noopener">
-        {{ appTexts.links.openApi }}
-      </a>
+  <div class="overview__masthead">
+    <div class="overview__hero">
+      <p class="eyebrow">{{ appTexts.eyebrow }}</p>
+      <h1>{{ appTexts.title }}</h1>
+      <p class="overview__lead">{{ appTexts.lead }}</p>
     </div>
+
+    <aside class="overview__spotlight" aria-labelledby="overview-links-title">
+      <p class="eyebrow">{{ appTexts.overview.linksEyebrow }}</p>
+      <h2 id="overview-links-title">{{ appTexts.overview.linksTitle }}</h2>
+      <p class="overview__spotlight-detail">{{ appTexts.overview.linksDetail }}</p>
+
+      <div class="overview__links">
+        <a class="btn btn-outline-secondary" href="/swagger-ui.html" target="_blank" rel="noopener">
+          {{ appTexts.links.swagger }}
+        </a>
+
+        <a class="btn btn-outline-secondary" href="/api-docs" target="_blank" rel="noopener">
+          {{ appTexts.links.openApi }}
+        </a>
+      </div>
+    </aside>
   </div>
 
-  <div class="overview__stats">
-    <article class="overview-stat">
-      <span>{{ appTexts.stats.authors }}</span>
-      <strong>{{ catalog.authorCount() }}</strong>
-    </article>
+  <section class="overview__panel" aria-labelledby="overview-stats-title">
+    <div class="overview__section-heading">
+      <p class="eyebrow">{{ appTexts.overview.statsEyebrow }}</p>
+      <h2 id="overview-stats-title">{{ appTexts.overview.statsTitle }}</h2>
+      <p>{{ appTexts.overview.statsDetail }}</p>
+    </div>
 
-    <article class="overview-stat">
-      <span>{{ appTexts.stats.subjects }}</span>
-      <strong>{{ catalog.subjectCount() }}</strong>
-    </article>
+    <div class="overview__stats">
+      <article class="overview-stat">
+        <span>{{ appTexts.stats.authors.label }}</span>
+        <strong>{{ catalog.authorCount() }}</strong>
+        <p>{{ appTexts.stats.authors.detail }}</p>
+      </article>
 
-    <article class="overview-stat">
-      <span>{{ appTexts.stats.books }}</span>
-      <strong>{{ catalog.bookCount() }}</strong>
-    </article>
-  </div>
+      <article class="overview-stat">
+        <span>{{ appTexts.stats.subjects.label }}</span>
+        <strong>{{ catalog.subjectCount() }}</strong>
+        <p>{{ appTexts.stats.subjects.detail }}</p>
+      </article>
 
-  <div class="overview-grid">
-    @for (section of sections; track section.path) {
-      <a class="overview-card" [routerLink]="section.path">
-        <div class="overview-card__body">
-          <h2>{{ section.label }}</h2>
-          <p>{{ section.description }}</p>
-        </div>
-      </a>
-    }
-  </div>
+      <article class="overview-stat">
+        <span>{{ appTexts.stats.books.label }}</span>
+        <strong>{{ catalog.bookCount() }}</strong>
+        <p>{{ appTexts.stats.books.detail }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="overview__panel" aria-labelledby="overview-modules-title">
+    <div class="overview__section-heading">
+      <p class="eyebrow">{{ appTexts.overview.modulesEyebrow }}</p>
+      <h2 id="overview-modules-title">{{ appTexts.overview.modulesTitle }}</h2>
+      <p>{{ appTexts.overview.modulesDetail }}</p>
+    </div>
+
+    <div class="overview-grid">
+      @for (section of sections; track section.path) {
+        <a class="overview-card" [routerLink]="section.path">
+          <span class="overview-card__kicker">{{ appTexts.overview.cardEyebrow }}</span>
+
+          <div class="overview-card__body">
+            <h3>{{ section.label }}</h3>
+            <p>{{ section.description }}</p>
+          </div>
+
+          <span class="overview-card__cta">{{ appTexts.overview.cardAction }}</span>
+        </a>
+      }
+    </div>
+  </section>
 </section>

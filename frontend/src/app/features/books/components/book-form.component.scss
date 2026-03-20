@@ -189,4 +189,18 @@
   .selection-options {
     grid-template-columns: 1fr;
   }
+
+  .selection-field {
+    padding: 0.9rem;
+  }
+
+  .selection-field__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .selection-chip {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
