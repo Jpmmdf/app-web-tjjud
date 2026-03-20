@@ -1,6 +1,6 @@
 # GitOps e Demo
 
-![Topologia da demo no Argo CD](../assets/images/argo-demo-overview.svg)
+![Topologia da demo no Argo CD](../assets/images/argo-demo-overview.png)
 
 ## Estado desejado
 

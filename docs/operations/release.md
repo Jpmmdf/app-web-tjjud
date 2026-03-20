@@ -1,6 +1,6 @@
 # Release e Imagens
 
-![Pipeline principal de entrega](../assets/images/main-delivery-overview.svg)
+![Pipeline principal de entrega](../assets/images/main-delivery-overview.png)
 
 ## Fluxo recomendado
 
