@@ -8,19 +8,21 @@ O fluxo automatizado do repositorio segue esta ordem:
 2. as pipelines de CI de backend e frontend rodam nessa PR
 3. depois do merge na `main`, a pipeline `Main Delivery` detecta quais componentes mudaram
 4. a pipeline executa novamente a CI relevante na `main`
-5. para cada componente alterado, a pipeline le a versao em `backend/pom.xml` ou `frontend/package.json`
+5. para cada componente alterado, a pipeline calcula a proxima versao semantica a partir das tags ja publicadas
 6. a pipeline cria a tag do componente e publica a GitHub Release
 7. por fim, a pipeline publica a imagem correspondente no Docker Hub
 
-Esse desenho elimina o `release-please` e usa a versao que ja veio no codigo mergeado como fonte de verdade da release.
+Esse desenho elimina o `release-please` e centraliza o versionamento na propria pipeline.
 Ele assume que a `main` esta protegida e recebe alteracoes apenas por PR aprovada e mergeada.
 
 ## Fonte da versao
 
-- backend: `backend/pom.xml`
-- frontend: `frontend/package.json`
+- backend: ultima tag `backend-vX.Y.Z`
+- frontend: ultima tag `frontend-vX.Y.Z`
 
-Se um componente mudou e a tag da versao dele ja existe para outro commit, a pipeline falha de forma explicita. Isso evita republicar a mesma versao com conteudo diferente e obriga o bump de versao a acontecer antes do merge na `main`.
+A pipeline sobe o patch por padrao em `push` para `main`.
+Nas execucoes manuais (`workflow_dispatch`), e possivel escolher `patch`, `minor` ou `major` para backend e frontend.
+Se a execucao for repetida para o mesmo commit, a pipeline reaproveita a tag ja criada para esse commit em vez de tentar gerar uma nova versao.
 
 ## Tags publicadas
 
@@ -34,7 +36,7 @@ As imagens recebem:
 
 ## Workflows
 
-- `main-delivery.yml`: executa no `push` da `main` e tambem pode ser disparado manualmente; no `push` ele detecta as areas alteradas, e na execucao manual ele processa backend e frontend completos, depois cria as tags e GitHub Releases e chama os jobs de publicacao Docker
+- `main-delivery.yml`: executa no `push` da `main` e tambem pode ser disparado manualmente; no `push` ele detecta as areas alteradas, calcula a proxima versao por componente, cria as tags e GitHub Releases e chama os jobs de publicacao Docker
 - `dependabot-auto-approve.yml`: aprova automaticamente PRs validas abertas pelo Dependabot
 - `backend-image.yml`: workflow reutilizavel para publicar a imagem do backend, tambem acionavel manualmente
 - `frontend-image.yml`: workflow reutilizavel para publicar a imagem do frontend, tambem acionavel manualmente

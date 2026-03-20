@@ -9,6 +9,25 @@ on:
       - "frontend/**"
       - ".nvmrc"
   workflow_dispatch:
+    inputs:
+      backend_bump:
+        description: Incremento de versao do backend
+        required: false
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      frontend_bump:
+        description: Incremento de versao do frontend
+        required: false
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 permissions:
   contents: write
@@ -96,16 +115,17 @@ jobs:
 
       - name: Descobrir versao do backend
         id: meta
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_BUMP: ${{ inputs.backend_bump }}
         run: |
-          VERSION="$(ruby -e "content = File.read('backend/pom.xml'); after_artifact = content.split('<artifactId>backend</artifactId>', 2)[1] or abort; match = after_artifact.match(/<version>([^<]+)<\\/version>/) or abort; puts match[1]")"
+          BUMP_LEVEL="patch"
 
-          if [ -z "$VERSION" ]; then
-            echo "::error::Nao foi possivel descobrir a versao do backend em backend/pom.xml."
-            exit 1
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$INPUT_BUMP" ]; then
+            BUMP_LEVEL="$INPUT_BUMP"
           fi
 
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag_name=backend-v$VERSION" >> "$GITHUB_OUTPUT"
+          ./.github/scripts/resolve-version.sh "backend-" "$BUMP_LEVEL" "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Configurar identidade do Git
         run: |
@@ -122,7 +142,7 @@ jobs:
           EXISTING_TAG_SHA="$(git rev-list -n 1 "refs/tags/$TAG_NAME" 2>/dev/null || true)"
 
           if [ -n "$EXISTING_TAG_SHA" ] && [ "$EXISTING_TAG_SHA" != "$GITHUB_SHA" ]; then
-            echo "::error::A tag $TAG_NAME ja existe para outro commit. Atualize a versao do backend em backend/pom.xml antes de fazer merge na main."
+            echo "::error::A tag $TAG_NAME foi criada por outra execucao concorrente. Rode a pipeline novamente."
             exit 1
           fi
 
@@ -174,16 +194,17 @@ jobs:
 
       - name: Descobrir versao do frontend
         id: meta
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_BUMP: ${{ inputs.frontend_bump }}
         run: |
-          VERSION="$(jq -r '.version' frontend/package.json)"
+          BUMP_LEVEL="patch"
 
-          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
-            echo "::error::Nao foi possivel descobrir a versao do frontend em frontend/package.json."
-            exit 1
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$INPUT_BUMP" ]; then
+            BUMP_LEVEL="$INPUT_BUMP"
           fi
 
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag_name=frontend-v$VERSION" >> "$GITHUB_OUTPUT"
+          ./.github/scripts/resolve-version.sh "frontend-" "$BUMP_LEVEL" "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Configurar identidade do Git
         run: |
@@ -200,7 +221,7 @@ jobs:
           EXISTING_TAG_SHA="$(git rev-list -n 1 "refs/tags/$TAG_NAME" 2>/dev/null || true)"
 
           if [ -n "$EXISTING_TAG_SHA" ] && [ "$EXISTING_TAG_SHA" != "$GITHUB_SHA" ]; then
-            echo "::error::A tag $TAG_NAME ja existe para outro commit. Atualize a versao do frontend em frontend/package.json antes de fazer merge na main."
+            echo "::error::A tag $TAG_NAME foi criada por outra execucao concorrente. Rode a pipeline novamente."
             exit 1
           fi
 
