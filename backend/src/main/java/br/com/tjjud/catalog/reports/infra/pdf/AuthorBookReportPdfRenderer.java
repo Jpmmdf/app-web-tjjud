@@ -192,7 +192,7 @@ public class AuthorBookReportPdfRenderer {
         details.add(Chunk.NEWLINE);
         details.add(new Phrase(messages.get("report.detalhe.edicao", book.edition()), bodyFont()));
         details.add(Chunk.NEWLINE);
-        details.add(new Phrase(messages.get("report.detalhe.ano", book.publicationYear()), bodyFont()));
+        details.add(new Phrase(messages.get("report.detalhe.ano", String.valueOf(book.publicationYear())), bodyFont()));
         return createParagraphCell(details, background, Element.ALIGN_LEFT);
     }
 
