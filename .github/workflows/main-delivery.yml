@@ -8,6 +8,7 @@ on:
       - "backend/**"
       - "frontend/**"
       - ".nvmrc"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -35,20 +36,27 @@ jobs:
       - name: Detectar areas alteradas
         id: filter
         env:
+          EVENT_NAME: ${{ github.event_name }}
           BEFORE_SHA: ${{ github.event.before }}
           CURRENT_SHA: ${{ github.sha }}
         run: |
           backend_changed=false
           frontend_changed=false
 
-          changed_files="$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA")"
-
-          if printf '%s\n' "$changed_files" | grep -q '^backend/'; then
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "Execucao manual detectada. Backend e frontend serao processados integralmente."
             backend_changed=true
-          fi
-
-          if printf '%s\n' "$changed_files" | grep -Eq '^(frontend/|\.nvmrc$)'; then
             frontend_changed=true
+          else
+            changed_files="$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA")"
+
+            if printf '%s\n' "$changed_files" | grep -q '^backend/'; then
+              backend_changed=true
+            fi
+
+            if printf '%s\n' "$changed_files" | grep -Eq '^(frontend/|\.nvmrc$)'; then
+              frontend_changed=true
+            fi
           fi
 
           echo "backend_changed=$backend_changed" >> "$GITHUB_OUTPUT"

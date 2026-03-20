@@ -49,6 +49,7 @@ Fluxo configurado:
 
 O fluxo nao usa mais `release-please`. A versao publicada vem direto dos arquivos versionados no proprio PR mergeado.
 Esse desenho assume que a `main` esta protegida e recebe alteracoes apenas por PR aprovada e mergeada.
+Se necessario, a pipeline `Main Delivery` tambem pode ser executada manualmente pelo GitHub Actions e, nesse modo, ela roda backend e frontend completos sem depender da deteccao por pasta alterada.
 
 Se um componente mudou e a tag daquela versao ja existir para outro commit, a pipeline falha. Isso força o bump de versao antes do merge na `main`.
 

@@ -35,7 +35,7 @@ As imagens recebem:
 
 ## Workflows
 
-- `main-delivery.yml`: executa no `push` da `main`, detecta as areas alteradas, roda a CI relevante, cria as tags e GitHub Releases e chama os jobs de publicacao Docker
+- `main-delivery.yml`: executa no `push` da `main` e tambem pode ser disparado manualmente; no `push` ele detecta as areas alteradas, e na execucao manual ele processa backend e frontend completos, depois cria as tags e GitHub Releases e chama os jobs de publicacao Docker
 - `dependabot-auto-approve.yml`: aprova automaticamente PRs validas abertas pelo Dependabot
 - `backend-image.yml`: workflow reutilizavel para publicar a imagem do backend, tambem acionavel manualmente
 - `frontend-image.yml`: workflow reutilizavel para publicar a imagem do frontend, tambem acionavel manualmente
