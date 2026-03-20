@@ -1,4 +1,4 @@
-# Operacao
+# Runtime
 
 ## Containers locais
 
@@ -24,6 +24,9 @@ docker compose up --build
 - `DB_PASSWORD`
 - `SERVER_PORT`
 - `JAVA_OPTS`
+- `SPRING_PROFILES_ACTIVE`
+- `APP_CORS_ALLOWED_ORIGINS`
+- `APP_PUBLIC_URL`
 - `OTEL_ENVIRONMENT`
 - `MANAGEMENT_TRACING_SAMPLING_PROBABILITY`
 - `MANAGEMENT_OTLP_TRACING_ENDPOINT`
@@ -40,6 +43,12 @@ docker compose up --build
 - postgres: `pg_isready`
 - backend: `/actuator/health/readiness`
 - frontend: publicado na porta `4200` e usando proxy reverso para `/api`
+
+## Perfis de execucao
+
+- `dev`: perfil padrao para desenvolvimento local
+- `build`: usado no build empacotado
+- `prod`: usado em deploys; exige `APP_CORS_ALLOWED_ORIGINS` sem `localhost`
 
 ## Observabilidade
 
@@ -60,4 +69,4 @@ docker compose up --build
 
 ## Releases
 
-O fluxo de release e publicacao de imagens roda apos merge na `main`. O detalhamento de versionamento, tags e Docker Hub esta em `docs/release.md`.
+O fluxo de release e publicacao de imagens roda apos merge na `main`. O detalhamento de versionamento, tags e Docker Hub esta em `operations/release.md`.

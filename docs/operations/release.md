@@ -1,5 +1,7 @@
 # Release e Imagens
 
+![Pipeline principal de entrega](../assets/images/main-delivery-overview.svg)
+
 ## Fluxo recomendado
 
 O fluxo automatizado do repositorio segue esta ordem:

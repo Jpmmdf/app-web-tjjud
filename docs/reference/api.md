@@ -1,9 +1,15 @@
 # API
 
+## Endpoints publicos
+
+- Frontend demo: [https://front-demo.pavim.com.br](https://front-demo.pavim.com.br)
+- Swagger UI: [https://front-demo.pavim.com.br/swagger-ui.html](https://front-demo.pavim.com.br/swagger-ui.html)
+- OpenAPI JSON: [https://front-demo.pavim.com.br/api-docs](https://front-demo.pavim.com.br/api-docs)
+
 ## Contrato principal
 
 - base path: `/api/v1`
-- documentacao interativa: `/swagger-ui/index.html`
+- documentacao interativa: `/swagger-ui.html`
 - contrato OpenAPI publicado pela API: `/api-docs`
 
 ## Recursos
@@ -43,6 +49,7 @@
 - o backend retorna `422` para validacao de negocio e `409` para conflito de integridade
 - livros precisam ter pelo menos um autor e um assunto
 - filtros de livros aceitam titulo, autor e assunto
+- a demo publica a API pelo mesmo host do frontend, via proxy reverso do nginx
 
 ## Observabilidade HTTP
 

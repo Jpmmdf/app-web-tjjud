@@ -69,6 +69,9 @@ make docs-build
 make docs-serve
 ```
 
+- Portal publicado: [https://jpmmdf.github.io/app-web-tjjud/](https://jpmmdf.github.io/app-web-tjjud/)
+- Demo publicada: [https://front-demo.pavim.com.br](https://front-demo.pavim.com.br)
+
 ## Diagramas C4
 
 ```bash

@@ -1,23 +1,31 @@
-site_name: TJJUD Cloud Native Docs
-site_description: Documentacao cloud-native do catalogo editorial TJJUD
-site_url: http://localhost:8000
+site_name: app-web-tjjud Docs
+site_description: Documentacao tecnica, operacional e de entrega do app-web-tjjud
+site_url: https://jpmmdf.github.io/app-web-tjjud/
 repo_name: app-web-tjjud
+repo_url: https://github.com/Jpmmdf/app-web-tjjud
+edit_uri: edit/main/docs/
 
 theme:
   name: readthedocs
   highlightjs: true
 
 nav:
-  - Visao Geral: index.md
+  - Inicio: index.md
+  - Visao Geral:
+      - Demo e Acessos: overview/demo.md
   - Arquitetura:
-      - Panorama: architecture/index.md
+      - Panorama: architecture/overview.md
       - C4 e Structurizr: architecture/c4.md
       - Decisoes: architecture/decisions.md
-  - API: api.md
-  - Dados: data.md
-  - Operacao: operations.md
-  - Release: release.md
-  - Onboarding: onboarding.md
+  - Referencia:
+      - API: reference/api.md
+      - Dados: reference/data.md
+  - Operacao:
+      - Runtime: operations/runtime.md
+      - GitOps e Demo: operations/gitops.md
+      - Release e Imagens: operations/release.md
+  - Comecando:
+      - Onboarding: getting-started/onboarding.md
 
 markdown_extensions:
   - admonition

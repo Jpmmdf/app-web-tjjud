@@ -1,31 +1,37 @@
-# Catalogo Editorial TJJUD
+# app-web-tjjud
 
-Portal central da solucao API-first implementada para o desafio TJJUD.
+Portal tecnico da solucao API-first para cadastro de autores, assuntos e livros com relatorio por autor, PDF e entrega cloud-native.
+
+## Acessos publicos
+
+- Frontend demo: [https://front-demo.pavim.com.br](https://front-demo.pavim.com.br)
+- Swagger UI: [https://front-demo.pavim.com.br/swagger-ui.html](https://front-demo.pavim.com.br/swagger-ui.html)
+- OpenAPI JSON: [https://front-demo.pavim.com.br/api-docs](https://front-demo.pavim.com.br/api-docs)
+- Documentacao publica: [https://jpmmdf.github.io/app-web-tjjud/](https://jpmmdf.github.io/app-web-tjjud/)
 
 ## O que existe aqui
 
-- backend `Spring Boot 4 / Java 21` com CRUD de autores, assuntos e livros
-- frontend `Angular 21` com formularios reativos e mascara BRL para o campo de valor
+- backend `Spring Boot 4 / Java 21` com CRUD, relatorio e exportacao PDF
+- frontend `Angular 21` com filtros, formularios reativos e consumo do OpenAPI
 - banco `PostgreSQL 16` com modelagem normalizada e view `vw_relatorio_livros_por_autor`
-- exportacao PDF do relatorio por autor
-- documentacao cloud-native e diagramas C4 gerados a partir de `Structurizr DSL`
+- deploy demo em Kubernetes com GitOps via Argo CD
+- documentacao tecnica com diagramas C4 derivados de `Structurizr DSL`
 
 ## Como navegar
 
-- **Arquitetura**: fronteiras do sistema, containers, componentes e topologia cloud-native
-- **API**: endpoints, fluxos principais e pontos de observabilidade
-- **Dados**: modelo relacional, tabelas associativas e view do relatorio
-- **Operacao**: compose, health checks, configuracao externa e sinais de observabilidade
-- **Release**: fluxo de versionamento, tags e publicacao das imagens Docker
-- **Onboarding**: caminho minimo para subir o ambiente e validar a entrega
+- **Visao Geral**: links publicos da demo, acessos e ambiente publicado
+- **Arquitetura**: panorama, diagramas C4 e decisoes tecnicas
+- **Referencia**: contrato HTTP e modelo de dados
+- **Operacao**: runtime, GitOps, releases e publicacao Docker
+- **Comecando**: caminho minimo para validar a solucao localmente
 
 ## Fluxo principal
 
-1. Cadastrar autores.
-2. Cadastrar assuntos.
-3. Cadastrar livros associando pelo menos um autor e um assunto.
-4. Consultar o relatorio agrupado por autor.
-5. Exportar o PDF do relatorio.
+1. cadastrar autores
+2. cadastrar assuntos
+3. cadastrar livros associando pelo menos um autor e um assunto
+4. consultar o relatorio agrupado por autor
+5. exportar o PDF do relatorio
 
 ## Criterio de atualizacao
 

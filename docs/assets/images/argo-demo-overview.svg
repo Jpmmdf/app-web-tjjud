@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860" role="img" aria-labelledby="title desc">
+  <title id="title">Estado da demo no Argo CD</title>
+  <desc id="desc">Ilustracao simplificada da aplicacao app-web-tjjud-demo no Argo CD, com status Healthy e Synced e a arvore principal de recursos.</desc>
+  <rect width="1400" height="860" fill="#eef3f8"/>
+  <rect x="24" y="24" width="1352" height="812" rx="20" fill="#ffffff" stroke="#d8e0eb"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="56" y="72" font-size="34" font-weight="700" fill="#1f2937">app-web-tjjud-demo</text>
+    <text x="56" y="104" font-size="18" fill="#5b6573">Argo CD sincronizando a branch main e os manifests em k8s/demo</text>
+
+    <rect x="56" y="136" width="280" height="108" rx="18" fill="#f7fbff" stroke="#c7d2df"/>
+    <text x="84" y="174" font-size="18" fill="#5b6573">APP HEALTH</text>
+    <text x="84" y="220" font-size="42" font-weight="700" fill="#0f9d58">Healthy</text>
+
+    <rect x="364" y="136" width="360" height="108" rx="18" fill="#f7fbff" stroke="#c7d2df"/>
+    <text x="392" y="174" font-size="18" fill="#5b6573">SYNC STATUS</text>
+    <text x="392" y="220" font-size="42" font-weight="700" fill="#0f9d58">Synced to main</text>
+
+    <rect x="752" y="136" width="360" height="108" rx="18" fill="#f7fbff" stroke="#c7d2df"/>
+    <text x="780" y="174" font-size="18" fill="#5b6573">LAST SYNC</text>
+    <text x="780" y="220" font-size="34" font-weight="700" fill="#0f9d58">Sync OK</text>
+
+    <circle cx="116" cy="430" r="34" fill="#8ba3b8"/>
+    <rect x="162" y="392" width="240" height="76" rx="16" fill="#ffffff" stroke="#c7d2df"/>
+    <text x="186" y="424" font-size="22" font-weight="700" fill="#1f2937">app-web-tjjud-demo</text>
+    <text x="186" y="450" font-size="15" fill="#5b6573">Application</text>
+
+    <line x1="402" y1="430" x2="506" y2="430" stroke="#a7b8c9" stroke-width="4"/>
+    <line x1="506" y1="250" x2="506" y2="760" stroke="#d5dee8" stroke-width="3" stroke-dasharray="8 8"/>
+
+    <g>
+      <line x1="506" y1="286" x2="592" y2="286" stroke="#a7b8c9" stroke-width="3"/>
+      <rect x="592" y="246" width="248" height="80" rx="14" fill="#ffffff" stroke="#c7d2df"/>
+      <text x="620" y="278" font-size="20" font-weight="700" fill="#1f2937">app-web-tjjud-demo-versions</text>
+      <text x="620" y="304" font-size="15" fill="#5b6573">ConfigMap</text>
+    </g>
+
+    <g>
+      <line x1="506" y1="376" x2="592" y2="376" stroke="#a7b8c9" stroke-width="3"/>
+      <rect x="592" y="336" width="248" height="80" rx="14" fill="#ffffff" stroke="#c7d2df"/>
+      <text x="620" y="368" font-size="20" font-weight="700" fill="#1f2937">app-web-tjjud-demo</text>
+      <text x="620" y="394" font-size="15" fill="#5b6573">Namespace</text>
+    </g>
+
+    <g>
+      <line x1="506" y1="466" x2="592" y2="466" stroke="#a7b8c9" stroke-width="3"/>
+      <rect x="592" y="426" width="248" height="80" rx="14" fill="#ffffff" stroke="#c7d2df"/>
+      <text x="620" y="458" font-size="20" font-weight="700" fill="#1f2937">backend</text>
+      <text x="620" y="484" font-size="15" fill="#5b6573">Service + Deployment + Pod</text>
+    </g>
+
+    <g>
+      <line x1="506" y1="556" x2="592" y2="556" stroke="#a7b8c9" stroke-width="3"/>
+      <rect x="592" y="516" width="248" height="80" rx="14" fill="#ffffff" stroke="#c7d2df"/>
+      <text x="620" y="548" font-size="20" font-weight="700" fill="#1f2937">frontend</text>
+      <text x="620" y="574" font-size="15" fill="#5b6573">Service + Deployment + Pod</text>
+    </g>
+
+    <g>
+      <line x1="506" y1="646" x2="592" y2="646" stroke="#a7b8c9" stroke-width="3"/>
+      <rect x="592" y="606" width="248" height="80" rx="14" fill="#ffffff" stroke="#c7d2df"/>
+      <text x="620" y="638" font-size="20" font-weight="700" fill="#1f2937">postgres</text>
+      <text x="620" y="664" font-size="15" fill="#5b6573">Service + StatefulSet + PVC</text>
+    </g>
+
+    <g>
+      <line x1="506" y1="736" x2="592" y2="736" stroke="#a7b8c9" stroke-width="3"/>
+      <rect x="592" y="696" width="248" height="80" rx="14" fill="#ffffff" stroke="#c7d2df"/>
+      <text x="620" y="728" font-size="20" font-weight="700" fill="#1f2937">tls + ingress</text>
+      <text x="620" y="754" font-size="15" fill="#5b6573">Certificate + Ingress</text>
+    </g>
+
+    <rect x="938" y="410" width="358" height="220" rx="20" fill="#f8fbff" stroke="#d3dfeb"/>
+    <text x="970" y="456" font-size="24" font-weight="700" fill="#1f2937">Resumo da demo</text>
+    <text x="970" y="500" font-size="18" fill="#334155">Host publico: front-demo.pavim.com.br</text>
+    <text x="970" y="536" font-size="18" fill="#334155">Namespace: app-web-tjjud-demo</text>
+    <text x="970" y="572" font-size="18" fill="#334155">TLS pronto com cert-manager</text>
+    <text x="970" y="608" font-size="18" fill="#334155">Sync automatica habilitada</text>
+  </g>
+</svg>
