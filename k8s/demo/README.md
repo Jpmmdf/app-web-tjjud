@@ -12,10 +12,11 @@ Este pacote cria um ambiente demo completo no cluster Kubernetes com:
 
 ## Arquivos sensiveis
 
-Os arquivos abaixo nao entram no Git e sao gerados pelo script de deploy:
+O arquivo abaixo nao entra no Git e e gerado pelo script de deploy:
 
 - `k8s/demo/secret.env`
-- `k8s/demo/versions.env`
+
+O arquivo `k8s/demo/versions.env` agora faz parte do repositorio para que o Argo CD consiga montar o pacote diretamente do Git.
 
 ## Deploy
 
@@ -28,10 +29,11 @@ Use o script:
 Por padrao ele:
 
 1. busca as tags mais recentes de release do backend e do frontend no repositorio
-2. gera `secret.env` e `versions.env` se necessario
-3. aponta os manifests para as imagens publicadas no Docker Hub em `joaomilhome/app-web-tjjud-backend` e `joaomilhome/app-web-tjjud-frontend`
-4. aplica os manifests no cluster remoto
-5. aguarda o rollout do banco, backend e frontend
+2. gera `secret.env` se necessario
+3. aplica ou atualiza o Secret runtime `app-web-tjjud-demo-secrets` no cluster remoto
+4. monta um pacote temporario com as tags de imagem desejadas para backend e frontend
+5. aplica os manifests no cluster remoto
+6. aguarda o rollout do banco, backend e frontend
 
 ## Variaveis uteis
 
@@ -39,3 +41,12 @@ Por padrao ele:
 - `K8S_DEMO_NAMESPACE`: namespace de deploy. Padrao: `app-web-tjjud-demo`
 - `K8S_DEMO_BACKEND_VERSION`: força uma versao especifica do backend em vez da ultima tag publicada
 - `K8S_DEMO_FRONTEND_VERSION`: força uma versao especifica do frontend em vez da ultima tag publicada
+
+## Argo CD
+
+O pacote `k8s/demo` foi estruturado para ser consumido pelo Argo CD diretamente do Git.
+Para isso:
+
+- `versions.env` fica versionado no repositorio
+- o Secret `app-web-tjjud-demo-secrets` precisa existir previamente no cluster
+- o backend continua interno ao cluster e o frontend publica a API externamente por `/api`

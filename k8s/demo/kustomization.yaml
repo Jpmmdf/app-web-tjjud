@@ -17,11 +17,6 @@ resources:
 generatorOptions:
   disableNameSuffixHash: true
 
-secretGenerator:
-  - name: app-web-tjjud-demo-secrets
-    envs:
-      - secret.env
-
 configMapGenerator:
   - name: app-web-tjjud-demo-versions
     envs:

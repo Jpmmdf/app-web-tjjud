@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-web-tjjud-demo
+  namespace: argocd
+spec:
+  project: app-web-tjjud
+  source:
+    repoURL: git@github.com:Jpmmdf/app-web-tjjud.git
+    targetRevision: codex/demo-deployment-assets
+    path: k8s/demo
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: app-web-tjjud-demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

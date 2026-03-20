@@ -5,6 +5,13 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 K8S_DIR="$ROOT_DIR/k8s/demo"
 SSH_TARGET="${K8S_DEMO_SSH_TARGET:-root@31.220.89.105}"
 NAMESPACE="${K8S_DEMO_NAMESPACE:-app-web-tjjud-demo}"
+WORK_DIR="$(mktemp -d)"
+
+cleanup() {
+  rm -rf "$WORK_DIR"
+}
+
+trap cleanup EXIT
 
 latest_component_version() {
   local prefix="$1"
@@ -40,7 +47,9 @@ EOF
   chmod 600 "$K8S_DIR/secret.env"
 fi
 
-cat > "$K8S_DIR/versions.env" <<EOF
+cp -R "$K8S_DIR"/. "$WORK_DIR"/
+
+cat > "$WORK_DIR/versions.env" <<EOF
 BACKEND_IMAGE=$BACKEND_IMAGE
 FRONTEND_IMAGE=$FRONTEND_IMAGE
 APP_VERSION=$BACKEND_VERSION
@@ -49,8 +58,18 @@ EOF
 echo "==> Using backend image: $BACKEND_IMAGE"
 echo "==> Using frontend image: $FRONTEND_IMAGE"
 
+echo "==> Ensuring namespace exists on $SSH_TARGET"
+ssh -o StrictHostKeyChecking=no "$SSH_TARGET" "kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -"
+
+echo "==> Applying runtime secret to $SSH_TARGET"
+kubectl create secret generic app-web-tjjud-demo-secrets \
+  --namespace "$NAMESPACE" \
+  --from-env-file="$K8S_DIR/secret.env" \
+  --dry-run=client \
+  -o yaml | ssh -o StrictHostKeyChecking=no "$SSH_TARGET" 'kubectl apply -f -'
+
 echo "==> Applying manifests to $SSH_TARGET"
-kubectl kustomize "$K8S_DIR" | ssh -o StrictHostKeyChecking=no "$SSH_TARGET" 'kubectl apply -f -'
+kubectl kustomize "$WORK_DIR" | ssh -o StrictHostKeyChecking=no "$SSH_TARGET" 'kubectl apply -f -'
 
 echo "==> Waiting for PostgreSQL"
 ssh -o StrictHostKeyChecking=no "$SSH_TARGET" "kubectl rollout status statefulset/postgres -n $NAMESPACE --timeout=10m"
