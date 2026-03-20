@@ -1,7 +1,6 @@
 name: Main Delivery
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -12,8 +11,6 @@ on:
 
 permissions:
   contents: write
-  issues: write
-  pull-requests: write
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -38,26 +35,20 @@ jobs:
       - name: Detectar areas alteradas
         id: filter
         env:
-          EVENT_NAME: ${{ github.event_name }}
           BEFORE_SHA: ${{ github.event.before }}
           CURRENT_SHA: ${{ github.sha }}
         run: |
           backend_changed=false
           frontend_changed=false
 
-          if [ "$EVENT_NAME" = "workflow_dispatch" ] || [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+          changed_files="$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA")"
+
+          if printf '%s\n' "$changed_files" | grep -q '^backend/'; then
             backend_changed=true
+          fi
+
+          if printf '%s\n' "$changed_files" | grep -Eq '^(frontend/|\.nvmrc$)'; then
             frontend_changed=true
-          else
-            changed_files="$(git diff --name-only "$BEFORE_SHA" "$CURRENT_SHA")"
-
-            if printf '%s\n' "$changed_files" | grep -q '^backend/'; then
-              backend_changed=true
-            fi
-
-            if printf '%s\n' "$changed_files" | grep -Eq '^(frontend/|\.nvmrc$)'; then
-              frontend_changed=true
-            fi
           fi
 
           echo "backend_changed=$backend_changed" >> "$GITHUB_OUTPUT"
@@ -75,118 +66,179 @@ jobs:
     if: ${{ needs.detect-changes.outputs.frontend_changed == 'true' }}
     uses: ./.github/workflows/frontend-ci.yml
 
-  release-please:
-    name: Release Please
+  backend-release:
+    name: Release Backend
     needs:
       - detect-changes
       - backend-ci
-      - frontend-ci
-    if: >-
-      always() &&
-      (needs.detect-changes.outputs.backend_changed == 'true' || needs.detect-changes.outputs.frontend_changed == 'true') &&
-      (needs.backend-ci.result == 'success' || needs.backend-ci.result == 'skipped') &&
-      (needs.frontend-ci.result == 'success' || needs.frontend-ci.result == 'skipped')
+    if: ${{ needs.detect-changes.outputs.backend_changed == 'true' && needs.backend-ci.result == 'success' }}
     runs-on: ubuntu-latest
     outputs:
-      backend_release_created: ${{ steps.release.outputs['backend--release_created'] }}
-      backend_version: ${{ steps.release.outputs['backend--version'] }}
-      backend_tag_name: ${{ steps.release.outputs['backend--tag_name'] }}
-      frontend_release_created: ${{ steps.release.outputs['frontend--release_created'] }}
-      frontend_version: ${{ steps.release.outputs['frontend--version'] }}
-      frontend_tag_name: ${{ steps.release.outputs['frontend--tag_name'] }}
+      version: ${{ steps.meta.outputs.version }}
+      tag_name: ${{ steps.meta.outputs.tag_name }}
+      release_ready: ${{ steps.publish.outputs.release_ready }}
     steps:
-      - name: Release Please
-        id: release
-        uses: googleapis/release-please-action@v4
+      - name: Checkout
+        uses: actions/checkout@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
-          skip-labeling: true
+          fetch-depth: 0
 
-  auto-merge-release-prs:
-    name: Auto Merge Release PRs
-    needs: release-please
-    if: ${{ needs.release-please.result == 'success' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Validar secrets do GitHub App
-        env:
-          AUTOMATION_APP_ID: ${{ secrets.AUTOMATION_APP_ID }}
-          AUTOMATION_APP_PRIVATE_KEY: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+      - name: Buscar tags do repositorio
+        run: git fetch --force --tags origin
+
+      - name: Descobrir versao do backend
+        id: meta
         run: |
-          if [ -z "$AUTOMATION_APP_ID" ] || [ -z "$AUTOMATION_APP_PRIVATE_KEY" ]; then
-            echo "::error::Configure os secrets AUTOMATION_APP_ID e AUTOMATION_APP_PRIVATE_KEY para gerar o token do GitHub App."
+          VERSION="$(
+            ruby <<'RUBY'
+            content = File.read('backend/pom.xml')
+            after_artifact = content.split('<artifactId>backend</artifactId>', 2)[1]
+            abort '' unless after_artifact
+            match = after_artifact.match(/<version>([^<]+)<\/version>/)
+            abort '' unless match
+            puts match[1]
+            RUBY
+          )"
+
+          if [ -z "$VERSION" ]; then
+            echo "::error::Nao foi possivel descobrir a versao do backend em backend/pom.xml."
             exit 1
           fi
 
-      - name: Gerar token do GitHub App
-        id: app-token
-        uses: actions/create-github-app-token@v3
-        with:
-          app-id: ${{ secrets.AUTOMATION_APP_ID }}
-          private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          permission-contents: write
-          permission-pull-requests: write
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag_name=backend-v$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Aprovar e mesclar PRs de release abertas pelo Release Please
+      - name: Criar release do backend
+        id: publish
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          TAG_NAME: ${{ steps.meta.outputs.tag_name }}
         run: |
-          RELEASE_PRS="$(
-            gh pr list \
-              --repo "$GITHUB_REPOSITORY" \
-              --state open \
-              --base main \
-              --json number,title,headRefName,author,reviewDecision \
-              --jq '.[] | select(.author.login == "app/github-actions") | select(.headRefName | startswith("release-please--branches--")) | select(.title | startswith("chore(main): release")) | @base64'
-          )"
+          EXISTING_TAG_SHA="$(git rev-list -n 1 "refs/tags/$TAG_NAME" 2>/dev/null || true)"
 
-          if [ -z "$RELEASE_PRS" ]; then
-            echo "Nenhuma PR de release pendente para aprovar."
+          if [ -n "$EXISTING_TAG_SHA" ] && [ "$EXISTING_TAG_SHA" != "$GITHUB_SHA" ]; then
+            echo "::error::A tag $TAG_NAME ja existe para outro commit. Atualize a versao do backend em backend/pom.xml antes de fazer merge na main."
+            exit 1
+          fi
+
+          if [ -n "$EXISTING_TAG_SHA" ] && gh release view "$TAG_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG_NAME ja existe para este commit. Reaproveitando a versao."
+            echo "release_ready=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          while IFS= read -r encoded_pr; do
-            [ -z "$encoded_pr" ] && continue
+          if [ -z "$EXISTING_TAG_SHA" ]; then
+            git tag -a "$TAG_NAME" "$GITHUB_SHA" -m "Release $TAG_NAME"
+            git push origin "refs/tags/$TAG_NAME"
+          fi
 
-            pr_json="$(printf '%s' "$encoded_pr" | base64 --decode)"
-            pr_number="$(printf '%s' "$pr_json" | jq -r '.number')"
-            review_decision="$(printf '%s' "$pr_json" | jq -r '.reviewDecision // empty')"
+          cat > backend-release-notes.md <<EOF
+          Release automatica do backend apos merge aprovado na main.
 
-            if [ "$review_decision" != "APPROVED" ]; then
-              gh pr review "$pr_number" \
-                --repo "$GITHUB_REPOSITORY" \
-                --approve \
-                --body "Aprovacao automatica da PR de release."
-            fi
+          Versao: $VERSION
+          Commit: $GITHUB_SHA
+          EOF
 
-            gh pr merge "$pr_number" \
-              --repo "$GITHUB_REPOSITORY" \
-              --auto \
-              --merge \
-              --delete-branch
-          done <<< "$RELEASE_PRS"
+          gh release create "$TAG_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "Backend v$VERSION" \
+            --notes-file backend-release-notes.md
+
+          echo "release_ready=true" >> "$GITHUB_OUTPUT"
+
+  frontend-release:
+    name: Release Frontend
+    needs:
+      - detect-changes
+      - frontend-ci
+    if: ${{ needs.detect-changes.outputs.frontend_changed == 'true' && needs.frontend-ci.result == 'success' }}
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag_name: ${{ steps.meta.outputs.tag_name }}
+      release_ready: ${{ steps.publish.outputs.release_ready }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Buscar tags do repositorio
+        run: git fetch --force --tags origin
+
+      - name: Descobrir versao do frontend
+        id: meta
+        run: |
+          VERSION="$(jq -r '.version' frontend/package.json)"
+
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "::error::Nao foi possivel descobrir a versao do frontend em frontend/package.json."
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag_name=frontend-v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Criar release do frontend
+        id: publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          TAG_NAME: ${{ steps.meta.outputs.tag_name }}
+        run: |
+          EXISTING_TAG_SHA="$(git rev-list -n 1 "refs/tags/$TAG_NAME" 2>/dev/null || true)"
+
+          if [ -n "$EXISTING_TAG_SHA" ] && [ "$EXISTING_TAG_SHA" != "$GITHUB_SHA" ]; then
+            echo "::error::A tag $TAG_NAME ja existe para outro commit. Atualize a versao do frontend em frontend/package.json antes de fazer merge na main."
+            exit 1
+          fi
+
+          if [ -n "$EXISTING_TAG_SHA" ] && gh release view "$TAG_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG_NAME ja existe para este commit. Reaproveitando a versao."
+            echo "release_ready=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -z "$EXISTING_TAG_SHA" ]; then
+            git tag -a "$TAG_NAME" "$GITHUB_SHA" -m "Release $TAG_NAME"
+            git push origin "refs/tags/$TAG_NAME"
+          fi
+
+          cat > frontend-release-notes.md <<EOF
+          Release automatica do frontend apos merge aprovado na main.
+
+          Versao: $VERSION
+          Commit: $GITHUB_SHA
+          EOF
+
+          gh release create "$TAG_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "Frontend v$VERSION" \
+            --notes-file frontend-release-notes.md
+
+          echo "release_ready=true" >> "$GITHUB_OUTPUT"
 
   publish-backend:
     name: Publish Backend Image
-    needs: release-please
-    if: ${{ needs.release-please.outputs.backend_release_created == 'true' }}
+    needs: backend-release
+    if: ${{ needs.backend-release.outputs.release_ready == 'true' }}
     uses: ./.github/workflows/backend-image.yml
     with:
-      version: ${{ needs.release-please.outputs.backend_version }}
-      git_tag: ${{ needs.release-please.outputs.backend_tag_name }}
+      version: ${{ needs.backend-release.outputs.version }}
+      git_tag: ${{ needs.backend-release.outputs.tag_name }}
       push_latest: true
     secrets: inherit
 
   publish-frontend:
     name: Publish Frontend Image
-    needs: release-please
-    if: ${{ needs.release-please.outputs.frontend_release_created == 'true' }}
+    needs: frontend-release
+    if: ${{ needs.frontend-release.outputs.release_ready == 'true' }}
     uses: ./.github/workflows/frontend-image.yml
     with:
-      version: ${{ needs.release-please.outputs.frontend_version }}
-      git_tag: ${{ needs.release-please.outputs.frontend_tag_name }}
+      version: ${{ needs.frontend-release.outputs.version }}
+      git_tag: ${{ needs.frontend-release.outputs.tag_name }}
       push_latest: true
     secrets: inherit

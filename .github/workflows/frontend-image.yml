@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       git_tag:
-        description: Git tag created by Release Please
+        description: Git tag used for this frontend release
         required: true
         type: string
       push_latest:
@@ -28,7 +28,7 @@ on:
         required: true
         type: string
       git_tag:
-        description: Git tag created by Release Please
+        description: Git tag used for this frontend release
         required: true
         type: string
       push_latest:

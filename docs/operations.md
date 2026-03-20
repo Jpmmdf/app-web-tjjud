@@ -60,4 +60,4 @@ docker compose up --build
 
 ## Releases
 
-O fluxo de release e publicacao de imagens foi separado do CI normal. O detalhamento de PR de release, tags e Docker Hub esta em `docs/release.md`.
+O fluxo de release e publicacao de imagens roda apos merge na `main`. O detalhamento de versionamento, tags e Docker Hub esta em `docs/release.md`.

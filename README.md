@@ -43,26 +43,23 @@ Fluxo configurado:
 1. Abrir PR normal para a `main`.
 2. Rodar CI de `backend` e `frontend` nessa PR.
 3. Fazer merge na `main`.
-4. Uma pipeline unica na `main` executa a CI relevante antes do `release-please`.
-5. O `release-please` abre ou atualiza uma PR unica de release, agrupando `backend` e `frontend` quando houver mudancas nos dois componentes.
-6. Essa PR de release pode ser autoaprovada e mesclada automaticamente no mesmo workflow.
-7. Ao fazer merge da PR de release, o `release-please` cria as tags e a GitHub Release usando `GITHUB_TOKEN`.
-8. No mesmo workflow, quando uma release real e criada, os jobs reutilizaveis publicam a imagem correspondente no Docker Hub.
+4. Uma pipeline unica na `main` executa a CI relevante novamente.
+5. Para cada componente alterado, a pipeline le a versao atual em `backend/pom.xml` ou `frontend/package.json`.
+6. A pipeline cria a tag do componente, publica a GitHub Release e depois publica a imagem correspondente no Docker Hub.
 
-No backend, a estrategia Maven do `release-please` esta configurada com `skip-snapshot`, entao a PR de release usa a versao final em vez de `-SNAPSHOT`. No frontend, o `package.json` continua sendo atualizado pelo strategy `node` quando a release e fechada.
+O fluxo nao usa mais `release-please`. A versao publicada vem direto dos arquivos versionados no proprio PR mergeado.
+Esse desenho assume que a `main` esta protegida e recebe alteracoes apenas por PR aprovada e mergeada.
 
-As pipelines normais de CI nao rodam nas PRs de release do `release-please`, para evitar trabalho duplicado.
-
-O agrupamento em uma unica PR tambem evita conflitos recorrentes no arquivo `.release-please-manifest.json`, que antes era alterado por duas PRs de release abertas ao mesmo tempo.
+Se um componente mudou e a tag daquela versao ja existir para outro commit, a pipeline falha. Isso força o bump de versao antes do merge na `main`.
 
 Secrets necessarios no repositorio:
 
 - `DOCKER_USERNAME`
 - `DOCKERHUB_TOKEN`
-- `AUTOMATION_APP_ID`: App ID do GitHub App usado nas automacoes de aprovacao
+- `AUTOMATION_APP_ID`: App ID do GitHub App usado nas automacoes do Dependabot
 - `AUTOMATION_APP_PRIVATE_KEY`: chave privada PEM do GitHub App
 
-O `release-please` usa `GITHUB_TOKEN`. O GitHub App continua sendo usado para a autoaprovacao das PRs de release e das PRs do Dependabot.
+O `GITHUB_TOKEN` do workflow cria as tags e as GitHub Releases. O GitHub App continua sendo usado apenas para a autoaprovacao das PRs do Dependabot.
 
 ## Documentacao
 
