@@ -209,6 +209,46 @@ class CatalogApiIntegrationTest {
     }
 
     @Test
+    void shouldNormalizeBookTextAndTitleFilter() throws Exception {
+        long authorId = createAuthor("Machado de Assis");
+        long subjectId = createSubject("Romance");
+
+        mockMvc.perform(post("/api/v1/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new BookUpsertRequest(
+                                "  Dom   Casmurro  ",
+                                "  Editora   Exemplo  ",
+                                3,
+                                1899,
+                                "129.90",
+                                List.of(authorId),
+                                List.of(subjectId)))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("Dom Casmurro"))
+                .andExpect(jsonPath("$.publisher").value("Editora Exemplo"));
+
+        mockMvc.perform(get("/api/v1/books").param("title", " Dom   Casmurro "))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items", hasSize(1)))
+                .andExpect(jsonPath("$.items[0].title").value("Dom Casmurro"))
+                .andExpect(jsonPath("$.items[0].publisher").value("Editora Exemplo"));
+
+        mockMvc.perform(post("/api/v1/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new BookUpsertRequest(
+                                "Dom    Casmurro",
+                                "Editora    Exemplo",
+                                3,
+                                1899,
+                                "129.90",
+                                List.of(authorId),
+                                List.of(subjectId)))))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail")
+                        .value("Já existe um livro cadastrado com a mesma combinação de título, editora, edição e ano de publicação."));
+    }
+
+    @Test
     void shouldRejectBookWithDuplicatedAuthors() throws Exception {
         long authorId = createAuthor("Machado de Assis");
         long subjectId = createSubject("Romance");
