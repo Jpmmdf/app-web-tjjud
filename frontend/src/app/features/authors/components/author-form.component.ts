@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { AuthorsApiService } from '../../../core/api/authors-api.service';
 import { ptBrCatalogMessages } from '../../../core/i18n/pt-br';
 import { CatalogFacadeService } from '../../../core/state/catalog-facade.service';
+import { normalizeTextValue } from '../../../shared/formatters/text-normalizer';
 
 @Component({
   selector: 'app-author-form',
@@ -45,7 +46,7 @@ export class AuthorFormComponent implements OnInit {
     }
 
     const result = await this.catalog.saveAuthor(this.editingAuthorId(), {
-      name: this.authorForm.getRawValue().name.trim(),
+      name: normalizeTextValue(this.authorForm.getRawValue().name),
     });
     if (result) {
       await this.router.navigate(['/autores']);

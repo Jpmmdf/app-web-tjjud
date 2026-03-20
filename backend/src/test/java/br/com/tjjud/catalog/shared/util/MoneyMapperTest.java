@@ -15,7 +15,17 @@ class MoneyMapperTest {
     }
 
     @Test
+    void shouldParseDecimalWithSurroundingWhitespace() {
+        assertEquals(new BigDecimal("129.90"), MoneyMapper.parse("  129.90  "));
+    }
+
+    @Test
     void shouldRejectNegativeValue() {
         assertThrows(BusinessValidationException.class, () -> MoneyMapper.parse("-1.00"));
+    }
+
+    @Test
+    void shouldRejectBlankValue() {
+        assertThrows(BusinessValidationException.class, () -> MoneyMapper.parse("   "));
     }
 }

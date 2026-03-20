@@ -8,6 +8,7 @@ import { SortDirection } from '../../../core/models/common.models';
 import type { SubjectSummary } from '../../../core/models/subjects.models';
 import { CatalogFacadeService } from '../../../core/state/catalog-facade.service';
 import { formatCurrencyValue, joinAuthorNames, joinSubjectDescriptions } from '../../../shared/formatters/catalog-formatters';
+import { normalizeTextValue } from '../../../shared/formatters/text-normalizer';
 
 @Component({
   selector: 'app-book-list',
@@ -278,7 +279,7 @@ export class BookListComponent implements OnInit {
   }
 
   private normalizeLookupQuery(value: string): string {
-    return value.trim().replace(/\s+/g, ' ');
+    return normalizeTextValue(value);
   }
 
   private async restoreSelectedFilters(): Promise<void> {

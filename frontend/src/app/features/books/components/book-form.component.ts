@@ -10,6 +10,7 @@ import type { SubjectSummary } from '../../../core/models/subjects.models';
 import { CatalogFacadeService } from '../../../core/state/catalog-facade.service';
 import { BrlCurrencyMaskDirective } from '../../../shared/directives/brl-currency-mask.directive';
 import { minimumSelectionValidator } from '../../../shared/forms/minimum-selection.validator';
+import { normalizeTextValue } from '../../../shared/formatters/text-normalizer';
 
 @Component({
   selector: 'app-book-form',
@@ -68,11 +69,11 @@ export class BookFormComponent implements OnInit {
 
     const rawValue = this.bookForm.getRawValue();
     const payload: BookUpsertPayload = {
-      title: this.normalizeTextValue(rawValue.title),
-      publisher: this.normalizeTextValue(rawValue.publisher),
+      title: normalizeTextValue(rawValue.title),
+      publisher: normalizeTextValue(rawValue.publisher),
       edition: rawValue.edition,
       publicationYear: rawValue.publicationYear,
-      price: rawValue.price,
+      price: normalizeTextValue(rawValue.price),
       authorIds: rawValue.authorIds,
       subjectIds: rawValue.subjectIds,
     };
@@ -167,10 +168,6 @@ export class BookFormComponent implements OnInit {
   }
 
   private normalizeTerm(value: string): string {
-    return this.normalizeTextValue(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  }
-
-  private normalizeTextValue(value: string): string {
-    return value.trim().replace(/\s+/g, ' ');
+    return normalizeTextValue(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 }

@@ -11,6 +11,7 @@ import { Book, BookUpsertPayload } from '../models/books.models';
 import { PageMetadata, ProblemResponse, SortDirection } from '../models/common.models';
 import { AuthorBookReport } from '../models/reports.models';
 import { Subject } from '../models/subjects.models';
+import { normalizeTextValue } from '../../shared/formatters/text-normalizer';
 
 export interface FlashMessage {
   kind: 'success' | 'error';
@@ -476,14 +477,10 @@ export class CatalogFacadeService {
   private normalizeBookList(filters: BookListState): BookListState {
     return {
       ...filters,
-      title: this.normalizeTextValue(filters.title),
+      title: normalizeTextValue(filters.title),
       authorId: filters.authorId ?? null,
       subjectId: filters.subjectId ?? null,
     };
-  }
-
-  private normalizeTextValue(value: string): string {
-    return value.trim().replace(/\s+/g, ' ');
   }
 
   private async runRequest<T>(operation: () => Promise<T>, fallbackMessage: string): Promise<T | undefined> {
