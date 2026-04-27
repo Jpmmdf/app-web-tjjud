@@ -1,4 +1,4 @@
-FROM maven:3.9.13-eclipse-temurin-21 AS build
+FROM maven:3.9.14-eclipse-temurin-25 AS build
 ARG APP_VERSION=local
 WORKDIR /workspace
 
